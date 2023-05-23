@@ -17,4 +17,11 @@
 	});
 </script>
 
-<div id="map" style="height: 500px;" />
+<div id="map" />
+
+<style>
+	#map {
+		width: 100vw;
+		height: 100vh;
+	}
+</style>

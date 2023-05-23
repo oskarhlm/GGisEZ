@@ -1,8 +1,20 @@
 <script lang="ts">
-	import { Map, Test } from '$lib/components';
+	export const prerender = true;
+
+	import { Map, Sidebar } from '$lib/components';
+	import ToolsDropdown from '$lib/components/AnalysisTools/ToolsDropdown.svelte';
 </script>
 
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
-<Test />
-<Map />
+<Map>
+	<div class="wrapper">
+		<Sidebar />
+		<ToolsDropdown />
+	</div>
+</Map>
+
+<style>
+	.wrapper {
+		height: 100%;
+		/* display: flex; */
+	}
+</style>
