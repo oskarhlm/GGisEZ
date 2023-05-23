@@ -1,14 +1,19 @@
 <script lang="ts">
-	import AnalysisElement from '../AnalysisTools/AnalysisElement.svelte';
+	import SortableList from 'svelte-sortable-list';
+	import ListItem from './ListItem.svelte';
 	const elementNames = ['Buffer', 'Intersect', 'Dissolve'];
+	let list = ['First Item', 'Second Item', 'Third Item'];
+	const sortList = (ev: any) => {
+		list = ev.detail;
+	};
 </script>
 
 <div class="container">
 	<div class="content">
 		<h1 style="margin-top: 0;">Layers</h1>
-		{#each elementNames as e}
-			<!-- <AnalysisElement name={e} /> -->
-		{/each}
+		<SortableList {list} key={null} on:sort={sortList}>
+			<ListItem />
+		</SortableList>
 	</div>
 </div>
 
