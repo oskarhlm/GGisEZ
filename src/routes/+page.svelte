@@ -10,9 +10,8 @@
 	</div>
 </Map>
 
-<style>
+<style lang="scss">
 	.wrapper {
 		height: 100%;
-		/* display: flex; */
 	}
 </style>

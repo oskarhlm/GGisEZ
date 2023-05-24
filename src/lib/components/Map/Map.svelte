@@ -2,18 +2,12 @@
 	import Mapbox from './Mapbox.svelte';
 </script>
 
-<div id="wrapper">
-	<Mapbox />
-	<div id="overlay">
-		<slot />
-	</div>
+<Mapbox />
+<div id="overlay">
+	<slot />
 </div>
 
 <style>
-	#wrapper {
-		/* position: relative; */
-	}
-
 	#overlay {
 		position: absolute;
 		top: 0;

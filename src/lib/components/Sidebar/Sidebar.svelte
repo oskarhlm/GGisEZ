@@ -1,8 +1,8 @@
 <script lang="ts">
 	import SortableList from 'svelte-sortable-list';
 	import ListItem from './ListItem.svelte';
-	const elementNames = ['Buffer', 'Intersect', 'Dissolve'];
-	let list = ['First Item', 'Second Item', 'Third Item'];
+
+	let list = ['point', 'line', 'polygon'];
 	const sortList = (ev: any) => {
 		list = ev.detail;
 	};
@@ -11,23 +11,33 @@
 <div class="container">
 	<div class="content">
 		<h1 style="margin-top: 0;">Layers</h1>
-		<SortableList {list} key={null} on:sort={sortList}>
-			<ListItem />
+		<SortableList {list} key={null} on:sort={sortList} let:item let:index>
+			<ListItem {item} {index} />
 		</SortableList>
 	</div>
 </div>
 
-<style>
+<style lang="scss">
 	.container {
 		width: 250px;
 		height: 100%;
 		border-radius: 20px;
-		background-color: var(--secondary-color);
+		@include transparent-background($secondary-color, 0.8);
 		pointer-events: all;
 	}
 
 	.content {
 		padding: 20px;
-		/* background-color: red; */
+
+		/* :global(ul > li) {
+			border: none;
+			
+		} */
+
+		:global(ul) {
+			:global(li) {
+				border: none;
+			}
+		}
 	}
 </style>

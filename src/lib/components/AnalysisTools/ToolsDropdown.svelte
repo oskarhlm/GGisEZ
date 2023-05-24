@@ -12,7 +12,7 @@
 	<AnalysisElement name="VORNOI" iconPath="button-icons/vornoi.png" />
 </div>
 
-<style>
+<style lang="scss">
 	.container {
 		position: absolute;
 		top: 0;
@@ -21,8 +21,13 @@
 		display: flex;
 		flex-direction: column;
 		gap: 7px;
-		background-color: var(--background-gray);
+		@include transparent-background($background-gray, 0.8);
 		height: fit-content;
 		align-items: center;
+		opacity: 0.8;
+	}
+
+	.container:hover {
+		opacity: 1;
 	}
 </style>

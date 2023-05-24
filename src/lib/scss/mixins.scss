@@ -1,0 +1,3 @@
+@mixin transparent-background($hex, $opacity) {
+	background-color: rgba(red($hex), green($hex), blue($hex), $opacity);
+}

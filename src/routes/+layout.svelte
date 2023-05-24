@@ -1,6 +1,5 @@
-<script lang="ts">
-	import '../styles.scss';
-	import '@fontsource/roboto';
+<script>
+	import './_global.scss';
 </script>
 
 <slot />

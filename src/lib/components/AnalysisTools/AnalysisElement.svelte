@@ -8,11 +8,7 @@
 	<p>{name}</p>
 </button>
 
-<style>
-	:local(.wrapper) {
-		--image-size: 40px;
-	}
-
+<style lang="scss">
 	p {
 		margin: 0;
 		font-size: 12px;
@@ -22,7 +18,7 @@
 	button {
 		border: none;
 		appearance: none;
-		background-color: var(--background-gray);
+		background-color: rgba(0, 0, 0, 0);
 		border-radius: 0;
 		padding: 0;
 		cursor: inherit;
@@ -32,7 +28,7 @@
 	}
 
 	button:hover {
-		background-color: var(--background-gray-brighter);
+		background-color: $background-gray-brighter;
 	}
 
 	.button-icon {
