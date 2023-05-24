@@ -5,16 +5,16 @@
 		<link rel="icon" href="./favicon.png" />
 		<meta name="viewport" content="width=device-width" />
 		<meta http-equiv="content-security-policy" content="">
-		<link href="./_app/immutable/assets/_layout.199e139b.css" rel="stylesheet">
-		<link href="./_app/immutable/assets/_page.473835a7.css" rel="stylesheet">
-		<link rel="modulepreload" href="./_app/immutable/entry/start.195348fa.js">
+		<link href="./_app/immutable/assets/_layout.930627ee.css" rel="stylesheet">
+		<link href="./_app/immutable/assets/_page.13fe35f5.css" rel="stylesheet">
+		<link rel="modulepreload" href="./_app/immutable/entry/start.c3d7758b.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/index.0358d19c.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/singletons.d1f11afb.js">
-		<link rel="modulepreload" href="./_app/immutable/entry/app.c028ccd1.js">
-		<link rel="modulepreload" href="./_app/immutable/entry/_layout.svelte.3b6c9c08.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/singletons.c311090e.js">
+		<link rel="modulepreload" href="./_app/immutable/entry/app.60adf79b.js">
+		<link rel="modulepreload" href="./_app/immutable/entry/_layout.svelte.0094203a.js">
 		<link rel="modulepreload" href="./_app/immutable/entry/_layout.ts.984db11e.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/_layout.da46b06b.js">
-		<link rel="modulepreload" href="./_app/immutable/entry/_page.svelte.4e866e0f.js">
+		<link rel="modulepreload" href="./_app/immutable/entry/_page.svelte.d99c54e6.js">
 		<style>
 			body {
 				margin: 0;
@@ -26,42 +26,54 @@
 		<div style="display: contents">
 
 
-<div id="wrapper" class="svelte-2yqxgr"><div id="map" class="svelte-1g6q6m2"></div>
-	<div id="overlay" class="svelte-2yqxgr"><div class="wrapper svelte-lw0eje"><div class="container svelte-19dqe8b"><div class="content svelte-19dqe8b"><h1 style="margin-top: 0;">Layers</h1>
-		<ul class="svelte-s1iyrp"><li data-index="0" data-id="&quot;First Item&quot;" draggable="true" class="svelte-s1iyrp"><p>undefined yaya</p>
-      </li><li data-index="1" data-id="&quot;Second Item&quot;" draggable="true" class="svelte-s1iyrp"><p>undefined yaya</p>
-      </li><li data-index="2" data-id="&quot;Third Item&quot;" draggable="true" class="svelte-s1iyrp"><p>undefined yaya</p>
+<div id="map" class="svelte-1g6q6m2"></div>
+<div id="overlay" class="svelte-1qfqd2b"><div class="wrapper svelte-1xu623i"><div class="container svelte-2kx4vn"><div class="content svelte-2kx4vn"><h1 style="margin-top: 0;">Layers</h1>
+		<ul class="svelte-s1iyrp"><li data-index="0" data-id="&quot;point&quot;" draggable="true" class="svelte-s1iyrp">
+
+<div class="item svelte-187dxa7"><img class="icon svelte-187dxa7" src="button-icons/point.png" alt="point">
+	<p class="description svelte-187dxa7">Point</p>
+</div>
+      </li><li data-index="1" data-id="&quot;line&quot;" draggable="true" class="svelte-s1iyrp">
+
+<div class="item svelte-187dxa7"><img class="icon svelte-187dxa7" src="button-icons/line.png" alt="line">
+	<p class="description svelte-187dxa7">Line</p>
+</div>
+      </li><li data-index="2" data-id="&quot;polygon&quot;" draggable="true" class="svelte-s1iyrp">
+
+<div class="item svelte-187dxa7"><img class="icon svelte-187dxa7" src="button-icons/polygon.png" alt="polygon">
+	<p class="description svelte-187dxa7">Polygon</p>
+</div>
       </li></ul></div>
 </div>
-		<div class="container svelte-8tpetr"><button class="svelte-19tjkmi"><img class="button-icon svelte-19tjkmi" alt="button" src="button-icons/bbox.png">
-	<p class="svelte-19tjkmi">BBOX</p>
+		<div class="container svelte-1x1k95d"><button class="svelte-15255n0"><img class="button-icon svelte-15255n0" alt="button" src="button-icons/bbox.png">
+	<p class="svelte-15255n0">BBOX</p>
 </button>
-	<button class="svelte-19tjkmi"><img class="button-icon svelte-19tjkmi" alt="button" src="button-icons/buffer.png">
-	<p class="svelte-19tjkmi">BUFFER</p>
+	<button class="svelte-15255n0"><img class="button-icon svelte-15255n0" alt="button" src="button-icons/buffer.png">
+	<p class="svelte-15255n0">BUFFER</p>
 </button>
-	<button class="svelte-19tjkmi"><img class="button-icon svelte-19tjkmi" alt="button" src="button-icons/clip.png">
-	<p class="svelte-19tjkmi">CLIP</p>
+	<button class="svelte-15255n0"><img class="button-icon svelte-15255n0" alt="button" src="button-icons/clip.png">
+	<p class="svelte-15255n0">CLIP</p>
 </button>
-	<button class="svelte-19tjkmi"><img class="button-icon svelte-19tjkmi" alt="button" src="button-icons/difference.png">
-	<p class="svelte-19tjkmi">DIFFERENCE</p>
+	<button class="svelte-15255n0"><img class="button-icon svelte-15255n0" alt="button" src="button-icons/difference.png">
+	<p class="svelte-15255n0">DIFFERENCE</p>
 </button>
-	<button class="svelte-19tjkmi"><img class="button-icon svelte-19tjkmi" alt="button" src="button-icons/intersection.png">
-	<p class="svelte-19tjkmi">INTERSECT</p>
+	<button class="svelte-15255n0"><img class="button-icon svelte-15255n0" alt="button" src="button-icons/intersection.png">
+	<p class="svelte-15255n0">INTERSECT</p>
 </button>
-	<button class="svelte-19tjkmi"><img class="button-icon svelte-19tjkmi" alt="button" src="button-icons/union.png">
-	<p class="svelte-19tjkmi">UNION</p>
+	<button class="svelte-15255n0"><img class="button-icon svelte-15255n0" alt="button" src="button-icons/union.png">
+	<p class="svelte-15255n0">UNION</p>
 </button>
-	<button class="svelte-19tjkmi"><img class="button-icon svelte-19tjkmi" alt="button" src="button-icons/vornoi.png">
-	<p class="svelte-19tjkmi">VORNOI</p>
+	<button class="svelte-15255n0"><img class="button-icon svelte-15255n0" alt="button" src="button-icons/vornoi.png">
+	<p class="svelte-15255n0">VORNOI</p>
 </button>
-</div></div></div>
+</div></div>
 </div>
 
 
 			
 			<script>
 				{
-					__sveltekit_17vfkvp = {
+					__sveltekit_9eo6hl = {
 						env: {},
 						base: new URL(".", location).pathname.slice(0, -1),
 						element: document.currentScript.parentElement
@@ -70,10 +82,10 @@
 					const data = [null,null];
 
 					Promise.all([
-						import("./_app/immutable/entry/start.195348fa.js"),
-						import("./_app/immutable/entry/app.c028ccd1.js")
+						import("./_app/immutable/entry/start.c3d7758b.js"),
+						import("./_app/immutable/entry/app.60adf79b.js")
 					]).then(([kit, app]) => {
-						kit.start(app, __sveltekit_17vfkvp.element, {
+						kit.start(app, __sveltekit_9eo6hl.element, {
 							node_ids: [0, 2],
 							data,
 							form: null,
