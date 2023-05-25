@@ -5,7 +5,7 @@
 	import ListItem from './ListItem.svelte';
 	import { onMount, createEventDispatcher } from 'svelte';
 
-	let list = ['point', 'line', 'polygon'];
+	let list = ['polygon', 'point', 'line'];
 	const sortList = (ev: any) => {
 		list = ev.detail;
 	};
