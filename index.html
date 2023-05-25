@@ -4,17 +4,33 @@
 		<meta charset="utf-8" />
 		<link rel="icon" href="./favicon.png" />
 		<meta name="viewport" content="width=device-width" />
+
+		<!-- Fonts and CSS -->
+		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,600,700"
+		/>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono" />
+
+		<!-- SMUI Styles -->
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/svelte-material-ui@7.0.0-beta.8/bare.css"
+		/>
+
 		<meta http-equiv="content-security-policy" content="">
-		<link href="./_app/immutable/assets/_layout.930627ee.css" rel="stylesheet">
-		<link href="./_app/immutable/assets/_page.13fe35f5.css" rel="stylesheet">
-		<link rel="modulepreload" href="./_app/immutable/entry/start.c3d7758b.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/index.0358d19c.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/singletons.c311090e.js">
-		<link rel="modulepreload" href="./_app/immutable/entry/app.60adf79b.js">
-		<link rel="modulepreload" href="./_app/immutable/entry/_layout.svelte.0094203a.js">
+		<link href="./_app/immutable/assets/_layout.bd5a2515.css" rel="stylesheet">
+		<link href="./_app/immutable/assets/_page.37e36a7e.css" rel="stylesheet">
+		<link rel="modulepreload" href="./_app/immutable/entry/start.beeaf322.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/index.26496cd8.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/singletons.3d7851d8.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/index.06352de7.js">
+		<link rel="modulepreload" href="./_app/immutable/entry/app.fee86cee.js">
+		<link rel="modulepreload" href="./_app/immutable/entry/_layout.svelte.1c26eac7.js">
 		<link rel="modulepreload" href="./_app/immutable/entry/_layout.ts.984db11e.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/_layout.da46b06b.js">
-		<link rel="modulepreload" href="./_app/immutable/entry/_page.svelte.d99c54e6.js">
+		<link rel="modulepreload" href="./_app/immutable/entry/_page.svelte.971aa7bd.js">
 		<style>
 			body {
 				margin: 0;
@@ -27,23 +43,46 @@
 
 
 <div id="map" class="svelte-1g6q6m2"></div>
-<div id="overlay" class="svelte-1qfqd2b"><div class="wrapper svelte-1xu623i"><div class="container svelte-2kx4vn"><div class="content svelte-2kx4vn"><h1 style="margin-top: 0;">Layers</h1>
-		<ul class="svelte-s1iyrp"><li data-index="0" data-id="&quot;point&quot;" draggable="true" class="svelte-s1iyrp">
-
-<div class="item svelte-187dxa7"><img class="icon svelte-187dxa7" src="button-icons/point.png" alt="point">
-	<p class="description svelte-187dxa7">Point</p>
+<div id="overlay" class="svelte-1qfqd2b"><div class="wrapper svelte-1xu623i"><div class="container svelte-ajbrnc"><div class="content svelte-ajbrnc"><span class="layer-title svelte-ajbrnc"><h2 style="margin: 0;">Layers</h2>
+			<i class="material-icons" aria-hidden="true">layers</i></span>
+		<hr class="svelte-ajbrnc">
+		<ul class="svelte-s1iyrp"><li data-index="0" data-id="&quot;point&quot;" draggable="true" class="svelte-s1iyrp"><div class="item svelte-1rtasbz"><img class="icon svelte-1rtasbz" src="button-icons/point.png" alt="point">
+	<p class="description">Point</p>
+	<span class="remove-btn svelte-1rtasbz"><button class="material-icons mdc-icon-button mdc-icon-button--display-flex" style=""><div class="mdc-icon-button__ripple"></div>
+  check</button></span>
+		<div class="mdc-tooltip" style="" aria-hidden="true" id="SMUI-tooltip-0" role="tooltip"><div class="mdc-tooltip__surface mdc-tooltip__surface-animation" style="">Accept layer edit</div>
 </div>
-      </li><li data-index="1" data-id="&quot;line&quot;" draggable="true" class="svelte-s1iyrp">
-
-<div class="item svelte-187dxa7"><img class="icon svelte-187dxa7" src="button-icons/line.png" alt="line">
-	<p class="description svelte-187dxa7">Line</p>
 </div>
-      </li><li data-index="2" data-id="&quot;polygon&quot;" draggable="true" class="svelte-s1iyrp">
-
-<div class="item svelte-187dxa7"><img class="icon svelte-187dxa7" src="button-icons/polygon.png" alt="polygon">
-	<p class="description svelte-187dxa7">Polygon</p>
+      </li><li data-index="1" data-id="&quot;line&quot;" draggable="true" class="svelte-s1iyrp"><div class="item svelte-1rtasbz"><img class="icon svelte-1rtasbz" src="button-icons/line.png" alt="line">
+	<p class="description">Line</p>
+	<span class="remove-btn svelte-1rtasbz"><button class="material-icons mdc-icon-button mdc-icon-button--display-flex" style=""><div class="mdc-icon-button__ripple"></div>
+  check</button></span>
+		<div class="mdc-tooltip" style="" aria-hidden="true" id="SMUI-tooltip-1" role="tooltip"><div class="mdc-tooltip__surface mdc-tooltip__surface-animation" style="">Accept layer edit</div>
 </div>
-      </li></ul></div>
+</div>
+      </li><li data-index="2" data-id="&quot;polygon&quot;" draggable="true" class="svelte-s1iyrp"><div class="item svelte-1rtasbz"><img class="icon svelte-1rtasbz" src="button-icons/polygon.png" alt="polygon">
+	<p class="description">Polygon</p>
+	<span class="remove-btn svelte-1rtasbz"><button class="material-icons mdc-icon-button mdc-icon-button--display-flex" style=""><div class="mdc-icon-button__ripple"></div>
+  check</button></span>
+		<div class="mdc-tooltip" style="" aria-hidden="true" id="SMUI-tooltip-2" role="tooltip"><div class="mdc-tooltip__surface mdc-tooltip__surface-animation" style="">Accept layer edit</div>
+</div>
+</div>
+      </li></ul>
+		<hr style="margin-top: auto" class="svelte-ajbrnc">
+		<span class="file-action-row svelte-ajbrnc"><button class="material-icons mdc-icon-button mdc-icon-button--display-flex" style=""><div class="mdc-icon-button__ripple"></div>
+  upload_file</button>
+				<div class="mdc-tooltip" style="" aria-hidden="true" id="SMUI-tooltip-3" role="tooltip"><div class="mdc-tooltip__surface mdc-tooltip__surface-animation" style="">Upload layers</div>
+</div>
+			<input id="file-upload" multiple type="file" style="display: none;">
+			<button class="material-icons mdc-icon-button mdc-icon-button--display-flex" style=""><div class="mdc-icon-button__ripple"></div>
+  download</button>
+				<div class="mdc-tooltip" style="" aria-hidden="true" id="SMUI-tooltip-4" role="tooltip"><div class="mdc-tooltip__surface mdc-tooltip__surface-animation" style="">Download layer(s)</div>
+</div>
+			<span style="margin-left: auto;"><button class="material-icons mdc-icon-button mdc-icon-button--display-flex" style=""><div class="mdc-icon-button__ripple"></div>
+  rule</button>
+					<div class="mdc-tooltip" style="" aria-hidden="true" id="SMUI-tooltip-5" role="tooltip"><div class="mdc-tooltip__surface mdc-tooltip__surface-animation" style="">Select layers</div>
+</div></span></span>
+		</div>
 </div>
 		<div class="container svelte-1x1k95d"><button class="svelte-15255n0"><img class="button-icon svelte-15255n0" alt="button" src="button-icons/bbox.png">
 	<p class="svelte-15255n0">BBOX</p>
@@ -73,7 +112,7 @@
 			
 			<script>
 				{
-					__sveltekit_9eo6hl = {
+					__sveltekit_1y3jg8p = {
 						env: {},
 						base: new URL(".", location).pathname.slice(0, -1),
 						element: document.currentScript.parentElement
@@ -82,10 +121,10 @@
 					const data = [null,null];
 
 					Promise.all([
-						import("./_app/immutable/entry/start.c3d7758b.js"),
-						import("./_app/immutable/entry/app.60adf79b.js")
+						import("./_app/immutable/entry/start.beeaf322.js"),
+						import("./_app/immutable/entry/app.fee86cee.js")
 					]).then(([kit, app]) => {
-						kit.start(app, __sveltekit_9eo6hl.element, {
+						kit.start(app, __sveltekit_1y3jg8p.element, {
 							node_ids: [0, 2],
 							data,
 							form: null,
