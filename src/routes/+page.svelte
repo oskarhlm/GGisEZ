@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Tooltip, { Wrapper } from '@smui/tooltip';
+
 	import { Map, Sidebar } from '$lib/components';
 	import ToolsDropdown from '$lib/components/AnalysisTools/ToolsDropdown.svelte';
 </script>

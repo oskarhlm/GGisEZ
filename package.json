@@ -16,7 +16,12 @@
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.28.1",
+		"@smui/button": "^7.0.0-beta.8",
+		"@smui/checkbox": "^7.0.0-beta.8",
+		"@smui/fab": "^7.0.0-beta.8",
 		"@smui/icon-button": "^7.0.0-beta.8",
+		"@smui/radio": "^7.0.0-beta.8",
+		"@smui/tooltip": "^7.0.0-beta.8",
 		"@sveltejs/adapter-auto": "^2.0.0",
 		"@sveltejs/adapter-node": "^1.2.3",
 		"@sveltejs/adapter-static": "^2.0.2",
@@ -43,6 +48,7 @@
 		"@types/mapbox-gl": "^2.7.10",
 		"mapbox-gl": "^2.13.0",
 		"node-sass": "^9.0.0",
+		"svelte-material-ui": "^7.0.0-beta.8",
 		"svelte-preprocess": "^5.0.3",
 		"svelte-sortable-list": "^1.1.0"
 	}
