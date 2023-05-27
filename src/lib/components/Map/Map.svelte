@@ -33,8 +33,19 @@
 			zoom: 11
 		});
 
-		const Draw = new MapboxDraw();
-		// map.addControl(Draw, 'top-left');
+		const Draw = new MapboxDraw({
+			displayControlsDefault: false,
+			controls: {
+				point: true,
+				line_string: true,
+				polygon: true,
+				trash: true
+			},
+			// Set mapbox-gl-draw to draw by default.
+			// The user does not have to click the polygon control button first.
+			defaultMode: 'draw_polygon'
+		});
+		map.addControl(Draw, 'top-left');
 	});
 
 	mapSources.subscribe((sources) => {

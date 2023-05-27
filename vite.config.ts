@@ -12,6 +12,7 @@ export default defineConfig({
 				additionalData: `
 				  @import '$lib/scss/mixins';
 					@import '$lib/scss/variables';
+					@import 'src/theme/_smui-theme';
 				`
 			}
 		}

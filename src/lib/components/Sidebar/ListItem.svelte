@@ -1,21 +1,37 @@
 <script lang="ts">
 	import IconButton from '@smui/icon-button';
 	import Tooltip, { Wrapper } from '@smui/tooltip';
-	import type { GeoJSON } from 'geojson';
+	import type { GeoJSON, Geometry, Feature, FeatureCollection } from 'geojson';
 	import { onMount } from 'svelte';
 	import type { MapSource } from '../../../stores/mapSources';
+	import _ from 'lodash';
+	import { isGeometry, isFeature, isFeatureCollection } from '../../utils/geojson';
 
 	export let item: MapSource;
 	export let index: any;
 
-	const featureTypeToIconPath = new Map<
-		'point' | 'line' | 'polygon',
-		{ description: string; iconPath: string }
-	>([
-		['point', { description: 'Point', iconPath: 'button-icons/point.png' }],
-		['line', { description: 'Line', iconPath: 'button-icons/line.png' }],
-		['polygon', { description: 'Polygon', iconPath: 'button-icons/polygon.png' }]
-	]);
+	let geometries: Geometry[];
+
+	if (isGeometry(item.data)) {
+		geometries = [item.data];
+	} else if (isFeature(item.data)) {
+		geometries = [item.data.geometry];
+	} else if (isFeatureCollection(item.data)) {
+		geometries = _.map(item.data.features, (feature) => feature.geometry);
+	}
+
+	function getIconPath(geometry: Geometry) {
+		switch (geometry.type) {
+			case 'Point' || 'MultiPoint':
+				return 'button-icons/point.png';
+			case 'LineString' || 'MultiLineString':
+				return 'button-icons/line.png';
+			case 'Polygon' || 'MultiPolygon':
+				return 'button-icons/polygon.png';
+			case 'GeometryCollection':
+				return undefined;
+		}
+	}
 
 	type layerAction = 'remove' | 'acceptEdit' | 'cancelEdit';
 	let action: layerAction = 'acceptEdit';

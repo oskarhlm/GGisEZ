@@ -8,11 +8,6 @@
 	import GeoJSONReader from '../../utils/fileUploader';
 	import _ from 'lodash';
 
-	// let list = ['polygon', 'point', 'line'];
-	// const sortList = (ev: any) => {
-	// 	list = ev.detail;
-	// };
-
 	const sortList = (ev: any) => {
 		mapSources.set(ev.detail);
 	};
@@ -68,11 +63,11 @@
 				</Wrapper>
 			</span>
 		</span>
-		{#if files}
+		<!-- {#if files}
 			{#each files as file}
 				{file.name}
 			{/each}
-		{/if}
+		{/if} -->
 	</div>
 </div>
 

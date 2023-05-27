@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import type { GeoJSON } from 'geojson';
+import { isFeatureCollection, isGeoJSON } from './geojson';
 
 class GeoJSONReader {
 	cb: (filename: string, data: GeoJSON) => void;
@@ -14,6 +15,17 @@ class GeoJSONReader {
 				const fileContent = e.target.result as string;
 				const jsonData = JSON.parse(fileContent);
 				console.log(jsonData);
+
+				if (!isGeoJSON(jsonData)) {
+					console.error('Not a geojson file!');
+					return;
+				}
+
+				if (isFeatureCollection(jsonData)) {
+					const collections = _.groupBy(jsonData.features, (feature) => feature.geometry.type);
+					console.log(collections);
+				}
+
 				this.cb(filename.replace('.json', ''), jsonData);
 			}
 		};
