@@ -1,8 +1,11 @@
 <script lang="ts">
 	import IconButton from '@smui/icon-button';
 	import Tooltip, { Wrapper } from '@smui/tooltip';
+	import type { GeoJSON } from 'geojson';
+	import { onMount } from 'svelte';
+	import type { MapSource } from '../../../stores/mapSources';
 
-	export let item: any;
+	export let item: MapSource;
 	export let index: any;
 
 	const featureTypeToIconPath = new Map<
@@ -24,8 +27,8 @@
 </script>
 
 <div class="item">
-	<img class="icon" src={featureTypeToIconPath.get(item)?.iconPath} alt={item} />
-	<p class="description">{featureTypeToIconPath.get(item)?.description}</p>
+	<img class="icon" src="button-icons/polygon.png" alt={item.name} />
+	<p class="description">{item.name}</p>
 	<Wrapper>
 		<span class="remove-btn"
 			><IconButton class="material-icons">

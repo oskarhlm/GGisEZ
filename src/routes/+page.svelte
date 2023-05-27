@@ -1,19 +1,20 @@
 <script lang="ts">
-	import Tooltip, { Wrapper } from '@smui/tooltip';
-
 	import { Map, Sidebar } from '$lib/components';
 	import ToolsDropdown from '$lib/components/AnalysisTools/ToolsDropdown.svelte';
 </script>
 
-<Map>
-	<div class="wrapper">
-		<Sidebar />
-		<ToolsDropdown />
-	</div>
-</Map>
+<Map on:variableUpdated />
+<div id="overlay">
+	<Sidebar />
+	<ToolsDropdown />
+</div>
 
 <style lang="scss">
-	.wrapper {
-		height: 100%;
+	#overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		inset: 20px;
+		pointer-events: none;
 	}
 </style>

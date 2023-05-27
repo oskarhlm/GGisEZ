@@ -3,22 +3,33 @@
 	import IconButton, { Icon } from '@smui/icon-button';
 	import SortableList from 'svelte-sortable-list';
 	import ListItem from './ListItem.svelte';
-	import { onMount, createEventDispatcher } from 'svelte';
+	import { onMount } from 'svelte';
+	import { mapSources } from '../../../stores/mapSources';
+	import GeoJSONReader from '../../utils/fileUploader';
+	import _ from 'lodash';
 
-	let list = ['polygon', 'point', 'line'];
+	// let list = ['polygon', 'point', 'line'];
+	// const sortList = (ev: any) => {
+	// 	list = ev.detail;
+	// };
+
 	const sortList = (ev: any) => {
-		list = ev.detail;
+		mapSources.set(ev.detail);
 	};
+
+	const geojsonReader = new GeoJSONReader((name, data) =>
+		mapSources.update((storeData) => [...storeData, { name, data }])
+	);
 
 	let fileInput: HTMLInputElement;
 	let files: FileList;
-	const dispatch = createEventDispatcher();
 
 	function handleFileChange(event: Event) {
 		const inputElement = event.target as HTMLInputElement;
 		if (inputElement.files && inputElement.files.length > 0) {
 			files = inputElement.files;
-			dispatch('filesSelected', files);
+			console.log(files[0].text);
+			geojsonReader.readFiles(files);
 		}
 	}
 
@@ -34,7 +45,7 @@
 			<Icon class="material-icons">layers</Icon></span
 		>
 		<hr />
-		<SortableList {list} key={null} on:sort={sortList} let:item let:index>
+		<SortableList list={$mapSources} key={null} on:sort={sortList} let:item let:index>
 			<ListItem {item} {index} />
 		</SortableList>
 		<hr style="margin-top: auto" />
@@ -66,52 +77,11 @@
 </div>
 
 <style lang="scss">
-	.inputfile-box {
-		position: relative;
-	}
-
-	.inputfile {
-		display: none;
-	}
-
-	.container {
-		display: inline-block;
-		width: 100%;
-	}
-
-	.file-box {
-		display: inline-block;
-		width: 100%;
-		border: 1px solid;
-		padding: 5px 0px 5px 5px;
-		box-sizing: border-box;
-		height: calc(2rem - 2px);
-	}
-
-	.file-button {
-		background: red;
-		padding: 5px;
-		position: absolute;
-		border: 1px solid;
-		top: 0px;
-		right: 0px;
-	}
-
 	.file-action-row {
 		/* margin-left: auto; */
 		display: flex;
 		align-items: center;
 		justify-content: center;
-
-		button {
-			background: none;
-			border: none;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			cursor: pointer;
-			font-size: medium;
-		}
 
 		:global(.material-icons) {
 			background: none;
