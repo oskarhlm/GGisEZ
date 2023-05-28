@@ -4,7 +4,7 @@
 	import SortableList from 'svelte-sortable-list';
 	import ListItem from './ListItem.svelte';
 	import { onMount } from 'svelte';
-	import GeoReader from '../../utils/fileUploader';
+	import { readFiles } from '../../utils/fileUploader';
 	import { mapSources } from '../../../stores/mapSources';
 	import _ from 'lodash';
 
@@ -12,19 +12,15 @@
 		mapSources.set(ev.detail);
 	};
 
-	const geojsonReader = new GeoReader((name, data) =>
-		mapSources.update((storeData) => [...storeData, { name, data }])
-	);
-
 	let fileInput: HTMLInputElement;
 	let files: FileList;
 
-	function handleFileChange(event: Event) {
+	async function handleFileChange(event: Event) {
 		const inputElement = event.target as HTMLInputElement;
 		if (inputElement.files && inputElement.files.length > 0) {
 			files = inputElement.files;
-			console.log(files[0].text);
-			geojsonReader.readFiles(files);
+			const geojsonSources = await readFiles(files);
+			mapSources.update((storesData) => [...storesData, ...geojsonSources]);
 		}
 	}
 
