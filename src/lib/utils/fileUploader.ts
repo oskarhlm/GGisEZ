@@ -1,26 +1,32 @@
 import _ from 'lodash';
-import type { GeoJSON, FeatureCollection } from 'geojson';
+import type {
+	GeoJSON,
+	FeatureCollection,
+	Geometry,
+	Position,
+	GeometryCollection,
+	Point,
+	MultiLineString,
+	MultiPoint,
+	MultiPolygon,
+	LineString,
+	Polygon
+} from 'geojson';
 import { isFeatureCollection, isGeoJSON } from './geojson';
 import { read, openDbf } from 'shapefile';
 import proj4 from 'proj4';
 import type { MapSource } from '../../stores/mapSources';
 
-export async function readFiles(files: FileList) {
-	// const geojsonSources = _.map(files, (file) => readGeoJSONFile(file)).filter(
-	// 	(item): item is Promise<MapSource> => item !== undefined
-	// );
-
-	// return Promise.all(geojsonSources);
-
+export function readFiles(files: FileList) {
 	const groupedFiles = _.groupBy(files, (file) => file.name.split('.')[0]);
 
 	const geoJsonSources = _.flatMap(groupedFiles, (group) => {
 		const shp = group.find((f) => f.name.endsWith('.shp'));
-		const dbf = group.find((f) => f.name.endsWith('.dbf'));
-		const prj = group.find((f) => f.name.endsWith('.prj'));
 		const json = group.find((f) => f.name.endsWith('.json'));
 
 		if (shp) {
+			const dbf = group.find((f) => f.name.endsWith('.dbf'));
+			const prj = group.find((f) => f.name.endsWith('.prj'));
 			return readShp(shp, dbf, prj);
 		} else if (json) {
 			return group.map(readGeoJSONFile);
@@ -32,13 +38,9 @@ export async function readFiles(files: FileList) {
 	);
 
 	return Promise.all(filteredSources);
-
-	// const requests = _.map(files, (file) => new Promise(() => this.readShape(file)));
-
-	// const requests = _.map(files, (file) => new Promise(() => this.readPrj(file)));
 }
 
-export async function getProjString(epsg: string) {
+export async function getProj4String(epsg: string) {
 	const res = await fetch(`https://epsg.io/${epsg}.proj4js`);
 	const str = await res.text();
 	const proj4StringRegex = /"([^"]+)"/g;
@@ -90,7 +92,46 @@ async function readShp(shp: File, dbf?: File, prj?: File): Promise<MapSource> {
 	console.log(properties);
 
 	const converter = prj && (await readPrj(prj));
-	// converter?.forward(proj4)
+	console.log(converter);
+
+	console.log(converter?.forward([276844.4299999997, 7029156.989999998]));
+
+	const convertGeometry = (geometry: Geometry, converter: proj4.Converter): Geometry => {
+		if (geometry.type === 'Point') {
+			return {
+				...geometry,
+				coordinates: converter.forward(geometry.coordinates)
+			};
+		} else if (geometry.type === 'LineString' || geometry.type === 'MultiPoint') {
+			return {
+				...geometry,
+				coordinates: geometry.coordinates.map(converter!.forward)
+			};
+		} else if (geometry.type === 'Polygon' || geometry.type === 'MultiLineString') {
+			return {
+				...geometry,
+				coordinates: geometry.coordinates.map((p) => p.map(converter!.forward))
+			};
+		} else if (geometry.type === 'MultiPolygon') {
+			return {
+				...geometry,
+				coordinates: geometry.coordinates.map((p) => p.map((p) => p.map(converter!.forward)))
+			};
+		} else if (geometry.type === 'GeometryCollection') {
+			return {
+				...geometry,
+				geometries: geometry.geometries.map((g) => convertGeometry(g, converter))
+			} satisfies GeometryCollection;
+		}
+
+		return geometry;
+	};
+
+	converter &&
+		geojsonData.features.forEach((f) => {
+			f.geometry = convertGeometry(f.geometry, converter);
+		});
+	console.log(geojsonData);
 
 	return { name: shp.name, data: geojsonData };
 }
@@ -102,7 +143,7 @@ async function readPrj(file: File) {
 			try {
 				const prjFileContent = e.target?.result;
 				const sourceProjection = prjFileContent?.toString().trim();
-				const targetProjection = await getProjString('4236');
+				const targetProjection = await getProj4String('4326');
 				const converter = proj4(sourceProjection!, targetProjection);
 				resolve(converter);
 			} catch (error) {

@@ -57,10 +57,10 @@
 			});
 			map.addLayer({
 				id: source.name,
-				type: 'fill',
+				type: 'line',
 				source: source.name,
 				paint: {
-					'fill-color': defaultColors[index % defaultColors.length]
+					'line-color': defaultColors[index % defaultColors.length]
 				}
 			});
 		});
