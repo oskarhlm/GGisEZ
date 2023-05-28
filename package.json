@@ -13,7 +13,8 @@
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
 		"format": "prettier --plugin-search-dir . --write .",
 		"deploy": "npm run build && touch build/.nojekyll && gh-pages -d build -t true",
-		"prepare": "smui-theme compile build/smui.css -i src/theme"
+		"prepare": "npm run smui-theme",
+		"smui-theme": "smui-theme compile static/smui.css -i src/theme"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.28.1",
@@ -28,6 +29,9 @@
 		"@sveltejs/adapter-static": "^2.0.2",
 		"@sveltejs/kit": "^1.5.0",
 		"@types/lodash": "^4.14.195",
+		"@types/proj4": "^2.5.2",
+		"@types/shapefile": "^0.6.1",
+		"@types/wellknown": "^0.5.4",
 		"@typescript-eslint/eslint-plugin": "^5.45.0",
 		"@typescript-eslint/parser": "^5.45.0",
 		"eslint": "^8.28.0",
@@ -54,9 +58,13 @@
 		"lodash": "^4.17.21",
 		"mapbox-gl": "^2.13.0",
 		"node-sass": "^9.0.0",
+		"proj4": "^2.9.0",
+		"reproject": "^1.2.7",
+		"shapefile": "^0.6.6",
 		"svelte-material-ui": "^7.0.0-beta.8",
 		"svelte-preprocess": "^5.0.3",
 		"svelte-sortable-list": "^1.1.0",
-		"vanilla-picker": "^2.12.1"
+		"vanilla-picker": "^2.12.1",
+		"wellknown": "^0.5.0"
 	}
 }

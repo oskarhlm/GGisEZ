@@ -45,7 +45,7 @@
 			// The user does not have to click the polygon control button first.
 			defaultMode: 'draw_polygon'
 		});
-		map.addControl(Draw, 'top-left');
+		// map.addControl(Draw, 'top-left');
 	});
 
 	mapSources.subscribe((sources) => {

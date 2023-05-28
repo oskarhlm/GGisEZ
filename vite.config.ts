@@ -7,12 +7,12 @@ export default defineConfig({
 		include: ['src/**/*.{test,spec}.{js,ts}']
 	},
 	css: {
+		postcss: {},
 		preprocessorOptions: {
 			scss: {
 				additionalData: `
 				  @import '$lib/scss/mixins';
 					@import '$lib/scss/variables';
-					@import 'src/theme/_smui-theme';
 				`
 			}
 		}

@@ -4,15 +4,15 @@
 	import SortableList from 'svelte-sortable-list';
 	import ListItem from './ListItem.svelte';
 	import { onMount } from 'svelte';
+	import GeoReader from '../../utils/fileUploader';
 	import { mapSources } from '../../../stores/mapSources';
-	import GeoJSONReader from '../../utils/fileUploader';
 	import _ from 'lodash';
 
 	const sortList = (ev: any) => {
 		mapSources.set(ev.detail);
 	};
 
-	const geojsonReader = new GeoJSONReader((name, data) =>
+	const geojsonReader = new GeoReader((name, data) =>
 		mapSources.update((storeData) => [...storeData, { name, data }])
 	);
 

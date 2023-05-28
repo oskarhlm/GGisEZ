@@ -2,7 +2,6 @@
 	import IconButton from '@smui/icon-button';
 	import Tooltip, { Wrapper } from '@smui/tooltip';
 	import type { GeoJSON, Geometry, Feature, FeatureCollection } from 'geojson';
-	import { onMount } from 'svelte';
 	import type { MapSource } from '../../../stores/mapSources';
 	import _ from 'lodash';
 	import { isGeometry, isFeature, isFeatureCollection } from '../../utils/geojson';
