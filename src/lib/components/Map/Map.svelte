@@ -49,7 +49,7 @@
 	});
 
 	mapSources.subscribe((sources) => {
-		sources.forEach((source) => {
+		sources.forEach((source, index) => {
 			if (map.getSource(source.name)) return;
 			map.addSource(source.name, {
 				type: 'geojson',
@@ -60,7 +60,7 @@
 				type: 'fill',
 				source: source.name,
 				paint: {
-					'fill-color': defaultColors[sources.length % defaultColors.length]
+					'fill-color': defaultColors[index % defaultColors.length]
 				}
 			});
 		});

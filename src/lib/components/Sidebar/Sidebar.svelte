@@ -12,19 +12,18 @@
 		mapSources.set(ev.detail);
 	};
 
-	const geojsonReader = new GeoReader((name, data) =>
-		mapSources.update((storeData) => [...storeData, { name, data }])
-	);
+	const geojsonReader = new GeoReader();
 
 	let fileInput: HTMLInputElement;
 	let files: FileList;
 
-	function handleFileChange(event: Event) {
+	async function handleFileChange(event: Event) {
 		const inputElement = event.target as HTMLInputElement;
 		if (inputElement.files && inputElement.files.length > 0) {
 			files = inputElement.files;
-			console.log(files[0].text);
-			geojsonReader.readFiles(files);
+			const geojsonSources = await Promise.all(geojsonReader.readFiles(files));
+			geojsonSources.forEach((g) => console.log(g));
+			mapSources.update((storesData) => [...storesData, ...geojsonSources]);
 		}
 	}
 

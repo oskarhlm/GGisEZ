@@ -1,59 +1,24 @@
 import _, { every } from 'lodash';
-import type { GeoJSON } from 'geojson';
+import type { GeoJSON, FeatureCollection } from 'geojson';
 import { isFeatureCollection, isGeoJSON } from './geojson';
 import { read, openDbf } from 'shapefile';
 import proj4 from 'proj4';
+import type { MapSource } from '../../stores/mapSources';
 
 class GeoReader {
-	cb: (filename: string, data: GeoJSON) => void;
+	public readFiles(files: FileList) {
+		const geojsonSources = _.map(files, (file) => this.readJSONFile(file)).filter(
+			(item): item is Promise<MapSource> => item !== undefined
+		);
 
-	constructor(cb: (filename: string, data: GeoJSON) => void) {
-		this.cb = cb;
+		return geojsonSources;
+
+		// const requests = _.map(files, (file) => new Promise(() => this.readShape(file)));
+
+		// const requests = _.map(files, (file) => new Promise(() => this.readPrj(file)));
 	}
 
-	setupReader(reader: FileReader, filename: string) {
-		reader.onload = (e: ProgressEvent<FileReader>) => {
-			if (e.target && e.target.result) {
-				const fileContent = e.target.result as string;
-				const geojsonData = JSON.parse(fileContent);
-				console.log(geojsonData);
-
-				if (isFeatureCollection(geojsonData)) {
-					const collections = _.groupBy(geojsonData.features, (feature) => feature.geometry.type);
-					console.log(collections);
-				}
-
-				this.cb(filename.replace('.json', ''), geojsonData);
-			}
-		};
-	}
-
-	readJSONFile(file: File) {
-		if (file.type !== 'application/json') {
-			console.error('Not a json file!');
-			return;
-		}
-
-		const reader = new FileReader();
-		this.setupReader(reader, file.name);
-		reader.readAsText(file);
-	}
-
-	async readPrj(file: File) {
-		const reader = new FileReader();
-
-		reader.onload = async (e: ProgressEvent<FileReader>) => {
-			const prjFileContent = e.target?.result;
-			const sourceProjWkt = prjFileContent?.toString().trim();
-			const targetProj2 = await this.getProjString('4236');
-			const pts = proj4(sourceProjWkt!, targetProj2!, [270344.33, 7041891.63]);
-			console.log(pts);
-		};
-
-		reader.readAsText(file);
-	}
-
-	private async getProjString(epsg: string) {
+	public async getProjString(epsg: string) {
 		const res = await fetch(`https://epsg.io/${epsg}.proj4js`);
 		const str = await res.text();
 		const proj4StringRegex = /"([^"]+)"/g;
@@ -66,30 +31,97 @@ class GeoReader {
 		}
 	}
 
-	async readShape(shp: File, dbf?: File, prj: string = '25833') {
-		const arrayBuffer = await shp.arrayBuffer();
-		if (shp.name.endsWith('.dbf')) {
-			const dbf = await openDbf(arrayBuffer);
-			console.log(await dbf.read());
+	private readJSONFileOld(file: File) {
+		if (file.type !== 'application/json') {
+			console.error('Not a json file!');
 			return;
 		}
 
-		const sourceEPSG = '25833';
-		const targetEPSG = '4326';
-		const geojsonData = await read(arrayBuffer);
+		const reader = new FileReader();
+		reader.onload = (e: ProgressEvent<FileReader>) => {
+			if (e.target && e.target.result) {
+				const fileContent = e.target.result as string;
+				const geojsonData = JSON.parse(fileContent);
+				console.log(geojsonData);
 
+				if (isFeatureCollection(geojsonData)) {
+					const collections = _.groupBy(geojsonData.features, (feature) => feature.geometry.type);
+					console.log(collections);
+				}
+
+				this.cb(file.name.replace('.json', ''), geojsonData);
+			}
+		};
+
+		reader.readAsText(file);
+	}
+
+	private readJSONFile(file: File) {
+		if (file.type !== 'application/json') {
+			console.error('Not a json file!');
+			return;
+		}
+
+		return new Promise<MapSource>((resolve, reject) => {
+			const reader = new FileReader();
+			reader.onload = (e: ProgressEvent<FileReader>) => {
+				if (e.target && e.target.result) {
+					const fileContent = e.target.result as string;
+					const geojsonData = JSON.parse(fileContent);
+					console.log(geojsonData);
+
+					if (isFeatureCollection(geojsonData)) {
+						const collections = _.groupBy(geojsonData.features, (feature) => feature.geometry.type);
+						console.log(collections);
+					}
+
+					resolve({ name: file.name, data: geojsonData });
+				}
+				reject('Could not parse geoJSON file');
+			};
+			reader.readAsText(file);
+		});
+	}
+
+	private async readShp(shp: File, dbf?: File, prj?: File) {
+		const arrayBuffer = await shp.arrayBuffer();
+
+		const geojsonData = await read(arrayBuffer);
 		console.log(geojsonData);
+
+		const properties = dbf && (await this.readDbf(dbf));
+		console.log(properties);
+
+		const converter = prj && (await this.readPrj(prj));
+		// converter?.forward(proj4)
+
 		this.cb(shp.name.replace('.shp', ''), geojsonData);
 	}
 
-	readFiles(files: FileList) {
-		// const requests = _.map(files, (file) => new Promise(() => this.readJSONFile(file)));
-		// Promise.all(requests).then(() => console.log('Done reading files'));
-		// this.getProjString('4326');
-		// const requests = _.map(files, (file) => new Promise(() => this.readShape(file)));
-		// Promise.all(requests).then(() => console.log('Done reading files'));
+	private async readPrj(file: File) {
+		return new Promise<proj4.Converter>((resolve, reject) => {
+			const reader = new FileReader();
+			reader.onload = async (e) => {
+				try {
+					const prjFileContent = e.target?.result;
+					const sourceProjection = prjFileContent?.toString().trim();
+					const targetProjection = await this.getProjString('4236');
+					const converter = proj4(sourceProjection!, targetProjection);
+					resolve(converter);
+				} catch (error) {
+					reject(error);
+				}
+			};
 
-		const requests = _.map(files, (file) => new Promise(() => this.readPrj(file)));
+			reader.readAsText(file);
+		});
+	}
+
+	private async readDbf(file: File) {
+		const arrayBuffer = await file.arrayBuffer();
+		const dbf = await openDbf(arrayBuffer);
+		const properties = (await dbf.read()).value;
+		return properties;
 	}
 }
 
