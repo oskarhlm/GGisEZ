@@ -12,6 +12,10 @@ export function isFeatureCollection(geojson: GeoJSON): geojson is FeatureCollect
 	return (geojson as FeatureCollection).type === 'FeatureCollection';
 }
 
+export function isGeometryCollection(geojson: GeoJSON): geojson is GeometryCollection {
+	return (geojson as GeometryCollection).type === 'GeometryCollection';
+}
+
 export function isGeoJSON(json: any): json is GeoJSON {
 	if (json && typeof json === 'object') {
 		if (json.type === 'FeatureCollection' && Array.isArray(json.features)) {

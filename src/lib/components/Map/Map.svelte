@@ -1,27 +1,49 @@
 <script lang="ts">
 	import mapboxgl from 'mapbox-gl';
+	import type { GeometryCollection } from 'geojson';
 	import 'mapbox-gl/dist/mapbox-gl.css';
 	import MapboxDraw from '@mapbox/mapbox-gl-draw';
 	import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 	import { onMount, createEventDispatcher } from 'svelte';
 	import { mapSources } from '../../../stores/mapSources';
+	import { addLayerWithTypeCheck } from './utils';
 
 	let map: mapboxgl.Map;
-	let draw: MapboxDraw;
-	// const layers =
 
-	const defaultColors: string[] = [
-		'#FF5733',
-		'#F2BE22',
-		'#17BEBB',
-		'#7B68EE',
-		'#FF8C00',
-		'#00BFFF',
-		'#9932CC',
-		'#2E8B57',
-		'#FF1493',
-		'#8B4513'
-	];
+	const geometryCollection: GeometryCollection = {
+		type: 'GeometryCollection',
+		geometries: [
+			{
+				type: 'MultiPolygon',
+				coordinates: [
+					[
+						[
+							[-73, 45],
+							[-76, 46],
+							[-75, 47],
+							[-73, 45]
+						]
+					],
+					[
+						[
+							[-70, 42],
+							[-73, 43],
+							[-72, 44],
+							[-70, 42]
+						]
+					]
+				]
+			},
+			{
+				type: 'MultiPoint',
+				coordinates: [
+					[-72, 44],
+					[-75, 45],
+					[-74, 46]
+				]
+			}
+		]
+	};
 
 	onMount(() => {
 		mapboxgl.accessToken =
@@ -31,6 +53,37 @@
 			style: 'mapbox://styles/mapbox/streets-v11',
 			center: [10.395053, 63.430515],
 			zoom: 11
+		});
+
+		map.on('load', () => {
+			map.addSource('geomColl', {
+				type: 'geojson',
+				data: geometryCollection
+			});
+
+			// 	map.addLayer({
+			// 		id: 'layer',
+			// 		type: 'fill',
+			// 		source: 'geomColl',
+			// 		layout: {},
+			// 		paint: {
+			// 			'fill-color': '#088',
+			// 			'fill-opacity': 0.8
+			// 		}
+			// 	});
+			// 	map.addLayer({
+			// 		id: 'layer2',
+			// 		type: 'circle',
+			// 		source: 'geomColl',
+			// 		layout: {},
+			// 		paint: {
+			// 			'circle-radius': 10,
+			// 			'circle-color': '#088',
+			// 			'circle-opacity': 0.8
+			// 		},
+			// 		filter: ['==', '$type', 'Point']
+			// 	});
+			addLayerWithTypeCheck(map, { name: 'geomColl', data: geometryCollection });
 		});
 
 		const Draw = new MapboxDraw({
@@ -55,14 +108,7 @@
 				type: 'geojson',
 				data: source.data
 			});
-			map.addLayer({
-				id: source.name,
-				type: 'line',
-				source: source.name,
-				paint: {
-					'line-color': defaultColors[index % defaultColors.length]
-				}
-			});
+			addLayerWithTypeCheck(map, source);
 		});
 	});
 

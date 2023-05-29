@@ -59,11 +59,6 @@
 				</Wrapper>
 			</span>
 		</span>
-		<!-- {#if files}
-			{#each files as file}
-				{file.name}
-			{/each}
-		{/if} -->
 	</div>
 </div>
 
