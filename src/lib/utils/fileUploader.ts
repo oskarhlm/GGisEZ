@@ -10,9 +10,10 @@ import type {
 	MultiPoint,
 	MultiPolygon,
 	LineString,
-	Polygon
+	Polygon,
+	GeoJsonProperties
 } from 'geojson';
-import { isFeatureCollection, isGeoJSON } from './geojson';
+import { convertGeometry, isFeatureCollection, isGeoJSON } from './geojson';
 import { read, openDbf } from 'shapefile';
 import proj4 from 'proj4';
 import type { MapSource } from '../../stores/mapSources';
@@ -49,7 +50,7 @@ export async function getProj4String(epsg: string) {
 		const proj4String = match[1].replace(/"/g, '');
 		return proj4String.trim();
 	} else {
-		console.log('Failed to extract Proj4 string.');
+		console.error('Failed to extract Proj4 string.');
 	}
 }
 
@@ -84,56 +85,28 @@ function readGeoJSONFile(file: File) {
 
 async function readShp(shp: File, dbf?: File, prj?: File): Promise<MapSource> {
 	const arrayBuffer = await shp.arrayBuffer();
-
 	const geojsonData = await read(arrayBuffer);
-	console.log(geojsonData);
 
 	const properties = dbf && (await readDbf(dbf));
-	console.log(properties);
+	if (properties && geojsonData.features.length === properties.length) {
+		_.zip(geojsonData.features, properties).forEach(([f, p]) => {
+			_.merge(f, { properties: p });
+		});
+	} else {
+		throw new Error(
+			`Mismatch of features and properties (${geojsonData.features.length} vs. ${properties?.length})`
+		);
+	}
+
+	console.log(geojsonData);
 
 	const converter = prj && (await readPrj(prj));
-	console.log(converter);
-
-	console.log(converter?.forward([276844.4299999997, 7029156.989999998]));
-
-	const convertGeometry = (geometry: Geometry, converter: proj4.Converter): Geometry => {
-		if (geometry.type === 'Point') {
-			return {
-				...geometry,
-				coordinates: converter.forward(geometry.coordinates)
-			};
-		} else if (geometry.type === 'LineString' || geometry.type === 'MultiPoint') {
-			return {
-				...geometry,
-				coordinates: geometry.coordinates.map(converter!.forward)
-			};
-		} else if (geometry.type === 'Polygon' || geometry.type === 'MultiLineString') {
-			return {
-				...geometry,
-				coordinates: geometry.coordinates.map((p) => p.map(converter!.forward))
-			};
-		} else if (geometry.type === 'MultiPolygon') {
-			return {
-				...geometry,
-				coordinates: geometry.coordinates.map((p) => p.map((p) => p.map(converter!.forward)))
-			};
-		} else if (geometry.type === 'GeometryCollection') {
-			return {
-				...geometry,
-				geometries: geometry.geometries.map((g) => convertGeometry(g, converter))
-			} satisfies GeometryCollection;
-		}
-
-		return geometry;
-	};
-
 	converter &&
 		geojsonData.features.forEach((f) => {
 			f.geometry = convertGeometry(f.geometry, converter);
 		});
-	console.log(geojsonData);
 
-	return { name: shp.name, data: geojsonData };
+	return { name: shp.name.split('.')[0], data: geojsonData };
 }
 
 async function readPrj(file: File) {
@@ -158,6 +131,17 @@ async function readPrj(file: File) {
 async function readDbf(file: File) {
 	const arrayBuffer = await file.arrayBuffer();
 	const dbf = await openDbf(arrayBuffer);
-	const properties = (await dbf.read()).value;
-	return properties;
+
+	async function readUntilDone(
+		propertiesArray: GeoJsonProperties[] = []
+	): Promise<GeoJsonProperties[]> {
+		const properties = await dbf.read();
+		if (!properties.done) {
+			return await readUntilDone([...propertiesArray, properties.value]);
+		}
+
+		return propertiesArray;
+	}
+
+	return await readUntilDone();
 }

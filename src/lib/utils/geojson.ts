@@ -1,4 +1,4 @@
-import type { GeoJSON, Geometry, Feature, FeatureCollection } from 'geojson';
+import type { GeoJSON, Geometry, Feature, FeatureCollection, GeometryCollection } from 'geojson';
 
 export function isGeometry(geojson: GeoJSON): geojson is Geometry {
 	return (geojson as Geometry).type !== undefined;
@@ -39,4 +39,35 @@ export function isGeoJSON(json: any): json is GeoJSON {
 		}
 	}
 	return false;
+}
+
+export function convertGeometry(geometry: Geometry, converter: proj4.Converter): Geometry {
+	if (geometry.type === 'Point') {
+		return {
+			...geometry,
+			coordinates: converter.forward(geometry.coordinates)
+		};
+	} else if (geometry.type === 'LineString' || geometry.type === 'MultiPoint') {
+		return {
+			...geometry,
+			coordinates: geometry.coordinates.map(converter!.forward)
+		};
+	} else if (geometry.type === 'Polygon' || geometry.type === 'MultiLineString') {
+		return {
+			...geometry,
+			coordinates: geometry.coordinates.map((p) => p.map(converter!.forward))
+		};
+	} else if (geometry.type === 'MultiPolygon') {
+		return {
+			...geometry,
+			coordinates: geometry.coordinates.map((p) => p.map((p) => p.map(converter!.forward)))
+		};
+	} else if (geometry.type === 'GeometryCollection') {
+		return {
+			...geometry,
+			geometries: geometry.geometries.map((g) => convertGeometry(g, converter))
+		} satisfies GeometryCollection;
+	}
+
+	return geometry;
 }
