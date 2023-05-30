@@ -5,11 +5,13 @@
 	import ListItem from './ListItem.svelte';
 	import { onMount } from 'svelte';
 	import { readFiles } from '../../utils/fileUploader';
-	import { mapSources } from '../../../stores/mapSources';
+	import { mapSources, type MapSource } from '../../../stores/mapSources';
+	import { mapLayers } from '../../../stores/mapLayers';
 	import _ from 'lodash';
 
 	const sortList = (ev: any) => {
-		mapSources.set(ev.detail);
+		// const newList: MapSource[] = ev.detail;
+		// mapSources.set(newList);
 	};
 
 	let fileInput: HTMLInputElement;
@@ -36,7 +38,7 @@
 			<Icon class="material-icons">layers</Icon></span
 		>
 		<hr />
-		<SortableList list={$mapSources} key={null} on:sort={sortList} let:item let:index>
+		<SortableList list={$mapLayers} key={null} on:sort={sortList} let:item let:index>
 			<ListItem {item} {index} />
 		</SortableList>
 		<hr style="margin-top: auto" />

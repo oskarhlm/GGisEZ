@@ -1,4 +1,11 @@
-import type { GeoJSON, Geometry, Feature, FeatureCollection, GeometryCollection } from 'geojson';
+import type {
+	GeoJSON,
+	Geometry,
+	Feature,
+	FeatureCollection,
+	GeometryCollection,
+	GeoJsonTypes
+} from 'geojson';
 
 export function isGeometry(geojson: GeoJSON): geojson is Geometry {
 	return (geojson as Geometry).type !== undefined;
@@ -74,4 +81,34 @@ export function convertGeometry(geometry: Geometry, converter: proj4.Converter):
 	}
 
 	return geometry;
+}
+
+type ValueOf<T> = T[keyof T];
+
+type IncludesEvery<T, U extends T[]> = T extends ValueOf<U> ? true : false;
+
+type WhenIncludesEvery<T, U extends T[]> = IncludesEvery<T, U> extends true ? U : never;
+
+export const enumerate =
+	<T>() =>
+	<U extends T[]>(...elements: WhenIncludesEvery<T, U>): U =>
+		elements;
+
+/**
+ * Denne er litt artig...
+ */
+export function isGeoJsonType(candidate: string): candidate is GeoJsonTypes {
+	const valid = enumerate<GeoJsonTypes>()(
+		'Feature',
+		'FeatureCollection',
+		'GeometryCollection',
+		'LineString',
+		'MultiLineString',
+		'MultiPoint',
+		'MultiPolygon',
+		'Point',
+		'Polygon'
+	);
+
+	return valid.some((value) => candidate === value);
 }

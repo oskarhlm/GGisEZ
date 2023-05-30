@@ -1,6 +1,6 @@
 <script lang="ts">
 	import mapboxgl from 'mapbox-gl';
-	import type { GeometryCollection } from 'geojson';
+	import type { GeometryCollection, Feature } from 'geojson';
 	import 'mapbox-gl/dist/mapbox-gl.css';
 	import MapboxDraw from '@mapbox/mapbox-gl-draw';
 	import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
@@ -9,6 +9,19 @@
 	import { addLayerWithTypeCheck } from './utils';
 
 	let map: mapboxgl.Map;
+
+	const pointFeature: Feature = {
+		type: 'Feature',
+		properties: {
+			capacity: '10',
+			type: 'U-Rack',
+			mount: 'Surface'
+		},
+		geometry: {
+			type: 'Point',
+			coordinates: [-71.073283, 42.4175]
+		}
+	};
 
 	const geometryCollection: GeometryCollection = {
 		type: 'GeometryCollection',
@@ -55,37 +68,6 @@
 			zoom: 11
 		});
 
-		map.on('load', () => {
-			map.addSource('geomColl', {
-				type: 'geojson',
-				data: geometryCollection
-			});
-
-			// 	map.addLayer({
-			// 		id: 'layer',
-			// 		type: 'fill',
-			// 		source: 'geomColl',
-			// 		layout: {},
-			// 		paint: {
-			// 			'fill-color': '#088',
-			// 			'fill-opacity': 0.8
-			// 		}
-			// 	});
-			// 	map.addLayer({
-			// 		id: 'layer2',
-			// 		type: 'circle',
-			// 		source: 'geomColl',
-			// 		layout: {},
-			// 		paint: {
-			// 			'circle-radius': 10,
-			// 			'circle-color': '#088',
-			// 			'circle-opacity': 0.8
-			// 		},
-			// 		filter: ['==', '$type', 'Point']
-			// 	});
-			addLayerWithTypeCheck(map, { name: 'geomColl', data: geometryCollection });
-		});
-
 		const Draw = new MapboxDraw({
 			displayControlsDefault: false,
 			controls: {
@@ -94,15 +76,27 @@
 				polygon: true,
 				trash: true
 			},
-			// Set mapbox-gl-draw to draw by default.
-			// The user does not have to click the polygon control button first.
 			defaultMode: 'draw_polygon'
 		});
 		// map.addControl(Draw, 'top-left');
+
+		map.on('load', function () {
+			map.addSource('source', {
+				type: 'geojson',
+				data: geometryCollection
+			});
+			addLayerWithTypeCheck(map, { name: 'source', data: geometryCollection });
+
+			map.addSource('point-source', {
+				type: 'geojson',
+				data: pointFeature
+			});
+			addLayerWithTypeCheck(map, { name: 'point-source', data: pointFeature });
+		});
 	});
 
 	mapSources.subscribe((sources) => {
-		sources.forEach((source, index) => {
+		sources.forEach((source) => {
 			if (map.getSource(source.name)) return;
 			map.addSource(source.name, {
 				type: 'geojson',

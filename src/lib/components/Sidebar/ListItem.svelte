@@ -5,30 +5,33 @@
 	import type { MapSource } from '../../../stores/mapSources';
 	import _ from 'lodash';
 	import { isGeometry, isFeature, isFeatureCollection } from '../../utils/geojson';
+	import type mapboxgl from 'mapbox-gl';
 
-	export let item: MapSource;
+	// export let item: MapSource;
+	export let item: mapboxgl.AnyLayer;
 	export let index: any;
 
-	let geometries: Geometry[];
+	// let geometries: Geometry[];
 
-	if (isGeometry(item.data)) {
-		geometries = [item.data];
-	} else if (isFeature(item.data)) {
-		geometries = [item.data.geometry];
-	} else if (isFeatureCollection(item.data)) {
-		geometries = _.map(item.data.features, (feature) => feature.geometry);
-	}
+	// if (isGeometry(item.data)) {
+	// 	geometries = [item.data];
+	// } else if (isFeature(item.data)) {
+	// 	geometries = [item.data.geometry];
+	// } else if (isFeatureCollection(item.data)) {
+	// 	geometries = _.map(item.data.features, (feature) => feature.geometry);
+	// }
 
-	function getIconPath(geometry: Geometry) {
-		switch (geometry.type) {
-			case 'Point' || 'MultiPoint':
+	function getIconPath(layer: mapboxgl.AnyLayer) {
+		switch (layer.type) {
+			case 'circle':
 				return 'button-icons/point.png';
-			case 'LineString' || 'MultiLineString':
+			case 'line':
 				return 'button-icons/line.png';
-			case 'Polygon' || 'MultiPolygon':
+			case 'fill':
+			case 'fill-extrusion':
 				return 'button-icons/polygon.png';
-			case 'GeometryCollection':
-				return undefined;
+			default:
+				return 'button-icons/polygon.png';
 		}
 	}
 
@@ -42,8 +45,8 @@
 </script>
 
 <div class="item">
-	<img class="icon" src="button-icons/polygon.png" alt={item.name} />
-	<p class="description">{item.name}</p>
+	<img class="icon" src={getIconPath(item)} alt={item.type} />
+	<p class="description">{item.id}</p>
 	<Wrapper>
 		<span class="remove-btn"
 			><IconButton class="material-icons">
