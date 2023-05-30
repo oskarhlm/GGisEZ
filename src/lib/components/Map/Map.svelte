@@ -7,6 +7,7 @@
 	import { onMount, createEventDispatcher } from 'svelte';
 	import { mapSources } from '../../../stores/mapSources';
 	import { addLayerWithTypeCheck } from './utils';
+	import { mapLayers } from '../../../stores/mapLayers';
 
 	let map: mapboxgl.Map;
 
@@ -81,6 +82,18 @@
 		// map.addControl(Draw, 'top-left');
 
 		map.on('load', function () {
+			mapLayers.subscribeNewLayerIndex((newLayerIndex) => {
+				if (!newLayerIndex) return;
+
+				const { index } = newLayerIndex;
+				const movedLayer = $mapLayers[index];
+				const layerAbove = $mapLayers[index - 1];
+
+				layerAbove ? map.moveLayer(movedLayer.id, layerAbove.id) : map.moveLayer(movedLayer.id);
+				if (movedLayer) {
+					console.log(index, movedLayer.id);
+				}
+			});
 			// map.addSource('source', {
 			// 	type: 'geojson',
 			// 	data: geometryCollection
@@ -104,11 +117,6 @@
 			addLayerWithTypeCheck(map, source);
 		});
 	});
-
-	const dispatch = createEventDispatcher();
-	function handleMapUpdate() {
-		dispatch('variableUpdated', map);
-	}
 </script>
 
 <div id="map" />

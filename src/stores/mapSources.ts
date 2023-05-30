@@ -3,8 +3,6 @@ import type { GeoJSON } from 'geojson';
 
 export type MapSource = { name: string; data: GeoJSON };
 
-// export const mapSources: Writable<MapSource[]> = writable([]);
-
 function createMapSources() {
 	const { subscribe, set, update }: Writable<MapSource[]> = writable([]);
 
@@ -20,7 +18,6 @@ function createMapSources() {
 							.filter((name) => name.startsWith(s.name)).length;
 						s.name += `_${numEqualNamesInStore}`;
 					}
-					console.log(s.name);
 				});
 
 				return [...storeSources, ...newSources];

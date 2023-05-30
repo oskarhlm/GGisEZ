@@ -1,27 +1,25 @@
 <script lang="ts">
 	import Tooltip, { Wrapper } from '@smui/tooltip';
 	import IconButton, { Icon } from '@smui/icon-button';
-	import SortableList from 'svelte-sortable-list';
+	import SortableList from '../../SortableList.svelte';
 	import ListItem from './ListItem.svelte';
 	import { onMount } from 'svelte';
 	import { readFiles } from '../../utils/fileUploader';
-	import { mapSources, type MapSource } from '../../../stores/mapSources';
+	import { mapSources } from '../../../stores/mapSources';
 	import { mapLayers } from '../../../stores/mapLayers';
 	import _ from 'lodash';
-	import type mapboxgl from 'mapbox-gl';
 
 	const sortList = (ev: any) => {
-		const oldList = $mapLayers;
-		const newList: mapboxgl.AnyLayer[] = ev.detail;
-
+		const { newList, from, to } = ev.detail;
+		const movedLayerId = newList[to];
 		mapLayers.set(newList);
+		mapLayers.setNewLayerIndex({ layerId: movedLayerId, index: parseInt(to) });
 	};
 
 	let fileInput: HTMLInputElement;
 	let files: FileList;
 
 	async function handleFileChange(event: Event) {
-		console.log('hæææ');
 		const inputElement = event.target as HTMLInputElement;
 		if (inputElement.files && inputElement.files.length > 0) {
 			files = inputElement.files;
