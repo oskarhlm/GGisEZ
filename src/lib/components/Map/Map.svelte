@@ -81,17 +81,16 @@
 		// map.addControl(Draw, 'top-left');
 
 		map.on('load', function () {
-			map.addSource('source', {
-				type: 'geojson',
-				data: geometryCollection
-			});
-			addLayerWithTypeCheck(map, { name: 'source', data: geometryCollection });
-
-			map.addSource('point-source', {
-				type: 'geojson',
-				data: pointFeature
-			});
-			addLayerWithTypeCheck(map, { name: 'point-source', data: pointFeature });
+			// map.addSource('source', {
+			// 	type: 'geojson',
+			// 	data: geometryCollection
+			// });
+			// addLayerWithTypeCheck(map, { name: 'source', data: geometryCollection });
+			// map.addSource('point-source', {
+			// 	type: 'geojson',
+			// 	data: pointFeature
+			// });
+			// addLayerWithTypeCheck(map, { name: 'point-source', data: pointFeature });
 		});
 	});
 

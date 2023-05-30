@@ -75,7 +75,7 @@ function addPointLayer(map: mapboxgl.Map, source: MapSource, id?: string, filter
 		}
 	};
 	if (filter) newLayer.filter = filter;
-	mapLayers.update((currentLayers) => [...currentLayers, newLayer]);
+	mapLayers.add(newLayer);
 	map.addLayer(newLayer);
 }
 
@@ -89,7 +89,7 @@ function addLineLayer(map: mapboxgl.Map, source: MapSource, id?: string, filter?
 		}
 	};
 	if (filter) newLayer.filter = filter;
-	mapLayers.update((currentLayers) => [...currentLayers, newLayer]);
+	mapLayers.add(newLayer);
 	map.addLayer(newLayer);
 }
 
@@ -103,7 +103,7 @@ function addPolygonLayer(map: mapboxgl.Map, source: MapSource, id?: string, filt
 		}
 	};
 	if (filter) newLayer.filter = filter;
-	mapLayers.update((currentLayers) => [...currentLayers, newLayer]);
+	mapLayers.add(newLayer);
 	map.addLayer(newLayer);
 }
 

@@ -19,6 +19,7 @@ import proj4 from 'proj4';
 import type { MapSource } from '../../stores/mapSources';
 
 export function readFiles(files: FileList) {
+	console.log(files);
 	const groupedFiles = _.groupBy(files, (file) => file.name.split('.')[0]);
 
 	const geoJsonSources = _.flatMap(groupedFiles, (group) => {
@@ -70,7 +71,6 @@ function readGeoJSONFile(file: File) {
 
 				if (isFeatureCollection(geojsonData)) {
 					const collections = _.groupBy(geojsonData.features, (feature) => feature.geometry.type);
-					console.log(collections);
 				}
 
 				resolve({ name: file.name.replace('.json', ''), data: geojsonData });

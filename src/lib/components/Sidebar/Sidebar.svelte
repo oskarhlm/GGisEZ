@@ -8,21 +8,26 @@
 	import { mapSources, type MapSource } from '../../../stores/mapSources';
 	import { mapLayers } from '../../../stores/mapLayers';
 	import _ from 'lodash';
+	import type mapboxgl from 'mapbox-gl';
 
 	const sortList = (ev: any) => {
-		// const newList: MapSource[] = ev.detail;
-		// mapSources.set(newList);
+		const oldList = $mapLayers;
+		const newList: mapboxgl.AnyLayer[] = ev.detail;
+
+		mapLayers.set(newList);
 	};
 
 	let fileInput: HTMLInputElement;
 	let files: FileList;
 
 	async function handleFileChange(event: Event) {
+		console.log('hæææ');
 		const inputElement = event.target as HTMLInputElement;
 		if (inputElement.files && inputElement.files.length > 0) {
 			files = inputElement.files;
 			const geojsonSources = await readFiles(files);
-			mapSources.update((storesData) => [...storesData, ...geojsonSources]);
+			mapSources.add(geojsonSources);
+			inputElement.value = '';
 		}
 	}
 

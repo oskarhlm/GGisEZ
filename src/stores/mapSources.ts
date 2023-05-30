@@ -3,4 +3,29 @@ import type { GeoJSON } from 'geojson';
 
 export type MapSource = { name: string; data: GeoJSON };
 
-export const mapSources: Writable<MapSource[]> = writable([]);
+// export const mapSources: Writable<MapSource[]> = writable([]);
+
+function createMapSources() {
+	const { subscribe, set, update }: Writable<MapSource[]> = writable([]);
+
+	return {
+		subscribe,
+		set,
+		add: (newSources: MapSource[]) =>
+			update((storeSources) => {
+				newSources.forEach((s) => {
+					if (storeSources.map((l) => l.name).includes(s.name)) {
+						const numEqualNamesInStore = storeSources
+							.map((l) => l.name)
+							.filter((name) => name.startsWith(s.name)).length;
+						s.name += `_${numEqualNamesInStore}`;
+					}
+					console.log(s.name);
+				});
+
+				return [...storeSources, ...newSources];
+			})
+	};
+}
+
+export const mapSources = createMapSources();
