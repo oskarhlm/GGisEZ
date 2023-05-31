@@ -2,14 +2,14 @@ import { writable, type Writable } from 'svelte/store';
 import type mapboxgl from 'mapbox-gl';
 import type { GeoJSON } from 'geojson';
 import { enumerate } from '$lib/utils/geojson';
+import type { GeoJSONSourceRaw } from 'mapbox-gl';
 
-export type MapLayer = {
+export type MapLayer<T extends mapboxgl.Layer> = {
 	displayName: string;
-	data: GeoJSON;
-} & mapboxgl.Layer;
+} & T;
 
 function createMapLayers() {
-	const { subscribe, set, update }: Writable<mapboxgl.Layer[]> = writable([]);
+	const { subscribe, set, update }: Writable<MapLayer<mapboxgl.Layer>[]> = writable([]);
 	const {
 		subscribe: subscribeNewLayerIndex,
 		set: setNewLayerIndex
@@ -18,7 +18,7 @@ function createMapLayers() {
 	return {
 		subscribe,
 		set,
-		add: (newLayer: mapboxgl.Layer) =>
+		add: <T extends mapboxgl.Layer>(newLayer: MapLayer<T>) =>
 			update((storeLayers) => {
 				if (storeLayers.map((l) => l.id).includes(newLayer.id)) {
 					const numEqualNamesInStore = storeLayers
@@ -26,6 +26,7 @@ function createMapLayers() {
 						.filter((name) => name.startsWith(newLayer.id)).length;
 					newLayer.id += `_${numEqualNamesInStore}`;
 				}
+				console.log((newLayer.source as GeoJSONSourceRaw).data);
 
 				return [newLayer, ...storeLayers];
 			}),

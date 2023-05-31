@@ -91,20 +91,26 @@
 
 				layerAbove ? map.moveLayer(movedLayer.id, layerAbove.id) : map.moveLayer(movedLayer.id);
 			});
-			// const sourceData: GeoJSONSourceRaw = {
-			// 	type: 'geojson',
-			// 	data: geometryCollection
-			// };
+			const sourceData: GeoJSONSourceRaw = {
+				type: 'geojson',
+				data: geometryCollection
+			};
 			// map.addSource('source', sourceData);
-			// addLayerWithTypeCheck(map, {
-			// 	id: 'source',
-			// 	geojson: sourceData
-			// });
-			// map.addSource('point-source', {
-			// 	type: 'geojson',
-			// 	data: pointFeature
-			// });
-			// addLayerWithTypeCheck(map, { name: 'point-source', data: pointFeature });
+			addLayerWithTypeCheck(map, {
+				id: 'source',
+				geojson: sourceData
+			});
+			map.addSource('point-source', {
+				type: 'geojson',
+				data: pointFeature
+			});
+			addLayerWithTypeCheck(map, {
+				id: 'point-source',
+				geojson: {
+					type: 'geojson',
+					data: pointFeature
+				}
+			});
 		});
 	});
 
