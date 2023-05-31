@@ -15,7 +15,7 @@ import {
 	isGeometry,
 	isGeoJsonType
 } from '$lib/utils/geojson';
-import { mapLayers } from '../../../stores/mapLayers';
+import { mapLayers, type MapLayer } from '../../../stores/mapLayers';
 import _ from 'lodash';
 import type { GeoJSONSource, GeoJSONSourceRaw } from 'mapbox-gl';
 
@@ -35,13 +35,26 @@ const defaultColors: string[] = [
 let colorIndex = 0;
 const nextColor = () => defaultColors[colorIndex++ % defaultColors.length];
 
+function isString(value: unknown): value is string {
+	return typeof value === 'string';
+}
+
+export function isValid(data: GeoJSON | undefined | string): data is GeoJSON {
+	return data !== undefined && !isString(data);
+}
+
 export function addLayerWithTypeCheck(
 	map: mapboxgl.Map,
 	source: MapSource,
 	id?: string,
 	filter?: any[]
 ) {
-	switch (source.data.type) {
+	const data = source.geojson.data;
+	if (!isValid(data)) {
+		throw new Error('Invalid data source');
+	}
+
+	switch (data.type) {
 		case 'Point':
 		case 'MultiPoint':
 			addPointLayer(map, source, id, filter);
@@ -68,9 +81,9 @@ export function addLayerWithTypeCheck(
 
 function addPointLayer(map: mapboxgl.Map, source: MapSource, id?: string, filter?: any[]) {
 	const newLayer: mapboxgl.CircleLayer = {
-		id: id || source.name,
+		id: id || source.id,
 		type: 'circle',
-		source: source.name,
+		source: source.id,
 		paint: {
 			'circle-color': nextColor()
 		}
@@ -82,9 +95,9 @@ function addPointLayer(map: mapboxgl.Map, source: MapSource, id?: string, filter
 
 function addLineLayer(map: mapboxgl.Map, source: MapSource, id?: string, filter?: any[]) {
 	const newLayer: mapboxgl.LineLayer = {
-		id: id || source.name,
+		id: id || source.id,
 		type: 'line',
-		source: source.name,
+		source: source.id,
 		paint: {
 			'line-color': nextColor()
 		}
@@ -96,9 +109,9 @@ function addLineLayer(map: mapboxgl.Map, source: MapSource, id?: string, filter?
 
 function addPolygonLayer(map: mapboxgl.Map, source: MapSource, id?: string, filter?: any[]) {
 	const newLayer: mapboxgl.FillLayer = {
-		id: id || source.name,
+		id: id || source.id,
 		type: 'fill',
-		source: source.name,
+		source: source.id,
 		paint: {
 			'fill-color': nextColor()
 		}
@@ -106,26 +119,24 @@ function addPolygonLayer(map: mapboxgl.Map, source: MapSource, id?: string, filt
 	if (filter) newLayer.filter = filter;
 	mapLayers.add(newLayer);
 	map.addLayer(newLayer);
-	map.on('click', newLayer.id, () => {
-		const stores = map.querySourceFeatures(source.name);
-		console.log(stores.map((s) => s.geometry));
-	});
 }
 
 function addFeature(map: mapboxgl.Map, source: MapSource) {
-	if (!isFeature(source.data)) throw new Error('Not a Feature');
+	const data = source.geojson.data;
+	if (!isValid(data) || !isFeature(data)) throw new Error('Not a Feature');
 
-	addLayerWithTypeCheck(map, { ...source, data: source.data.geometry });
+	addLayerWithTypeCheck(map, { ...source, geojson: source.geojson });
 }
 
 function addGeometryCollection(map: mapboxgl.Map, source: MapSource) {
-	if (!isGeometryCollection(source.data)) throw new Error('Not a GeometryCollection');
+	const data = source.geojson.data;
+	if (!isValid(data) || !isGeometryCollection(data)) throw new Error('Not a GeometryCollection');
 
 	let includesPoints = false;
 	let includesLines = false;
 	let includesPolygons = false;
 
-	const groups = _.groupBy(source.data.geometries, (g) => g.type);
+	const groups = _.groupBy(data.geometries, (g) => g.type);
 	_.forEach(groups, (group, value) => {
 		if (!isGeoJsonType(value)) throw new Error('Not a valid geometry type');
 		if (group.length === 0) return;
@@ -148,20 +159,21 @@ function addGeometryCollection(map: mapboxgl.Map, source: MapSource) {
 		}
 	});
 
-	includesPoints && addPointLayer(map, source, `${source.name}-point`, ['==', '$type', 'Point']);
-	includesLines && addLineLayer(map, source, `${source.name}-line`, ['==', '$type', 'LineString']);
+	includesPoints && addPointLayer(map, source, `${source.id}-point`, ['==', '$type', 'Point']);
+	includesLines && addLineLayer(map, source, `${source.id}-line`, ['==', '$type', 'LineString']);
 	includesPolygons &&
-		addPolygonLayer(map, source, `${source.name}-polygon`, ['==', '$type', 'Polygon']);
+		addPolygonLayer(map, source, `${source.id}-polygon`, ['==', '$type', 'Polygon']);
 }
 
 function addFeatureCollectionLayer(map: mapboxgl.Map, source: MapSource) {
-	if (!isFeatureCollection(source.data)) throw new Error('Not a FeaureCollection');
+	const data = source.geojson.data;
+	if (!isValid(data) || !isFeatureCollection(data)) throw new Error('Not a FeaureCollection');
 
 	let includesPoints = false;
 	let includesLines = false;
 	let includesPolygons = false;
 
-	const groups = _.groupBy(source.data.features, (f) => f.geometry.type);
+	const groups = _.groupBy(data.features, (f) => f.geometry.type);
 	_.forEach(groups, (group, value) => {
 		if (!isGeoJsonType(value)) throw new Error('Not a valid geometry type');
 		if (group.length === 0) return;
@@ -184,8 +196,8 @@ function addFeatureCollectionLayer(map: mapboxgl.Map, source: MapSource) {
 		}
 	});
 
-	includesPoints && addPointLayer(map, source, `${source.name}-point`, ['==', '$type', 'Point']);
-	includesLines && addLineLayer(map, source, `${source.name}-line`, ['==', '$type', 'LineString']);
+	includesPoints && addPointLayer(map, source, `${source.id}-point`, ['==', '$type', 'Point']);
+	includesLines && addLineLayer(map, source, `${source.id}-line`, ['==', '$type', 'LineString']);
 	includesPolygons &&
-		addPolygonLayer(map, source, `${source.name}-polygon`, ['==', '$type', 'Polygon']);
+		addPolygonLayer(map, source, `${source.id}-polygon`, ['==', '$type', 'Polygon']);
 }

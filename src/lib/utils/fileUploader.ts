@@ -73,7 +73,13 @@ function readGeoJSONFile(file: File) {
 					const collections = _.groupBy(geojsonData.features, (feature) => feature.geometry.type);
 				}
 
-				resolve({ name: file.name.replace('.json', ''), data: geojsonData });
+				resolve({
+					id: file.name.replace('.json', ''),
+					geojson: {
+						type: 'geojson',
+						data: geojsonData
+					}
+				});
 			}
 
 			reject('Could not parse geoJSON file');
@@ -106,7 +112,13 @@ async function readShp(shp: File, dbf?: File, prj?: File): Promise<MapSource> {
 			f.geometry = convertGeometry(f.geometry, converter);
 		});
 
-	return { name: shp.name.split('.')[0], data: geojsonData };
+	return {
+		id: shp.name.split('.')[0],
+		geojson: {
+			type: 'geojson',
+			data: geojsonData
+		}
+	};
 }
 
 async function readPrj(file: File) {

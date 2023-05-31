@@ -3,28 +3,10 @@ import type mapboxgl from 'mapbox-gl';
 import type { GeoJSON } from 'geojson';
 import { enumerate } from '$lib/utils/geojson';
 
-type DataLayer = {
+export type MapLayer = {
 	displayName: string;
 	data: GeoJSON;
-} & mapboxgl.AnyLayer;
-
-const ya: DataLayer = {
-	id: 'hihi',
-	type: 'circle',
-	displayName: 'ahha',
-	data: {
-		type: 'Feature',
-		properties: {
-			capacity: '10',
-			type: 'U-Rack',
-			mount: 'Surface'
-		},
-		geometry: {
-			type: 'Point',
-			coordinates: [-71.073283, 42.4175]
-		}
-	}
-};
+} & mapboxgl.Layer;
 
 function createMapLayers() {
 	const { subscribe, set, update }: Writable<mapboxgl.Layer[]> = writable([]);

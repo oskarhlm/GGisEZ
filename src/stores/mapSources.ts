@@ -1,9 +1,9 @@
 import { writable, type Writable } from 'svelte/store';
 import type { GeoJSON } from 'geojson';
-import type { AnySourceData } from 'mapbox-gl';
+import type { GeoJSONSourceRaw } from 'mapbox-gl';
 
-// export type MapSource = { name: string; data: GeoJSON };
-export type MapSource = { name: string; data: GeoJSON };
+// export type MapSource = { id: string; data: GeoJSON };
+export type MapSource = { id: string; geojson: GeoJSONSourceRaw };
 
 function createMapSources() {
 	const { subscribe, set, update }: Writable<MapSource[]> = writable([]);
@@ -14,11 +14,11 @@ function createMapSources() {
 		add: (newSources: MapSource[]) =>
 			update((storeSources) => {
 				newSources.forEach((s) => {
-					if (storeSources.map((l) => l.name).includes(s.name)) {
+					if (storeSources.map((l) => l.id).includes(s.id)) {
 						const numEqualNamesInStore = storeSources
-							.map((l) => l.name)
-							.filter((name) => name.startsWith(s.name)).length;
-						s.name += `_${numEqualNamesInStore}`;
+							.map((l) => l.id)
+							.filter((id) => id.startsWith(s.id)).length;
+						s.id += `_${numEqualNamesInStore}`;
 					}
 				});
 

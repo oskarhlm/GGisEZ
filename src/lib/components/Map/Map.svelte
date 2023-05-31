@@ -1,12 +1,12 @@
 <script lang="ts">
-	import mapboxgl from 'mapbox-gl';
+	import mapboxgl, { type AnySourceData, type GeoJSONSourceRaw } from 'mapbox-gl';
 	import type { GeometryCollection, Feature } from 'geojson';
 	import 'mapbox-gl/dist/mapbox-gl.css';
 	import MapboxDraw from '@mapbox/mapbox-gl-draw';
 	import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 	import { onMount, createEventDispatcher } from 'svelte';
 	import { mapSources } from '../../../stores/mapSources';
-	import { addLayerWithTypeCheck } from './utils';
+	import { addLayerWithTypeCheck, isValid } from './utils';
 	import { mapLayers } from '../../../stores/mapLayers';
 
 	let map: mapboxgl.Map;
@@ -91,11 +91,15 @@
 
 				layerAbove ? map.moveLayer(movedLayer.id, layerAbove.id) : map.moveLayer(movedLayer.id);
 			});
-			// map.addSource('source', {
+			// const sourceData: GeoJSONSourceRaw = {
 			// 	type: 'geojson',
 			// 	data: geometryCollection
+			// };
+			// map.addSource('source', sourceData);
+			// addLayerWithTypeCheck(map, {
+			// 	id: 'source',
+			// 	geojson: sourceData
 			// });
-			// addLayerWithTypeCheck(map, { name: 'source', data: geometryCollection });
 			// map.addSource('point-source', {
 			// 	type: 'geojson',
 			// 	data: pointFeature
@@ -106,11 +110,14 @@
 
 	mapSources.subscribe((sources) => {
 		sources.forEach((source) => {
-			if (map.getSource(source.name)) return;
-			map.addSource(source.name, {
+			if (map.getSource(source.id)) return;
+			const data = source.geojson.data;
+			if (!isValid(data)) return;
+			const sourceData: GeoJSONSourceRaw = {
 				type: 'geojson',
-				data: source.data
-			});
+				data: data
+			};
+			map.addSource(source.id, sourceData);
 			addLayerWithTypeCheck(map, source);
 		});
 	});
