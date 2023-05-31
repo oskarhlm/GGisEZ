@@ -19,7 +19,7 @@
 		border: none;
 		appearance: none;
 		background-color: rgba(0, 0, 0, 0);
-		border-radius: 0;
+		border-radius: 5px;
 		padding: 0;
 		cursor: inherit;
 		width: 100%;

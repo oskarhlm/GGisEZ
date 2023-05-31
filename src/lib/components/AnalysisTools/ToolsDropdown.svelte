@@ -18,6 +18,7 @@
 		top: 0;
 		right: 0;
 		pointer-events: all;
+		border-radius: 5px;
 		display: flex;
 		flex-direction: column;
 		gap: 7px;

@@ -1,6 +1,8 @@
 import { writable, type Writable } from 'svelte/store';
 import type { GeoJSON } from 'geojson';
+import type { AnySourceData } from 'mapbox-gl';
 
+// export type MapSource = { name: string; data: GeoJSON };
 export type MapSource = { name: string; data: GeoJSON };
 
 function createMapSources() {

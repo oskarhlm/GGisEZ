@@ -90,9 +90,6 @@
 				const layerAbove = $mapLayers[index - 1];
 
 				layerAbove ? map.moveLayer(movedLayer.id, layerAbove.id) : map.moveLayer(movedLayer.id);
-				if (movedLayer) {
-					console.log(index, movedLayer.id);
-				}
 			});
 			// map.addSource('source', {
 			// 	type: 'geojson',

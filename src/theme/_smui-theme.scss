@@ -2,13 +2,20 @@
 
 @use '@material/theme/color-palette';
 
-// Svelte Colors!
+$primary-color: #010798;
+$secondary-color: #d0d1e2;
+$highlight-color: #c1fbff;
+$background-gray: #808080;
+$background-gray-brighter: #989898;
+$surface: #fff;
+$error: #a11818;
+
 @use '@material/theme/index' as theme with (
-	$primary: #010798,
-	$secondary: #d0d1e2,
-	$surface: #fff,
-	$background: #808080,
-	$error: #a11818
+	$primary: $primary-color,
+	$secondary: $secondary-color,
+	$surface: $surface,
+	$background: $background-gray,
+	$error: $error
 );
 
 html,

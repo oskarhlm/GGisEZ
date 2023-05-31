@@ -17,6 +17,7 @@ import {
 } from '$lib/utils/geojson';
 import { mapLayers } from '../../../stores/mapLayers';
 import _ from 'lodash';
+import type { GeoJSONSource, GeoJSONSourceRaw } from 'mapbox-gl';
 
 const defaultColors: string[] = [
 	'#FF5733',
@@ -105,6 +106,10 @@ function addPolygonLayer(map: mapboxgl.Map, source: MapSource, id?: string, filt
 	if (filter) newLayer.filter = filter;
 	mapLayers.add(newLayer);
 	map.addLayer(newLayer);
+	map.on('click', newLayer.id, () => {
+		const stores = map.querySourceFeatures(source.name);
+		console.log(stores.map((s) => s.geometry));
+	});
 }
 
 function addFeature(map: mapboxgl.Map, source: MapSource) {
