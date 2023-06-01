@@ -5,15 +5,16 @@
 	import 'mapbox-gl/dist/mapbox-gl.css';
 	import MapboxDraw from '@mapbox/mapbox-gl-draw';
 	import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
-	import { onMount, createEventDispatcher } from 'svelte';
+	import { onMount } from 'svelte';
 	import { mapSources } from '../../../stores/mapSources';
 	import { addLayerWithTypeCheck, isValid } from './utils';
 	import { mapLayers } from '../../../stores/mapLayers';
 	import { get } from 'svelte/store';
 	import Sidebar from '../Sidebar/Sidebar.svelte';
-	import ToolsDropdown from '../AnalysisTools/ToolsDropdown.svelte';
+	import ToolsDropdown, { type Tool } from '../AnalysisTools/ToolsDropdown.svelte';
 
 	let map: mapboxgl.Map;
+	let selectedTool: Tool | null;
 
 	const pointFeature: Feature = {
 		type: 'Feature',
@@ -69,7 +70,7 @@
 		map = new mapboxgl.Map({
 			container: 'map',
 			style: 'mapbox://styles/mapbox/streets-v11',
-			center: [10.395053, 63.430515],
+			center: [10.345053, 63.430515],
 			zoom: 11
 		});
 
@@ -141,8 +142,8 @@
 
 <div id="map" />
 <div id="overlay">
-	<Sidebar {map} />
-	<ToolsDropdown {map} />
+	<Sidebar {map} {selectedTool} />
+	<ToolsDropdown {map} {selectedTool} on:toolSelected={(e) => (selectedTool = e.detail)} />
 </div>
 
 <style lang="scss">
@@ -157,5 +158,6 @@
 		left: 0;
 		inset: 20px;
 		pointer-events: none;
+		display: flex;
 	}
 </style>

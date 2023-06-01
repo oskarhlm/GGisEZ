@@ -27,7 +27,7 @@ function createMapLayers() {
 						.filter((name) => name.startsWith(newLayer.id)).length;
 					newLayer.id += `_${numEqualNamesInStore}`;
 				}
-				console.log((newLayer.source as GeoJSONSourceRaw).data);
+				// console.log((newLayer.source as GeoJSONSourceRaw).data);
 
 				return [newLayer, ...storeLayers];
 			}),

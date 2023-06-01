@@ -1,36 +1,56 @@
+<script lang="ts" context="module">
+	const toolTypeArray = [
+		'bbox',
+		'buffer',
+		'clip',
+		'difference',
+		'intersect',
+		'union',
+		'voronoi'
+	] as const;
+	export type Tool = (typeof toolTypeArray)[number];
+</script>
+
 <script lang="ts">
 	import AnalysisElement from './AnalysisElement.svelte';
 
 	export let map: mapboxgl.Map;
+	export let selectedTool: Tool | null;
+
+	const tools: { name: Tool; iconPath: string }[] = [
+		{ name: 'bbox', iconPath: 'button-icons/bbox.png' },
+		{ name: 'buffer', iconPath: 'button-icons/buffer.png' },
+		{ name: 'clip', iconPath: 'button-icons/clip.png' },
+		{ name: 'difference', iconPath: 'button-icons/difference.png' },
+		{ name: 'intersect', iconPath: 'button-icons/intersection.png' },
+		{ name: 'union', iconPath: 'button-icons/union.png' },
+		{ name: 'voronoi', iconPath: 'button-icons/vornoi.png' }
+	];
 </script>
 
 <div class="container">
-	<AnalysisElement name="BBOX" iconPath="button-icons/bbox.png" />
-	<AnalysisElement name="BUFFER" iconPath="button-icons/buffer.png" />
-	<AnalysisElement name="CLIP" iconPath="button-icons/clip.png" />
-	<AnalysisElement name="DIFFERENCE" iconPath="button-icons/difference.png" />
-	<AnalysisElement name="INTERSECT" iconPath="button-icons/intersection.png" />
-	<AnalysisElement name="UNION" iconPath="button-icons/union.png" />
-	<AnalysisElement name="VORNOI" iconPath="button-icons/vornoi.png" />
+	{#each tools as tool}
+		<AnalysisElement {...tool} selected={tool.name === selectedTool} on:toolSelected />
+	{/each}
 </div>
 
 <style lang="scss">
 	.container {
-		position: absolute;
+		/* position: absolute;
 		top: 0;
-		right: 0;
+		right: 0; */
+		margin-left: 10px;
 		pointer-events: all;
-		border-radius: 5px;
+		/* border-radius: 5px; */
 		display: flex;
 		flex-direction: column;
-		gap: 7px;
-		@include transparent-background($background-gray, 0.8);
+		/* gap: 7px; */
+		@include transparent-background($background-gray, 0.6);
 		height: fit-content;
 		align-items: center;
-		opacity: 0.8;
 	}
 
 	.container:hover {
-		opacity: 1;
+		@include transparent-background($background-gray, 0.8);
 	}
 </style>

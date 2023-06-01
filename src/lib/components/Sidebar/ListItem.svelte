@@ -7,7 +7,7 @@
 		| 'isInvisible'
 		| 'checked'
 		| 'notChecked';
-	export type Action = { tooltip: string; onClick: () => void; muiIcon: string };
+	export type Action = { tooltip?: string; onClick: () => void; muiIcon: string };
 	export type IconButtonDescription = { [key in LayerActionType]: Action };
 </script>
 
@@ -24,12 +24,15 @@
 	export let map: mapboxgl.Map;
 	export let layer: MapLayer<mapboxgl.Layer>;
 	export let selectModeEnabled: boolean;
+
 	let checked = false;
 	let currentAction: LayerActionType;
-	$: currentAction = selectModeEnabled ? 'remove' : checked ? 'checked' : 'notChecked';
+	$: currentAction = !selectModeEnabled ? 'remove' : checked ? 'checked' : 'notChecked';
 
 	let visibility: LayerActionType;
 	$: visibility = layer.isVisible ? 'isVisible' : 'isInvisible';
+
+	let nodeRef: Node;
 
 	function getIconPath(layer: mapboxgl.Layer) {
 		switch (layer.type) {
@@ -68,21 +71,23 @@
 		},
 		remove: {
 			tooltip: 'Remove layer',
-			onClick: () => {
+			onClick: async () => {
 				map.removeLayer(layer.id);
 				mapLayers.deleteLayer(layer.id);
+				nodeRef.parentNode?.removeChild(nodeRef);
+				setTimeout(() => {
+					// console.log('hei');
+				}, 0);
 			},
 			muiIcon: 'delete_outline'
 		},
 		checked: {
-			tooltip: 'Unselect',
 			onClick: () => {
 				checked = false;
 			},
 			muiIcon: 'check_box'
 		},
 		notChecked: {
-			tooltip: 'Select',
 			onClick: () => {
 				checked = true;
 			},
@@ -91,7 +96,7 @@
 	};
 </script>
 
-<div class="item">
+<div class="item" bind:this={nodeRef}>
 	<img class="icon" src={getIconPath(layer)} alt={layer.type} />
 	<p class="description">{layer.displayName}</p>
 	<Wrapper>
@@ -100,7 +105,7 @@
 				{actionDescription[visibility].muiIcon}
 			</IconButton></span
 		>
-		<Tooltip>{actionDescription[visibility].tooltip}</Tooltip>
+		<!-- <Tooltip>{actionDescription[visibility].tooltip}</Tooltip> -->
 	</Wrapper>
 	<Wrapper>
 		<span class="action-btn"
@@ -108,7 +113,9 @@
 				{actionDescription[currentAction].muiIcon}
 			</IconButton></span
 		>
-		<Tooltip>{actionDescription[currentAction].tooltip}</Tooltip>
+		{#if actionDescription[currentAction].tooltip}
+			<Tooltip>{actionDescription[currentAction].tooltip}</Tooltip>
+		{/if}
 	</Wrapper>
 </div>
 

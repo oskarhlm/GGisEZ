@@ -1,11 +1,22 @@
 <script lang="ts">
-	export let name: string;
+	import { createEventDispatcher } from 'svelte';
+	import type { Tool } from './ToolsDropdown.svelte';
+
+	export let name: Tool;
 	export let iconPath: string;
+	export let selected = false;
+
+	const dispatch = createEventDispatcher<{ toolSelected: Tool | null }>();
+
+	function handleSelect() {
+		selected = !selected;
+		dispatch('toolSelected', selected ? name : null);
+	}
 </script>
 
-<button>
+<button class:selected on:click={handleSelect}>
 	<img class="button-icon" alt="button" src={iconPath || 'button-icons/intersection.png'} />
-	<p>{name}</p>
+	<p>{name.toUpperCase()}</p>
 </button>
 
 <style lang="scss">
@@ -16,10 +27,13 @@
 	}
 
 	button {
-		border: none;
+		/* border: none; */
+		border-style: solid;
+		border-width: 2px;
 		appearance: none;
+		border-color: rgba(0, 0, 0, 0);
 		background-color: rgba(0, 0, 0, 0);
-		border-radius: 5px;
+		/* border-radius: 5px; */
 		padding: 0;
 		cursor: inherit;
 		width: 100%;
@@ -29,6 +43,12 @@
 
 	button:hover {
 		background-color: $background-gray-brighter;
+	}
+
+	.selected {
+		background-color: $background-gray-brighter;
+		border-color: $highlight-color;
+		opacity: 1;
 	}
 
 	.button-icon {

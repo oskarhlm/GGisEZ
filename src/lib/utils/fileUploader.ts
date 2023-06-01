@@ -19,7 +19,6 @@ import proj4 from 'proj4';
 import type { MapSource } from '../../stores/mapSources';
 
 export function readFiles(files: FileList) {
-	console.log(files);
 	const groupedFiles = _.groupBy(files, (file) => file.name.split('.')[0]);
 
 	const geoJsonSources = _.flatMap(groupedFiles, (group) => {
@@ -67,7 +66,6 @@ function readGeoJSONFile(file: File) {
 			if (e.target && e.target.result) {
 				const fileContent = e.target.result as string;
 				const geojsonData = JSON.parse(fileContent);
-				console.log(geojsonData);
 
 				if (isFeatureCollection(geojsonData)) {
 					const collections = _.groupBy(geojsonData.features, (feature) => feature.geometry.type);
@@ -103,8 +101,6 @@ async function readShp(shp: File, dbf?: File, prj?: File): Promise<MapSource> {
 			`Mismatch of features and properties (${geojsonData.features.length} vs. ${properties?.length})`
 		);
 	}
-
-	console.log(geojsonData);
 
 	const converter = prj && (await readPrj(prj));
 	converter &&

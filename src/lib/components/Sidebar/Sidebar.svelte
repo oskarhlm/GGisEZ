@@ -10,8 +10,12 @@
 	import _ from 'lodash';
 	import type { LayerActionType } from './ListItem.svelte';
 	import type mapboxgl from 'mapbox-gl';
+	import type { Tool } from '../AnalysisTools/ToolsDropdown.svelte';
+	import Select, { Option } from '@smui/select';
+	import type { MapLayer } from '../../../stores/mapLayers';
 
 	export let map: mapboxgl.Map;
+	export let selectedTool: Tool | null;
 
 	const sortList = (ev: any) => {
 		const { newList, from, to } = ev.detail;
@@ -38,17 +42,38 @@
 	onMount(() => {
 		fileInput.addEventListener('change', handleFileChange);
 	});
+
+	let layerA: MapLayer<mapboxgl.Layer>;
+	let layerB: MapLayer<mapboxgl.Layer>;
 </script>
 
-<div class="container">
+<div class="container pulsating-border">
 	<div class="content">
 		<span class="layer-title"
 			><h2 style="margin: 0;">Layers</h2>
 			<Icon class="material-icons">layers</Icon></span
 		>
 		<hr />
+		{#if selectedTool}
+			<h3>{selectedTool.toUpperCase()}</h3>
+			{#if selectedTool === 'difference'}
+				<Select key={(layer) => `${layer ? layer.id : ''}`} bind:value={layerA} label="Layer 1">
+					<Option value={null} />
+					{#each $mapLayers as layer}
+						<Option value={layer}>{layer.displayName}</Option>
+					{/each}
+				</Select>
+				<Select key={(layer) => `${layer ? layer.id : ''}`} bind:value={layerB} label="Layer 2">
+					<Option value={null} />
+					{#each $mapLayers as layer}
+						<Option value={layer}>{layer.displayName}</Option>
+					{/each}
+				</Select>
+				<span style="margin-top: 20px" />
+			{/if}
+		{/if}
 		<SortableList list={$mapLayers} key={null} on:sort={sortList} let:item>
-			<ListItem layer={item} {selectModeEnabled} {map} />
+			<ListItem layer={item} selectModeEnabled={selectModeEnabled !== null} {map} />
 		</SortableList>
 		<hr style="margin-top: auto" />
 		<span class="file-action-row">
@@ -69,7 +94,7 @@
 						class="material-icons"
 						on:click={() => {
 							selectModeEnabled = !selectModeEnabled;
-						}}>{selectModeEnabled ? 'rule' : 'check'}</IconButton
+						}}>{selectModeEnabled ? 'check' : 'rule'}</IconButton
 					>
 					<Tooltip>Select layers</Tooltip>
 				</Wrapper>
@@ -95,10 +120,15 @@
 	.container {
 		width: 300px;
 		height: 100%;
-		border-radius: 20px;
+		/* border-radius: 20px; */
 		@include transparent-background($secondary-color, 0.9);
 		pointer-events: all;
 		box-sizing: border-box;
+	}
+
+	.pulsating-border {
+		border: 3px solid $secondary-color;
+		animation: border-pulsate 1.5s infinite;
 	}
 
 	.layer-title {
@@ -130,6 +160,8 @@
 		} */
 
 		:global(ul) {
+			margin-block: 0;
+
 			:global(li) {
 				border: none;
 			}
