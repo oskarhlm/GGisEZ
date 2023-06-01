@@ -1,5 +1,7 @@
 <script lang="ts">
 	import AnalysisElement from './AnalysisElement.svelte';
+
+	export let map: mapboxgl.Map;
 </script>
 
 <div class="container">

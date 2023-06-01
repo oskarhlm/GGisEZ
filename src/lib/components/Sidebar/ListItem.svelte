@@ -1,3 +1,16 @@
+<script lang="ts" context="module">
+	export type LayerActionType =
+		| 'remove'
+		| 'acceptEdit'
+		| 'cancelEdit'
+		| 'isVisible'
+		| 'isInvisible'
+		| 'checked'
+		| 'notChecked';
+	export type Action = { tooltip: string; onClick: () => void; muiIcon: string };
+	export type IconButtonDescription = { [key in LayerActionType]: Action };
+</script>
+
 <script lang="ts">
 	import IconButton from '@smui/icon-button';
 	import Tooltip, { Wrapper } from '@smui/tooltip';
@@ -6,10 +19,17 @@
 	import _ from 'lodash';
 	import { isGeometry, isFeature, isFeatureCollection } from '../../utils/geojson';
 	import type mapboxgl from 'mapbox-gl';
-	import { mapLayers } from '../../../stores/mapLayers';
+	import { mapLayers, type MapLayer } from '../../../stores/mapLayers';
 
-	export let layer: mapboxgl.Layer;
-	export let index: any;
+	export let map: mapboxgl.Map;
+	export let layer: MapLayer<mapboxgl.Layer>;
+	export let selectModeEnabled: boolean;
+	let checked = false;
+	let currentAction: LayerActionType;
+	$: currentAction = selectModeEnabled ? 'remove' : checked ? 'checked' : 'notChecked';
+
+	let visibility: LayerActionType;
+	$: visibility = layer.isVisible ? 'isVisible' : 'isInvisible';
 
 	function getIconPath(layer: mapboxgl.Layer) {
 		switch (layer.type) {
@@ -25,44 +45,66 @@
 		}
 	}
 
-	type LayerActionType = 'remove' | 'acceptEdit' | 'cancelEdit' | 'isVisible' | 'isInvisible';
-	type Action = { tooltip: string; callback: () => void; muiIcon: string };
-	let currentAction: LayerActionType = 'isVisible';
-
-	const actionDescription: { [key in LayerActionType]: Action } = {
+	const actionDescription: IconButtonDescription = {
 		acceptEdit: {
 			tooltip: 'Accept layer edit',
-			callback: () => console.log('yayaya'),
+			onClick: () => console.log('yayaya'),
 			muiIcon: 'check'
 		},
-		cancelEdit: { tooltip: 'Cancel edit', callback: () => null, muiIcon: 'do_disturb' },
+		cancelEdit: { tooltip: 'Cancel edit', onClick: () => null, muiIcon: 'do_disturb' },
 		isInvisible: {
 			tooltip: 'Show',
-			callback: () => {
+			onClick: () => {
 				mapLayers.toggleVisibility(layer.id);
-				currentAction = 'isVisible';
 			},
 			muiIcon: 'visibility_off'
 		},
 		isVisible: {
 			tooltip: 'Hide',
-			callback: () => {
+			onClick: () => {
 				mapLayers.toggleVisibility(layer.id);
-				currentAction = 'isInvisible';
 			},
-
 			muiIcon: 'visibility'
 		},
-		remove: { tooltip: 'Accept layer edit', callback: () => null, muiIcon: 'remove' }
+		remove: {
+			tooltip: 'Remove layer',
+			onClick: () => {
+				map.removeLayer(layer.id);
+				mapLayers.deleteLayer(layer.id);
+			},
+			muiIcon: 'delete_outline'
+		},
+		checked: {
+			tooltip: 'Unselect',
+			onClick: () => {
+				checked = false;
+			},
+			muiIcon: 'check_box'
+		},
+		notChecked: {
+			tooltip: 'Select',
+			onClick: () => {
+				checked = true;
+			},
+			muiIcon: 'check_box_outline_blank'
+		}
 	};
 </script>
 
 <div class="item">
 	<img class="icon" src={getIconPath(layer)} alt={layer.type} />
-	<p class="description">{layer.id}</p>
+	<p class="description">{layer.displayName}</p>
 	<Wrapper>
-		<span class="remove-btn"
-			><IconButton class="material-icons" on:click={actionDescription[currentAction].callback}>
+		<span class="visibility-btn"
+			><IconButton class="material-icons" on:click={actionDescription[visibility].onClick}>
+				{actionDescription[visibility].muiIcon}
+			</IconButton></span
+		>
+		<Tooltip>{actionDescription[visibility].tooltip}</Tooltip>
+	</Wrapper>
+	<Wrapper>
+		<span class="action-btn"
+			><IconButton class="material-icons" on:click={actionDescription[currentAction].onClick}>
 				{actionDescription[currentAction].muiIcon}
 			</IconButton></span
 		>
@@ -83,9 +125,17 @@
 		-webkit-user-drag: none;
 	}
 
-	.remove-btn {
+	.visibility-btn {
 		margin-left: auto;
 
+		:global(.material-icons) {
+			background: none;
+			border: none;
+			cursor: pointer;
+		}
+	}
+
+	.visibility-btn {
 		:global(.material-icons) {
 			background: none;
 			border: none;

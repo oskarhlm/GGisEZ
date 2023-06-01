@@ -1,5 +1,6 @@
 <script lang="ts">
-	import mapboxgl, { type AnySourceData, type GeoJSONSourceRaw } from 'mapbox-gl';
+	import mapboxgl from 'mapbox-gl';
+	import type { AnySourceData, GeoJSONSourceRaw } from 'mapbox-gl';
 	import type { GeometryCollection, Feature } from 'geojson';
 	import 'mapbox-gl/dist/mapbox-gl.css';
 	import MapboxDraw from '@mapbox/mapbox-gl-draw';
@@ -8,6 +9,9 @@
 	import { mapSources } from '../../../stores/mapSources';
 	import { addLayerWithTypeCheck, isValid } from './utils';
 	import { mapLayers } from '../../../stores/mapLayers';
+	import { get } from 'svelte/store';
+	import Sidebar from '../Sidebar/Sidebar.svelte';
+	import ToolsDropdown from '../AnalysisTools/ToolsDropdown.svelte';
 
 	let map: mapboxgl.Map;
 
@@ -115,7 +119,6 @@
 		mapLayers.subscribe((layers) => {
 			layers.forEach((layer) => {
 				if (!map.getLayer(layer.id)) return;
-				const visibility = map.getLayoutProperty(layer.id, 'visibility');
 				map.setLayoutProperty(layer.id, 'visibility', layer.isVisible ? 'visible' : 'none');
 			});
 		});
@@ -137,10 +140,22 @@
 </script>
 
 <div id="map" />
+<div id="overlay">
+	<Sidebar {map} />
+	<ToolsDropdown {map} />
+</div>
 
-<style>
+<style lang="scss">
 	#map {
 		width: 100vw;
 		height: 100vh;
+	}
+
+	#overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		inset: 20px;
+		pointer-events: none;
 	}
 </style>

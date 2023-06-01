@@ -1,4 +1,4 @@
-import { writable, type Writable } from 'svelte/store';
+import { writable, type Subscriber, type Writable } from 'svelte/store';
 import type mapboxgl from 'mapbox-gl';
 import type { GeoJSON } from 'geojson';
 import { enumerate } from '$lib/utils/geojson';
@@ -39,6 +39,10 @@ function createMapLayers() {
 				if (!layer) throw new Error('Invalid layer id');
 				layer.isVisible = !layer.isVisible;
 				return storeLayers;
+			}),
+		deleteLayer: (layerId: string) =>
+			update((storeLayers) => {
+				return storeLayers.filter((l) => l.id !== layerId);
 			})
 	};
 }

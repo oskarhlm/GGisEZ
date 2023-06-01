@@ -8,6 +8,10 @@
 	import { mapSources } from '../../../stores/mapSources';
 	import { mapLayers } from '../../../stores/mapLayers';
 	import _ from 'lodash';
+	import type { LayerActionType } from './ListItem.svelte';
+	import type mapboxgl from 'mapbox-gl';
+
+	export let map: mapboxgl.Map;
 
 	const sortList = (ev: any) => {
 		const { newList, from, to } = ev.detail;
@@ -18,6 +22,8 @@
 
 	let fileInput: HTMLInputElement;
 	let files: FileList;
+
+	let selectModeEnabled = false;
 
 	async function handleFileChange(event: Event) {
 		const inputElement = event.target as HTMLInputElement;
@@ -41,8 +47,8 @@
 			<Icon class="material-icons">layers</Icon></span
 		>
 		<hr />
-		<SortableList list={$mapLayers} key={null} on:sort={sortList} let:item let:index>
-			<ListItem layer={item} {index} />
+		<SortableList list={$mapLayers} key={null} on:sort={sortList} let:item>
+			<ListItem layer={item} {selectModeEnabled} {map} />
 		</SortableList>
 		<hr style="margin-top: auto" />
 		<span class="file-action-row">
@@ -59,7 +65,12 @@
 			</Wrapper>
 			<span style="margin-left: auto;">
 				<Wrapper>
-					<IconButton class="material-icons">rule</IconButton>
+					<IconButton
+						class="material-icons"
+						on:click={() => {
+							selectModeEnabled = !selectModeEnabled;
+						}}>{selectModeEnabled ? 'rule' : 'check'}</IconButton
+					>
 					<Tooltip>Select layers</Tooltip>
 				</Wrapper>
 			</span>
@@ -82,7 +93,7 @@
 	}
 
 	.container {
-		width: 250px;
+		width: 300px;
 		height: 100%;
 		border-radius: 20px;
 		@include transparent-background($secondary-color, 0.9);
