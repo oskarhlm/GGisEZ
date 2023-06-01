@@ -5,6 +5,7 @@ import { enumerate } from '$lib/utils/geojson';
 import type { GeoJSONSourceRaw } from 'mapbox-gl';
 
 export type MapLayer<T extends mapboxgl.Layer> = {
+	isVisible: boolean;
 	displayName: string;
 } & T;
 
@@ -31,7 +32,14 @@ function createMapLayers() {
 				return [newLayer, ...storeLayers];
 			}),
 		setNewLayerIndex,
-		subscribeNewLayerIndex
+		subscribeNewLayerIndex,
+		toggleVisibility: (layerId: string) =>
+			update((storeLayers) => {
+				const layer = storeLayers.find((l) => l.id === layerId);
+				if (!layer) throw new Error('Invalid layer id');
+				layer.isVisible = !layer.isVisible;
+				return storeLayers;
+			})
 	};
 }
 

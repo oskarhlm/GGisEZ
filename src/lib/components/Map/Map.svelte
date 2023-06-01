@@ -112,6 +112,13 @@
 				}
 			});
 		});
+		mapLayers.subscribe((layers) => {
+			layers.forEach((layer) => {
+				if (!map.getLayer(layer.id)) return;
+				const visibility = map.getLayoutProperty(layer.id, 'visibility');
+				map.setLayoutProperty(layer.id, 'visibility', layer.isVisible ? 'visible' : 'none');
+			});
+		});
 	});
 
 	mapSources.subscribe((sources) => {

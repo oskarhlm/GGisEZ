@@ -42,7 +42,7 @@
 		>
 		<hr />
 		<SortableList list={$mapLayers} key={null} on:sort={sortList} let:item let:index>
-			<ListItem {item} {index} />
+			<ListItem layer={item} {index} />
 		</SortableList>
 		<hr style="margin-top: auto" />
 		<span class="file-action-row">

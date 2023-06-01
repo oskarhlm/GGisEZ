@@ -87,6 +87,7 @@ function addPointLayer(map: mapboxgl.Map, data: GeoJSON, id: string) {
 		paint: {
 			'circle-color': nextColor()
 		},
+		isVisible: true,
 		displayName: id
 	};
 	mapLayers.add(newLayer);
@@ -104,6 +105,7 @@ function addLineLayer(map: mapboxgl.Map, data: GeoJSON, id: string) {
 		paint: {
 			'line-color': nextColor()
 		},
+		isVisible: true,
 		displayName: id
 	};
 	mapLayers.add(newLayer);
@@ -121,6 +123,7 @@ function addPolygonLayer(map: mapboxgl.Map, data: GeoJSON, id: string) {
 		paint: {
 			'fill-color': nextColor()
 		},
+		isVisible: true,
 		displayName: id
 	};
 	mapLayers.add(newLayer);
