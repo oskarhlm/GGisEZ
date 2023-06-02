@@ -12,8 +12,9 @@
 		"test:unit": "vitest",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
 		"format": "prettier --plugin-search-dir . --write .",
-		"deploy": "npm run build && touch build/.nojekyll && gh-pages -d build -t true",
+		"deploy": "npm run build && npm run prepare-build && touch build/.nojekyll && gh-pages -d build -t true",
 		"prepare": "npm run smui-theme",
+		"prepare-build": "smui-theme compile build/smui.css -i src/theme",
 		"smui-theme": "smui-theme compile static/smui.css -i src/theme"
 	},
 	"devDependencies": {
@@ -54,6 +55,7 @@
 	"dependencies": {
 		"@fontsource/roboto": "^5.0.1",
 		"@mapbox/mapbox-gl-draw": "^1.4.1",
+		"@turf/buffer": "^6.5.0",
 		"@types/mapbox__mapbox-gl-draw": "^1.4.0",
 		"@types/mapbox-gl": "^2.7.10",
 		"lodash": "^4.17.21",

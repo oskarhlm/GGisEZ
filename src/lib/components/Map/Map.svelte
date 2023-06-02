@@ -9,12 +9,13 @@
 	import { mapSources } from '../../../stores/mapSources';
 	import { addLayerWithTypeCheck, isValid } from './utils';
 	import { mapLayers } from '../../../stores/mapLayers';
-	import { get } from 'svelte/store';
 	import Sidebar from '../Sidebar/Sidebar.svelte';
-	import ToolsDropdown, { type Tool } from '../AnalysisTools/ToolsDropdown.svelte';
+	import ToolsDropdown from '../AnalysisTools/ToolsDropdown.svelte';
+	import type { GeoJSON } from 'geojson';
+	import type { GeoJSONTool } from '../GeoJsonProcessing/types';
 
 	let map: mapboxgl.Map;
-	let selectedTool: Tool | null;
+	let selectedTool: GeoJSONTool | null;
 
 	const pointFeature: Feature = {
 		type: 'Feature',

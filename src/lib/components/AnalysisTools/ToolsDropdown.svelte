@@ -1,25 +1,14 @@
-<script lang="ts" context="module">
-	const toolTypeArray = [
-		'bbox',
-		'buffer',
-		'clip',
-		'difference',
-		'intersect',
-		'union',
-		'voronoi'
-	] as const;
-	export type Tool = (typeof toolTypeArray)[number];
-</script>
-
 <script lang="ts">
 	import AnalysisElement from './AnalysisElement.svelte';
+	import { BufferProcessor } from '../GeoJsonProcessing';
+	import type { GeoJSONTool, ToolName } from '../GeoJsonProcessing/types';
 
 	export let map: mapboxgl.Map;
-	export let selectedTool: Tool | null;
+	export let selectedTool: GeoJSONTool | null;
 
-	const tools: { name: Tool; iconPath: string }[] = [
+	const tools: GeoJSONTool[] = [
 		{ name: 'bbox', iconPath: 'button-icons/bbox.png' },
-		{ name: 'buffer', iconPath: 'button-icons/buffer.png' },
+		{ name: 'buffer', iconPath: 'button-icons/buffer.png', geoProcessor: BufferProcessor },
 		{ name: 'clip', iconPath: 'button-icons/clip.png' },
 		{ name: 'difference', iconPath: 'button-icons/difference.png' },
 		{ name: 'intersect', iconPath: 'button-icons/intersection.png' },
@@ -30,7 +19,7 @@
 
 <div class="container">
 	{#each tools as tool}
-		<AnalysisElement {...tool} selected={tool.name === selectedTool} on:toolSelected />
+		<AnalysisElement {tool} selected={tool === selectedTool} on:toolSelected />
 	{/each}
 </div>
 

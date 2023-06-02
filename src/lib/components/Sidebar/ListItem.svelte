@@ -20,6 +20,7 @@
 	import { isGeometry, isFeature, isFeatureCollection } from '../../utils/geojson';
 	import type mapboxgl from 'mapbox-gl';
 	import { mapLayers, type MapLayer } from '../../../stores/mapLayers';
+	import { createEventDispatcher } from 'svelte';
 
 	export let map: mapboxgl.Map;
 	export let layer: MapLayer<mapboxgl.Layer>;
@@ -27,12 +28,15 @@
 
 	let checked = false;
 	let currentAction: LayerActionType;
-	$: currentAction = !selectModeEnabled ? 'remove' : checked ? 'checked' : 'notChecked';
+	$: currentAction = selectModeEnabled ? 'remove' : checked ? 'checked' : 'notChecked';
 
 	let visibility: LayerActionType;
 	$: visibility = layer.isVisible ? 'isVisible' : 'isInvisible';
 
 	let nodeRef: Node;
+
+	const dispatch = createEventDispatcher<{ toggled: MapLayer<mapboxgl.Layer> }>();
+	const handleOnToggled = () => dispatch('toggled', layer);
 
 	function getIconPath(layer: mapboxgl.Layer) {
 		switch (layer.type) {
@@ -83,12 +87,14 @@
 		},
 		checked: {
 			onClick: () => {
+				handleOnToggled();
 				checked = false;
 			},
 			muiIcon: 'check_box'
 		},
 		notChecked: {
 			onClick: () => {
+				handleOnToggled();
 				checked = true;
 			},
 			muiIcon: 'check_box_outline_blank'

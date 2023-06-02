@@ -1,22 +1,21 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-	import type { Tool } from './ToolsDropdown.svelte';
+	import type { GeoJSONTool } from '../GeoJsonProcessing/types';
 
-	export let name: Tool;
-	export let iconPath: string;
+	export let tool: GeoJSONTool;
 	export let selected = false;
 
-	const dispatch = createEventDispatcher<{ toolSelected: Tool | null }>();
+	const dispatch = createEventDispatcher<{ toolSelected: GeoJSONTool | null }>();
 
 	function handleSelect() {
 		selected = !selected;
-		dispatch('toolSelected', selected ? name : null);
+		dispatch('toolSelected', selected ? tool : null);
 	}
 </script>
 
 <button class:selected on:click={handleSelect}>
-	<img class="button-icon" alt="button" src={iconPath || 'button-icons/intersection.png'} />
-	<p>{name.toUpperCase()}</p>
+	<img class="button-icon" alt="button" src={tool.iconPath || 'button-icons/intersection.png'} />
+	<p>{tool.name.toUpperCase()}</p>
 </button>
 
 <style lang="scss">

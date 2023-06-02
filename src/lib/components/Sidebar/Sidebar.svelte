@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Tooltip, { Wrapper } from '@smui/tooltip';
+	import Button, { Label } from '@smui/button';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import SortableList from '../../SortableList.svelte';
 	import ListItem from './ListItem.svelte';
@@ -10,12 +11,13 @@
 	import _ from 'lodash';
 	import type { LayerActionType } from './ListItem.svelte';
 	import type mapboxgl from 'mapbox-gl';
-	import type { Tool } from '../AnalysisTools/ToolsDropdown.svelte';
 	import Select, { Option } from '@smui/select';
 	import type { MapLayer } from '../../../stores/mapLayers';
+	import type { GeoJSONSourceRaw } from 'mapbox-gl';
+	import type { GeoJSONTool } from '../GeoJsonProcessing/types';
 
 	export let map: mapboxgl.Map;
-	export let selectedTool: Tool | null;
+	export let selectedTool: GeoJSONTool | null;
 
 	const sortList = (ev: any) => {
 		const { newList, from, to } = ev.detail;
@@ -28,6 +30,22 @@
 	let files: FileList;
 
 	let selectModeEnabled = false;
+	let selectedLayers: MapLayer<mapboxgl.Layer>[] = [];
+
+	function handleSelectedLayersUpdate(e: CustomEvent<MapLayer<mapboxgl.Layer>>) {
+		const layer = e.detail;
+
+		const data = layer.source as GeoJSONSourceRaw;
+		console.log(data.data);
+
+		const layerIsInArray = selectedLayers.find((l) => l.id === layer.id) !== undefined;
+		if (layerIsInArray) {
+			selectedLayers = selectedLayers.splice(selectedLayers.indexOf(layer), 1);
+			return;
+		}
+
+		selectedLayers = [...selectedLayers, layer];
+	}
 
 	async function handleFileChange(event: Event) {
 		const inputElement = event.target as HTMLInputElement;
@@ -43,8 +61,8 @@
 		fileInput.addEventListener('change', handleFileChange);
 	});
 
-	let layerA: MapLayer<mapboxgl.Layer>;
-	let layerB: MapLayer<mapboxgl.Layer>;
+	let differenceLayerA: MapLayer<mapboxgl.Layer>;
+	let differenceLayerB: MapLayer<mapboxgl.Layer>;
 </script>
 
 <div class="container pulsating-border">
@@ -55,15 +73,23 @@
 		>
 		<hr />
 		{#if selectedTool}
-			<h3>{selectedTool.toUpperCase()}</h3>
-			{#if selectedTool === 'difference'}
-				<Select key={(layer) => `${layer ? layer.id : ''}`} bind:value={layerA} label="Layer 1">
+			<h3>{selectedTool.name.toUpperCase()}</h3>
+			{#if selectedTool.name === 'difference'}
+				<Select
+					key={(layer) => `${layer ? layer.id : ''}`}
+					bind:value={differenceLayerA}
+					label="Layer 1"
+				>
 					<Option value={null} />
 					{#each $mapLayers as layer}
 						<Option value={layer}>{layer.displayName}</Option>
 					{/each}
 				</Select>
-				<Select key={(layer) => `${layer ? layer.id : ''}`} bind:value={layerB} label="Layer 2">
+				<Select
+					key={(layer) => `${layer ? layer.id : ''}`}
+					bind:value={differenceLayerB}
+					label="Layer 2"
+				>
 					<Option value={null} />
 					{#each $mapLayers as layer}
 						<Option value={layer}>{layer.displayName}</Option>
@@ -73,7 +99,12 @@
 			{/if}
 		{/if}
 		<SortableList list={$mapLayers} key={null} on:sort={sortList} let:item>
-			<ListItem layer={item} selectModeEnabled={selectModeEnabled !== null} {map} />
+			<ListItem
+				layer={item}
+				selectModeEnabled={selectModeEnabled !== null}
+				{map}
+				on:toggled={handleSelectedLayersUpdate}
+			/>
 		</SortableList>
 		<hr style="margin-top: auto" />
 		<span class="file-action-row">
@@ -89,7 +120,10 @@
 				<Tooltip>Download layer(s)</Tooltip>
 			</Wrapper>
 			<span style="margin-left: auto;">
-				<Wrapper>
+				<Button variant="unelevated">
+					<Label>Apply</Label>
+				</Button>
+				<!-- <Wrapper>
 					<IconButton
 						class="material-icons"
 						on:click={() => {
@@ -97,7 +131,7 @@
 						}}>{selectModeEnabled ? 'check' : 'rule'}</IconButton
 					>
 					<Tooltip>Select layers</Tooltip>
-				</Wrapper>
+				</Wrapper> -->
 			</span>
 		</span>
 	</div>
