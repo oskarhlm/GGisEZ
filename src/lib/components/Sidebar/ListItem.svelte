@@ -21,14 +21,15 @@
 	import type mapboxgl from 'mapbox-gl';
 	import { mapLayers, type MapLayer } from '../../../stores/mapLayers';
 	import { createEventDispatcher } from 'svelte';
+	import type { GeoJSONTool, Tool } from '../GeoJsonProcessing/types';
 
 	export let map: mapboxgl.Map;
 	export let layer: MapLayer<mapboxgl.Layer>;
-	export let selectModeEnabled: boolean;
+	export let selectedTool: GeoJSONTool | null;
 
 	let checked = false;
 	let currentAction: LayerActionType;
-	$: currentAction = selectModeEnabled ? 'remove' : checked ? 'checked' : 'notChecked';
+	$: currentAction = !selectedTool ? 'remove' : checked ? 'checked' : 'notChecked';
 
 	let visibility: LayerActionType;
 	$: visibility = layer.isVisible ? 'isVisible' : 'isInvisible';

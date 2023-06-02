@@ -15,6 +15,7 @@
 	import type { MapLayer } from '../../../stores/mapLayers';
 	import type { GeoJSONSourceRaw } from 'mapbox-gl';
 	import type { GeoJSONTool } from '../GeoJsonProcessing/types';
+	import { addLayerWithTypeCheck } from '../Map/utils';
 
 	export let map: mapboxgl.Map;
 	export let selectedTool: GeoJSONTool | null;
@@ -29,22 +30,38 @@
 	let fileInput: HTMLInputElement;
 	let files: FileList;
 
-	let selectModeEnabled = false;
 	let selectedLayers: MapLayer<mapboxgl.Layer>[] = [];
+
+	function handleApplyTransformation() {
+		if (
+			!selectedTool ||
+			!selectedTool.geoProcessor ||
+			!selectedTool.geoProcessor?.validator(selectedLayers)
+		)
+			return;
+
+		const newLayer = selectedTool.geoProcessor.processor(selectedLayers);
+		addLayerWithTypeCheck(map, {
+			id: 'test_buffer',
+			geojson: {
+				type: 'geojson',
+				data: newLayer
+			}
+		});
+	}
 
 	function handleSelectedLayersUpdate(e: CustomEvent<MapLayer<mapboxgl.Layer>>) {
 		const layer = e.detail;
-
-		const data = layer.source as GeoJSONSourceRaw;
-		console.log(data.data);
-
 		const layerIsInArray = selectedLayers.find((l) => l.id === layer.id) !== undefined;
 		if (layerIsInArray) {
-			selectedLayers = selectedLayers.splice(selectedLayers.indexOf(layer), 1);
+			selectedLayers = selectedLayers.filter((l) => l.id !== layer.id);
+			// selectedLayers.map((l) => l.id).forEach(console.log);
+			// if (selectedLayers.length === 0) console.log('Empty!');
 			return;
 		}
 
 		selectedLayers = [...selectedLayers, layer];
+		// selectedLayers.map((l) => l.id).forEach(console.log);
 	}
 
 	async function handleFileChange(event: Event) {
@@ -99,12 +116,7 @@
 			{/if}
 		{/if}
 		<SortableList list={$mapLayers} key={null} on:sort={sortList} let:item>
-			<ListItem
-				layer={item}
-				selectModeEnabled={selectModeEnabled !== null}
-				{map}
-				on:toggled={handleSelectedLayersUpdate}
-			/>
+			<ListItem layer={item} {selectedTool} {map} on:toggled={handleSelectedLayersUpdate} />
 		</SortableList>
 		<hr style="margin-top: auto" />
 		<span class="file-action-row">
@@ -120,7 +132,7 @@
 				<Tooltip>Download layer(s)</Tooltip>
 			</Wrapper>
 			<span style="margin-left: auto;">
-				<Button variant="unelevated">
+				<Button variant="unelevated" on:click={handleApplyTransformation}>
 					<Label>Apply</Label>
 				</Button>
 				<!-- <Wrapper>
