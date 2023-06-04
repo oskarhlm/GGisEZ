@@ -1,6 +1,8 @@
 <script lang="ts">
 	import Slider from '@smui/slider';
 	import Button from '@smui/button';
+	import Textfield from '@smui/textfield';
+
 	import FormField from '@smui/form-field/src/FormField.svelte';
 	import Select, { Option } from '@smui/select';
 	import type { Units } from '@turf/helpers';
@@ -8,20 +10,33 @@
 
 	export let updateOptions: (neweValue: any) => void;
 
-	const unitsArray: Units[] = ['meters', 'kilometers', 'nauticalmiles', 'acres'];
+	const unitsArray: Units[] = ['meters', 'kilometers'];
 	let units: Units = 'kilometers';
 	let radius = 1;
 
+	let radiusText = radius.toString();
+	let oldRadiusText = radiusText;
+
 	$: {
+		if (radiusText && radiusText !== oldRadiusText) {
+			radius = parseInt(radiusText);
+		}
+
+		radiusText = radius.toString();
+		oldRadiusText = radiusText;
+
 		updateOptions({ radius, units } satisfies BufferOptions);
 	}
 </script>
 
 <span style="display: flex; align-items: center;">
-	<FormField align="end" style="flex: 1;">
-		<Slider style="width: 100%;" bind:value={radius} />
-	</FormField>
-	<p>{radius}</p>
+	{#if units === 'kilometers'}
+		<Slider style="width: 100%;" bind:value={radius} min={1} max={50} step={1} />
+	{:else if units === 'meters'}
+		<Slider style="width: 100%;" bind:value={radius} min={1} max={1000} step={1} />
+	{/if}
+	<!-- <Textfield bind:value={radiusText} /> -->
+	<p>{radius.toFixed(0)}</p>
 </span>
 
 <Select bind:value={units} label="Unit: ">

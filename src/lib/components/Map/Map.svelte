@@ -1,3 +1,24 @@
+<script lang="ts" context="module">
+	export const tools: GeoJSONTool[] = [
+		{ name: 'bbox', iconPath: 'button-icons/bbox.png' },
+		{
+			name: 'buffer',
+			iconPath: 'button-icons/buffer.png',
+			geoProcessor: BufferProcessor,
+			optionsComponent: BufferOptions
+		},
+		{ name: 'clip', iconPath: 'button-icons/clip.png' },
+		{ name: 'difference', iconPath: 'button-icons/difference.png' },
+		{
+			name: 'intersect',
+			iconPath: 'button-icons/intersection.png',
+			geoProcessor: IntersectProcessor
+		},
+		{ name: 'union', iconPath: 'button-icons/union.png', geoProcessor: UnionProcessor },
+		{ name: 'voronoi', iconPath: 'button-icons/vornoi.png' }
+	];
+</script>
+
 <script lang="ts">
 	import mapboxgl from 'mapbox-gl';
 	import type { AnySourceData, GeoJSONSourceRaw } from 'mapbox-gl';
@@ -13,6 +34,8 @@
 	import ToolsDropdown from '../AnalysisTools/ToolsDropdown.svelte';
 	import type { GeoJSON } from 'geojson';
 	import type { GeoJSONTool } from '../GeoJsonProcessing/types';
+	import { BufferProcessor, IntersectProcessor, UnionProcessor } from '../GeoJsonProcessing';
+	import BufferOptions from '../Sidebar/ToolOptions/BufferOptions.svelte';
 
 	let map: mapboxgl.Map;
 	let selectedTool: GeoJSONTool | null;
@@ -143,8 +166,8 @@
 
 <div id="map" />
 <div id="overlay">
-	<Sidebar {map} {selectedTool} />
-	<ToolsDropdown {map} {selectedTool} on:toolSelected={(e) => (selectedTool = e.detail)} />
+	<Sidebar {map} bind:selectedTool />
+	<ToolsDropdown bind:selectedTool on:toolSelected={(e) => (selectedTool = e.detail)} />
 </div>
 
 <style lang="scss">

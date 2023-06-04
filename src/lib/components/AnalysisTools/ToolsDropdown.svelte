@@ -1,42 +1,9 @@
 <script lang="ts">
 	import AnalysisElement from './AnalysisElement.svelte';
-	import { BufferProcessor, IntersectProcessor } from '../GeoJsonProcessing';
 	import type { GeoJSONTool, ToolName } from '../GeoJsonProcessing/types';
-	import BufferOptions from '../Sidebar/ToolOptions/BufferOptions.svelte';
-	import IntersectOptions from '../Sidebar/ToolOptions/IntersectOptions.svelte';
+	import { tools } from '../Map/Map.svelte';
 
-	export let map: mapboxgl.Map;
 	export let selectedTool: GeoJSONTool | null;
-
-	const tools: GeoJSONTool[] = [
-		{ name: 'bbox', iconPath: 'button-icons/bbox.png' },
-		{
-			name: 'buffer',
-			iconPath: 'button-icons/buffer.png',
-			geoProcessor: BufferProcessor,
-			optionsComponent: BufferOptions
-		},
-		{ name: 'clip', iconPath: 'button-icons/clip.png' },
-		{ name: 'difference', iconPath: 'button-icons/difference.png' },
-		{
-			name: 'intersect',
-			iconPath: 'button-icons/intersection.png',
-			geoProcessor: IntersectProcessor,
-			optionsComponent: IntersectOptions
-		},
-		{ name: 'union', iconPath: 'button-icons/union.png' },
-		{ name: 'voronoi', iconPath: 'button-icons/vornoi.png' }
-	];
-
-	// const tools: GeoJSONTools = {
-	// 	bbox: { iconPath: 'button-icons/bbox.png' },
-	// 	buffer: { iconPath: 'button-icons/buffer.png', geoProcessor: BufferProcessor },
-	// 	clip: { iconPath: 'button-icons/clip.png' },
-	// 	difference: { iconPath: 'button-icons/difference.png' },
-	// 	intersect: { iconPath: 'button-icons/intersection.png' },
-	// 	union: {iconPath: 'button-icons/union.png' },
-	// 	voronoi: { iconPath: 'button-icons/vornoi.png' }
-	// }
 </script>
 
 <div class="container">

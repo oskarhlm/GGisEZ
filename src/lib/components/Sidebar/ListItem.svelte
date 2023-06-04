@@ -26,10 +26,12 @@
 	export let map: mapboxgl.Map;
 	export let layer: MapLayer<mapboxgl.Layer>;
 	export let selectedTool: GeoJSONTool | null;
+	export let selectModeEnabled: boolean;
 
 	let checked = false;
 	let currentAction: LayerActionType;
-	$: currentAction = !selectedTool ? 'remove' : checked ? 'checked' : 'notChecked';
+	$: currentAction =
+		!selectedTool && !selectModeEnabled ? 'remove' : checked ? 'checked' : 'notChecked';
 
 	let visibility: LayerActionType;
 	$: visibility = layer.isVisible ? 'isVisible' : 'isInvisible';
@@ -80,9 +82,6 @@
 				map.removeLayer(layer.id);
 				mapLayers.deleteLayer(layer.id);
 				nodeRef.parentNode?.removeChild(nodeRef);
-				setTimeout(() => {
-					// console.log('hei');
-				}, 0);
 			},
 			muiIcon: 'delete_outline'
 		},
@@ -112,7 +111,6 @@
 				{actionDescription[visibility].muiIcon}
 			</IconButton></span
 		>
-		<!-- <Tooltip>{actionDescription[visibility].tooltip}</Tooltip> -->
 	</Wrapper>
 	<Wrapper>
 		<span class="action-btn"

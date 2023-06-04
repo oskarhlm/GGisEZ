@@ -10,14 +10,6 @@ import type {
 import type { GeoJSONProcessor } from './types';
 import buffer from '@turf/buffer';
 import type { Units } from '@turf/helpers';
-
-import {
-	isFeature,
-	isFeatureCollection,
-	isGeometry,
-	isGeometryCollection
-} from '$lib/utils/geojson';
-import { isValid } from '../Map/utils';
 import type { MapLayer } from '../../../stores/mapLayers';
 import type mapboxgl from 'mapbox-gl';
 import _ from 'lodash';
@@ -28,9 +20,7 @@ export type BufferOptions = { radius: number; units: Units };
 function bufferProcessor(input: MapLayer<mapboxgl.Layer>[], options?: BufferOptions) {
 	const sources = input.map((l) => l.source) as GeoJSONSourceRaw[];
 	const data: any = sources.map((s) => s.data);
-	console.log(data);
 	const buf = buffer(data[0], options?.radius || 1, { units: options?.units || 'kilometers' });
-	console.log(buf);
 	return buf;
 }
 

@@ -1,4 +1,4 @@
-import type { GeoJSON } from 'geojson';
+import type { GeoJSON, Feature, FeatureCollection } from 'geojson';
 import type { MapLayer } from '../../../stores/mapLayers';
 import type mapboxgl from 'mapbox-gl';
 import type { SvelteComponent } from 'svelte';
@@ -40,6 +40,7 @@ export type Tool<Input extends MapLayer<mapboxgl.Layer>[], Output extends GeoJSO
 // export type GeoJSONTools = Tools<GeoJSON, GeoJSON>;
 // export type GeoJSONTool = Tool<MapLayer<mapboxgl.Layer>[], GeoJSON>;
 export type GeoJSONTool = Tool<any, GeoJSON | null>;
+// export type GeoJSONTool = Tool<any, Feature | FeatureCollection | null>;
 
 export type GeoJSONProcessor<
 	Input, // extends MapLayer<mapboxgl.Layer>[],

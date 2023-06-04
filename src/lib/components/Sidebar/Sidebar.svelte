@@ -9,54 +9,54 @@
 	import { mapSources } from '../../../stores/mapSources';
 	import { mapLayers } from '../../../stores/mapLayers';
 	import _ from 'lodash';
-	import type { LayerActionType } from './ListItem.svelte';
 	import type mapboxgl from 'mapbox-gl';
-	import Select, { Option } from '@smui/select';
 	import type { MapLayer } from '../../../stores/mapLayers';
 	import type { GeoJSONSourceRaw } from 'mapbox-gl';
 	import type { GeoJSONTool } from '../GeoJsonProcessing/types';
 	import { addLayerWithTypeCheck } from '../Map/utils';
-	import { BufferProcessor } from '../GeoJsonProcessing';
-	import type { GeoJSON } from 'geojson';
-	import BufferOptions from './ToolOptions/BufferOptions.svelte';
 
 	export let map: mapboxgl.Map;
 	export let selectedTool: GeoJSONTool | null;
 
-	const sortList = (ev: any) => {
-		const { newList, from, to } = ev.detail;
-		const movedLayerId = newList[to];
-		mapLayers.set(newList);
-		mapLayers.setNewLayerIndex({ layerId: movedLayerId, index: parseInt(to) });
-	};
-
 	let fileInput: HTMLInputElement;
 	let files: FileList;
 
+	let selectModeEnabled = false;
 	let selectedLayers: MapLayer<mapboxgl.Layer>[] = [];
+
 	let options: any;
 
 	function updateOptions(newOptions: any) {
 		options = newOptions;
 	}
 
+	function sortList(ev: any) {
+		const { newList, from, to } = ev.detail;
+		const movedLayerId = newList[to];
+		mapLayers.set(newList);
+		mapLayers.setNewLayerIndex({ layerId: movedLayerId, index: parseInt(to) });
+	}
+
 	function handleApplyTransformation() {
+		console.log(selectedTool);
 		if (!selectedTool?.geoProcessor?.validator(selectedLayers)) return;
 		const [poly1, poly2] = _.map(selectedLayers, (l) => {
 			const source = l.source as GeoJSONSourceRaw;
 			return source.data;
 		});
 
-		console.log(poly1, poly2);
-		const newLayer = selectedTool?.geoProcessor?.processor(selectedLayers, options);
-		newLayer &&
+		const result = selectedTool?.geoProcessor?.processor(selectedLayers, options);
+
+		result &&
 			addLayerWithTypeCheck(map, {
-				id: 'test_buffer',
+				id: selectedTool.name,
 				geojson: {
 					type: 'geojson',
-					data: newLayer
+					data: result
 				}
 			});
+
+		selectedTool = null;
 	}
 
 	function handleSelectedLayersUpdate(e: CustomEvent<MapLayer<mapboxgl.Layer>>) {
@@ -96,9 +96,17 @@
 			<h3>{selectedTool?.name.toUpperCase()}</h3>
 			<svelte:component this={selectedTool.optionsComponent} {updateOptions} />
 		{/if}
+		<!-- <div> -->
 		<SortableList list={$mapLayers} key={null} on:sort={sortList} let:item>
-			<ListItem layer={item} {selectedTool} {map} on:toggled={handleSelectedLayersUpdate} />
+			<ListItem
+				layer={item}
+				bind:selectModeEnabled
+				bind:selectedTool
+				{map}
+				on:toggled={handleSelectedLayersUpdate}
+			/>
 		</SortableList>
+		<!-- </div> -->
 		<hr style="margin-top: auto" />
 		<span class="file-action-row">
 			<Wrapper>
@@ -113,18 +121,24 @@
 				<Tooltip>Download layer(s)</Tooltip>
 			</Wrapper>
 			<span style="margin-left: auto;">
-				<Button variant="unelevated" on:click={handleApplyTransformation}>
-					<Label>Apply</Label>
-				</Button>
-				<!-- <Wrapper>
-					<IconButton
-						class="material-icons"
-						on:click={() => {
-							selectModeEnabled = !selectModeEnabled;
-						}}>{selectModeEnabled ? 'check' : 'rule'}</IconButton
-					>
-					<Tooltip>Select layers</Tooltip>
-				</Wrapper> -->
+				{#if selectedTool}
+					<Button variant="unelevated" on:click={handleApplyTransformation}>
+						<Label>Apply</Label>
+					</Button>
+					<Button variant="outlined" on:click={() => (selectedTool = null)}>
+						<Label>Cancel</Label>
+					</Button>
+				{:else}
+					<Wrapper>
+						<IconButton
+							class="material-icons"
+							on:click={() => {
+								selectModeEnabled = !selectModeEnabled;
+							}}>{selectModeEnabled ? 'check' : 'rule'}</IconButton
+						>
+						<Tooltip>Select layers</Tooltip>
+					</Wrapper>
+				{/if}
 			</span>
 		</span>
 	</div>
@@ -145,7 +159,7 @@
 	}
 
 	.container {
-		width: 300px;
+		width: 350px;
 		height: 100%;
 		/* border-radius: 20px; */
 		@include transparent-background($secondary-color, 0.9);
@@ -186,8 +200,12 @@
 			border: none;
 		} */
 
+		:global(::-webkit-scrollbar) {
+			width: 10px;
+		}
 		:global(ul) {
 			margin-block: 0;
+			overflow-y: scroll;
 
 			:global(li) {
 				border: none;

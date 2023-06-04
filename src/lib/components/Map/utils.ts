@@ -77,7 +77,7 @@ export function addLayerWithTypeCheck(map: mapboxgl.Map, source: MapSource, id?:
 }
 
 function addPointLayer(map: mapboxgl.Map, data: GeoJSON, id: string) {
-	const newLayer: MapLayer<mapboxgl.CircleLayer> = {
+	let newLayer: MapLayer<mapboxgl.CircleLayer> = {
 		id: id + '-point',
 		type: 'circle',
 		source: {
@@ -90,12 +90,13 @@ function addPointLayer(map: mapboxgl.Map, data: GeoJSON, id: string) {
 		isVisible: true,
 		displayName: id
 	};
+	newLayer = mapLayers.getUniqueLayerId(newLayer);
 	mapLayers.add(newLayer);
 	map.addLayer(newLayer);
 }
 
 function addLineLayer(map: mapboxgl.Map, data: GeoJSON, id: string) {
-	const newLayer: MapLayer<mapboxgl.LineLayer> = {
+	let newLayer: MapLayer<mapboxgl.LineLayer> = {
 		id: id + '-line',
 		type: 'line',
 		source: {
@@ -108,12 +109,13 @@ function addLineLayer(map: mapboxgl.Map, data: GeoJSON, id: string) {
 		isVisible: true,
 		displayName: id
 	};
+	newLayer = mapLayers.getUniqueLayerId(newLayer);
 	mapLayers.add(newLayer);
 	map.addLayer(newLayer);
 }
 
 function addPolygonLayer(map: mapboxgl.Map, data: GeoJSON, id: string) {
-	const newLayer: MapLayer<mapboxgl.FillLayer> = {
+	let newLayer: MapLayer<mapboxgl.FillLayer> = {
 		id: id + '-polygon',
 		type: 'fill',
 		source: {
@@ -126,6 +128,7 @@ function addPolygonLayer(map: mapboxgl.Map, data: GeoJSON, id: string) {
 		isVisible: true,
 		displayName: id
 	};
+	newLayer = mapLayers.getUniqueLayerId(newLayer);
 	mapLayers.add(newLayer);
 	map.addLayer(newLayer);
 }
