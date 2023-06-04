@@ -1,8 +1,8 @@
 // export { default as BufferProcessor } from './buffer';
 export { default as BufferProcessor } from './buffer';
-import type { GeoJSONTool } from './types';
-
+export { default as IntersectProcessor } from './intersect';
 export { toolNamesArray, type ToolName } from './types';
+
 // export const tools: GeoJSONTools = {
 // 	bbox: { iconPath: 'button-icons/bbox.png' },
 // 	buffer: { iconPath: 'button-icons/buffer.png', geoProcessor: BufferProcessor },

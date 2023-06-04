@@ -16,6 +16,9 @@
 	import type { GeoJSONSourceRaw } from 'mapbox-gl';
 	import type { GeoJSONTool } from '../GeoJsonProcessing/types';
 	import { addLayerWithTypeCheck } from '../Map/utils';
+	import { BufferProcessor } from '../GeoJsonProcessing';
+	import type { GeoJSON } from 'geojson';
+	import BufferOptions from './ToolOptions/BufferOptions.svelte';
 
 	export let map: mapboxgl.Map;
 	export let selectedTool: GeoJSONTool | null;
@@ -31,23 +34,29 @@
 	let files: FileList;
 
 	let selectedLayers: MapLayer<mapboxgl.Layer>[] = [];
+	let options: any;
+
+	function updateOptions(newOptions: any) {
+		options = newOptions;
+	}
 
 	function handleApplyTransformation() {
-		if (
-			!selectedTool ||
-			!selectedTool.geoProcessor ||
-			!selectedTool.geoProcessor?.validator(selectedLayers)
-		)
-			return;
-
-		const newLayer = selectedTool.geoProcessor.processor(selectedLayers);
-		addLayerWithTypeCheck(map, {
-			id: 'test_buffer',
-			geojson: {
-				type: 'geojson',
-				data: newLayer
-			}
+		if (!selectedTool?.geoProcessor?.validator(selectedLayers)) return;
+		const [poly1, poly2] = _.map(selectedLayers, (l) => {
+			const source = l.source as GeoJSONSourceRaw;
+			return source.data;
 		});
+
+		console.log(poly1, poly2);
+		const newLayer = selectedTool?.geoProcessor?.processor(selectedLayers, options);
+		newLayer &&
+			addLayerWithTypeCheck(map, {
+				id: 'test_buffer',
+				geojson: {
+					type: 'geojson',
+					data: newLayer
+				}
+			});
 	}
 
 	function handleSelectedLayersUpdate(e: CustomEvent<MapLayer<mapboxgl.Layer>>) {
@@ -55,13 +64,10 @@
 		const layerIsInArray = selectedLayers.find((l) => l.id === layer.id) !== undefined;
 		if (layerIsInArray) {
 			selectedLayers = selectedLayers.filter((l) => l.id !== layer.id);
-			// selectedLayers.map((l) => l.id).forEach(console.log);
-			// if (selectedLayers.length === 0) console.log('Empty!');
 			return;
 		}
 
 		selectedLayers = [...selectedLayers, layer];
-		// selectedLayers.map((l) => l.id).forEach(console.log);
 	}
 
 	async function handleFileChange(event: Event) {
@@ -77,9 +83,6 @@
 	onMount(() => {
 		fileInput.addEventListener('change', handleFileChange);
 	});
-
-	let differenceLayerA: MapLayer<mapboxgl.Layer>;
-	let differenceLayerB: MapLayer<mapboxgl.Layer>;
 </script>
 
 <div class="container pulsating-border">
@@ -90,30 +93,8 @@
 		>
 		<hr />
 		{#if selectedTool}
-			<h3>{selectedTool.name.toUpperCase()}</h3>
-			{#if selectedTool.name === 'difference'}
-				<Select
-					key={(layer) => `${layer ? layer.id : ''}`}
-					bind:value={differenceLayerA}
-					label="Layer 1"
-				>
-					<Option value={null} />
-					{#each $mapLayers as layer}
-						<Option value={layer}>{layer.displayName}</Option>
-					{/each}
-				</Select>
-				<Select
-					key={(layer) => `${layer ? layer.id : ''}`}
-					bind:value={differenceLayerB}
-					label="Layer 2"
-				>
-					<Option value={null} />
-					{#each $mapLayers as layer}
-						<Option value={layer}>{layer.displayName}</Option>
-					{/each}
-				</Select>
-				<span style="margin-top: 20px" />
-			{/if}
+			<h3>{selectedTool?.name.toUpperCase()}</h3>
+			<svelte:component this={selectedTool.optionsComponent} {updateOptions} />
 		{/if}
 		<SortableList list={$mapLayers} key={null} on:sort={sortList} let:item>
 			<ListItem layer={item} {selectedTool} {map} on:toggled={handleSelectedLayersUpdate} />

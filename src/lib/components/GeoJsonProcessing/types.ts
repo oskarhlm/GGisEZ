@@ -1,6 +1,7 @@
 import type { GeoJSON } from 'geojson';
 import type { MapLayer } from '../../../stores/mapLayers';
 import type mapboxgl from 'mapbox-gl';
+import type { SvelteComponent } from 'svelte';
 
 export const toolNamesArray = [
 	'bbox',
@@ -13,10 +14,11 @@ export const toolNamesArray = [
 ] as const;
 export type ToolName = (typeof toolNamesArray)[number];
 
-export type Tool<Input extends MapLayer<mapboxgl.Layer>[], Output extends GeoJSON> = {
+export type Tool<Input extends MapLayer<mapboxgl.Layer>[], Output extends GeoJSON | null> = {
 	name: ToolName;
 	iconPath: string;
-	geoProcessor?: GeoJSONProcessor<Input, Output | undefined>;
+	geoProcessor?: GeoJSONProcessor<Input, Output | undefined, any, any>;
+	optionsComponent?: any;
 };
 
 // export type Tool<Input extends GeoJSON, Output extends GeoJSON> = {
@@ -36,12 +38,15 @@ export type Tool<Input extends MapLayer<mapboxgl.Layer>[], Output extends GeoJSO
 // };
 
 // export type GeoJSONTools = Tools<GeoJSON, GeoJSON>;
-export type GeoJSONTool = Tool<MapLayer<mapboxgl.Layer>[], GeoJSON>;
+// export type GeoJSONTool = Tool<MapLayer<mapboxgl.Layer>[], GeoJSON>;
+export type GeoJSONTool = Tool<any, GeoJSON | null>;
 
 export type GeoJSONProcessor<
-	T extends MapLayer<mapboxgl.Layer>[],
-	U extends GeoJSON | undefined
+	Input, // extends MapLayer<mapboxgl.Layer>[],
+	Output, // extends GeoJSON | undefined,
+	ProcessorArgs extends Record<string, any>,
+	ValidatorArgs extends Record<string, any>
 > = {
-	processor: (inputData: T) => U;
-	validator: (inputData: T) => boolean;
+	processor: (inputData: Input, options?: ProcessorArgs) => Output;
+	validator: (inputData: Input, options?: ValidatorArgs) => boolean;
 };
