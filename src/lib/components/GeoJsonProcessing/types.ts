@@ -17,7 +17,7 @@ export type ToolName = (typeof toolNamesArray)[number];
 export type Tool<Input extends MapLayer<mapboxgl.Layer>[], Output extends GeoJSON | null> = {
 	name: ToolName;
 	iconPath: string;
-	geoProcessor?: GeoJSONProcessor<Input, Output | undefined, any, any>;
+	geoProcessor?: GeoJSONProcessor<Input, Output, any, any>;
 	optionsComponent?: any;
 };
 
@@ -44,10 +44,10 @@ export type GeoJSONTool = Tool<any, GeoJSON | null>;
 
 export type GeoJSONProcessor<
 	Input, // extends MapLayer<mapboxgl.Layer>[],
-	Output, // extends GeoJSON | undefined,
+	Output,
 	ProcessorArgs extends Record<string, any>,
 	ValidatorArgs extends Record<string, any>
 > = {
-	processor: (inputData: Input, options?: ProcessorArgs) => Output;
+	processor: (inputData: Input, options?: ProcessorArgs) => Output | null;
 	validator: (inputData: Input, options?: ValidatorArgs) => boolean;
 };

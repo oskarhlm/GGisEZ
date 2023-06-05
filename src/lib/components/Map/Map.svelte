@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
 	export const tools: GeoJSONTool[] = [
-		{ name: 'bbox', iconPath: 'button-icons/bbox.png' },
+		{ name: 'bbox', iconPath: 'button-icons/bbox.png', geoProcessor: BboxProcessor },
 		{
 			name: 'buffer',
 			iconPath: 'button-icons/buffer.png',
@@ -8,7 +8,12 @@
 			optionsComponent: BufferOptions
 		},
 		{ name: 'clip', iconPath: 'button-icons/clip.png' },
-		{ name: 'difference', iconPath: 'button-icons/difference.png' },
+		{
+			name: 'difference',
+			iconPath: 'button-icons/difference.png',
+			geoProcessor: DifferenceProcessor,
+			optionsComponent: DifferenceOptions
+		},
 		{
 			name: 'intersect',
 			iconPath: 'button-icons/intersection.png',
@@ -34,8 +39,15 @@
 	import ToolsDropdown from '../AnalysisTools/ToolsDropdown.svelte';
 	import type { GeoJSON } from 'geojson';
 	import type { GeoJSONTool } from '../GeoJsonProcessing/types';
-	import { BufferProcessor, IntersectProcessor, UnionProcessor } from '../GeoJsonProcessing';
+	import {
+		BboxProcessor,
+		BufferProcessor,
+		DifferenceProcessor,
+		IntersectProcessor,
+		UnionProcessor
+	} from '../GeoJsonProcessing';
 	import BufferOptions from '../Sidebar/ToolOptions/BufferOptions.svelte';
+	import DifferenceOptions from '../Sidebar/ToolOptions/DifferenceOptions.svelte';
 
 	let map: mapboxgl.Map;
 	let selectedTool: GeoJSONTool | null;

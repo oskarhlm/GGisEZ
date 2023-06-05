@@ -1,3 +1,8 @@
+<script lang="ts" context="module">
+	export type ToolSelectOptions = { args: any; layerSelection?: MapLayer<mapboxgl.Layer>[] };
+	// export type ToolSelectCallback = (args: any, layerSelection?: MapLayer<mapboxgl.Layer>[]) => void;
+</script>
+
 <script lang="ts">
 	import Tooltip, { Wrapper } from '@smui/tooltip';
 	import Button, { Label } from '@smui/button';
@@ -26,8 +31,14 @@
 
 	let options: any;
 
-	function updateOptions(newOptions: any) {
-		options = newOptions;
+	function updateOptions(options: ToolSelectOptions) {
+		console.log(options);
+		options = options.args;
+
+		if (options.layerSelection !== undefined && options.layerSelection.length !== undefined) {
+			console.log('heo');
+			selectedLayers = options.layerSelection;
+		}
 	}
 
 	function sortList(ev: any) {
@@ -40,10 +51,6 @@
 	function handleApplyTransformation() {
 		console.log(selectedTool);
 		if (!selectedTool?.geoProcessor?.validator(selectedLayers)) return;
-		const [poly1, poly2] = _.map(selectedLayers, (l) => {
-			const source = l.source as GeoJSONSourceRaw;
-			return source.data;
-		});
 
 		const result = selectedTool?.geoProcessor?.processor(selectedLayers, options);
 
@@ -96,17 +103,16 @@
 			<h3>{selectedTool?.name.toUpperCase()}</h3>
 			<svelte:component this={selectedTool.optionsComponent} {updateOptions} />
 		{/if}
-		<!-- <div> -->
 		<SortableList list={$mapLayers} key={null} on:sort={sortList} let:item>
 			<ListItem
 				layer={item}
 				bind:selectModeEnabled
 				bind:selectedTool
+				bind:selectedLayers
 				{map}
 				on:toggled={handleSelectedLayersUpdate}
 			/>
 		</SortableList>
-		<!-- </div> -->
 		<hr style="margin-top: auto" />
 		<span class="file-action-row">
 			<Wrapper>
@@ -146,7 +152,6 @@
 
 <style lang="scss">
 	.file-action-row {
-		/* margin-left: auto; */
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -161,7 +166,6 @@
 	.container {
 		width: 350px;
 		height: 100%;
-		/* border-radius: 20px; */
 		@include transparent-background($secondary-color, 0.9);
 		pointer-events: all;
 		box-sizing: border-box;

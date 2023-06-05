@@ -7,8 +7,9 @@
 	import Select, { Option } from '@smui/select';
 	import type { Units } from '@turf/helpers';
 	import type { BufferOptions } from '$lib/components/GeoJsonProcessing/buffer';
+	import type { ToolSelectOptions } from '../Sidebar.svelte';
 
-	export let updateOptions: (neweValue: any) => void;
+	export let updateOptions: (options: ToolSelectOptions) => void;
 
 	const unitsArray: Units[] = ['meters', 'kilometers'];
 	let units: Units = 'kilometers';
@@ -25,7 +26,7 @@
 		radiusText = radius.toString();
 		oldRadiusText = radiusText;
 
-		updateOptions({ radius, units } satisfies BufferOptions);
+		updateOptions({ args: { radius, units } satisfies BufferOptions });
 	}
 </script>
 

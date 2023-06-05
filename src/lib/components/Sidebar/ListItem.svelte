@@ -14,10 +14,7 @@
 <script lang="ts">
 	import IconButton from '@smui/icon-button';
 	import Tooltip, { Wrapper } from '@smui/tooltip';
-	import type { GeoJSON, Geometry, Feature, FeatureCollection } from 'geojson';
-	import type { MapSource } from '../../../stores/mapSources';
 	import _ from 'lodash';
-	import { isGeometry, isFeature, isFeatureCollection } from '../../utils/geojson';
 	import type mapboxgl from 'mapbox-gl';
 	import { mapLayers, type MapLayer } from '../../../stores/mapLayers';
 	import { createEventDispatcher } from 'svelte';
@@ -27,9 +24,11 @@
 	export let layer: MapLayer<mapboxgl.Layer>;
 	export let selectedTool: GeoJSONTool | null;
 	export let selectModeEnabled: boolean;
+	export let selectedLayers: MapLayer<mapboxgl.Layer>[];
 
-	let checked = false;
+	$: checked = selectedLayers.includes(layer);
 	let currentAction: LayerActionType;
+
 	$: currentAction =
 		!selectedTool && !selectModeEnabled ? 'remove' : checked ? 'checked' : 'notChecked';
 
