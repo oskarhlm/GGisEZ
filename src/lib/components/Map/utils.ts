@@ -160,7 +160,6 @@ function addPolygonLayer(
 		...options
 	};
 	newLayer = mapLayers.getUniqueLayerId(newLayer);
-	console.log(newLayer.id);
 	mapLayers.add(newLayer);
 	map.addLayer(newLayer);
 }

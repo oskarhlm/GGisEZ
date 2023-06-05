@@ -1,4 +1,5 @@
 import voronoi from '@turf/voronoi';
+import flatten from '@turf/flatten';
 import type { BBox } from '@turf/helpers';
 import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
@@ -27,7 +28,7 @@ import {
 	isPoint
 } from '$lib/utils/geojson';
 
-type VoronoiOptions = {
+export type VoronoiOptions = {
 	bbox: BBox;
 };
 
@@ -54,38 +55,18 @@ function voronoiProcessor(input: MapLayer<mapboxgl.Layer>[], options?: VoronoiOp
 		!isFeatureCollection(data) ||
 		!data.features.every((f) => isPoint(f.geometry) || isMultiPoint(f.geometry))
 	) {
-		console.log('haha');
 		return null;
 	}
 
-	const flattenedPoints = data.features.flatMap((f) => {
-		if (isPoint(f.geometry)) return f as Feature<Point, GeoJsonProperties>;
-		else if (isMultiPoint(f.geometry)) {
-			return (f as Feature<MultiPoint, GeoJsonProperties>).geometry.coordinates.map((coords) => {
-				const feature: Feature<Point, GeoJsonProperties> = {
-					type: 'Feature',
-					geometry: {
-						type: 'Point',
-						coordinates: coords
-					},
-					properties: {}
-				};
-				return feature;
-			});
-		}
+	const flattenedPoints = flatten(data as FeatureCollection<Point | MultiPoint>);
 
-		throw new Error();
+	const voronoiFC = voronoi(flattenedPoints, {
+		bbox: options?.bbox || bbox(flattenedPoints)
 	});
 
-	return voronoi(
-		{
-			type: 'FeatureCollection',
-			features: flattenedPoints
-		} satisfies FeatureCollection<Point, GeoJsonProperties>,
-		{
-			bbox: options?.bbox || bbox(data)
-		}
-	);
+	voronoiFC.features = voronoiFC.features.filter((f) => f !== undefined);
+
+	return voronoiFC;
 }
 
 function voronoiInputValidator(input: MapLayer<mapboxgl.Layer>[]): boolean {

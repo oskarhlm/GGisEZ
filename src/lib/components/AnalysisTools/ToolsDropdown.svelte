@@ -1,15 +1,17 @@
 <script lang="ts">
 	import AnalysisElement from './AnalysisElement.svelte';
 	import type { GeoJSONTool, ToolName } from '../GeoJsonProcessing/types';
-	import { tools } from '../Map/Map.svelte';
 
 	export let selectedTool: GeoJSONTool | null;
+	export let tools: GeoJSONTool[] | null;
 </script>
 
 <div class="container">
-	{#each tools as tool}
-		<AnalysisElement {tool} selected={tool === selectedTool} on:toolSelected />
-	{/each}
+	{#if tools}
+		{#each tools as tool}
+			<AnalysisElement {tool} selected={tool === selectedTool} on:toolSelected />
+		{/each}
+	{/if}
 </div>
 
 <style lang="scss">

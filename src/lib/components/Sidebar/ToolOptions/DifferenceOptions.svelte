@@ -14,7 +14,6 @@
 	$: layerBOptions = get(mapLayers).filter((l) => l.id !== layerAId);
 
 	$: {
-		console.log(layerAId, layerBId);
 		updateOptions({
 			args: {
 				layerA: get(mapLayers).find((l) => l.id === layerAId),

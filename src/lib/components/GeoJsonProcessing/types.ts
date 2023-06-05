@@ -18,7 +18,10 @@ export type Tool<Input extends MapLayer<mapboxgl.Layer>[], Output extends GeoJSO
 	name: ToolName;
 	iconPath: string;
 	geoProcessor?: GeoJSONProcessor<Input, Output, any, any>;
-	optionsComponent?: any;
+	optionsComponent?: {
+		component: any;
+		props: { [key: string]: any };
+	};
 };
 
 // export type Tool<Input extends GeoJSON, Output extends GeoJSON> = {

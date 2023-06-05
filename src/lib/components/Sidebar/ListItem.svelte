@@ -131,7 +131,7 @@
 	}
 
 	.icon {
-		margin-right: 10px;
+		padding-inline: 12px;
 		width: 20px;
 		-webkit-user-drag: none;
 	}

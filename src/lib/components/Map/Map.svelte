@@ -1,31 +1,5 @@
-<script lang="ts" context="module">
-	export const tools: GeoJSONTool[] = [
-		{ name: 'bbox', iconPath: 'button-icons/bbox.png', geoProcessor: BboxProcessor },
-		{
-			name: 'buffer',
-			iconPath: 'button-icons/buffer.png',
-			geoProcessor: BufferProcessor,
-			optionsComponent: BufferOptions
-		},
-		{ name: 'clip', iconPath: 'button-icons/clip.png' },
-		{
-			name: 'difference',
-			iconPath: 'button-icons/difference.png',
-			geoProcessor: DifferenceProcessor,
-			optionsComponent: DifferenceOptions
-		},
-		{
-			name: 'intersect',
-			iconPath: 'button-icons/intersection.png',
-			geoProcessor: IntersectProcessor
-		},
-		{ name: 'union', iconPath: 'button-icons/union.png', geoProcessor: UnionProcessor },
-		{ name: 'voronoi', iconPath: 'button-icons/vornoi.png', geoProcessor: VoronoiProcessor }
-	];
-</script>
-
 <script lang="ts">
-	import mapboxgl from 'mapbox-gl';
+	import mapboxgl, { Map } from 'mapbox-gl';
 	import type { AnySourceData, GeoJSONSourceRaw } from 'mapbox-gl';
 	import type { GeometryCollection, Feature, FeatureCollection } from 'geojson';
 	import 'mapbox-gl/dist/mapbox-gl.css';
@@ -39,6 +13,8 @@
 	import ToolsDropdown from '../AnalysisTools/ToolsDropdown.svelte';
 	import type { GeoJSON } from 'geojson';
 	import type { GeoJSONTool } from '../GeoJsonProcessing/types';
+	// @ts-ignore
+	import DrawRecangle from 'mapbox-gl-draw-rectangle-mode';
 	import {
 		BboxProcessor,
 		BufferProcessor,
@@ -49,22 +25,12 @@
 	} from '../GeoJsonProcessing';
 	import BufferOptions from '../Sidebar/ToolOptions/BufferOptions.svelte';
 	import DifferenceOptions from '../Sidebar/ToolOptions/DifferenceOptions.svelte';
+	import VoronoiOptions from '../Sidebar/ToolOptions/VoronoiOptions.svelte';
 
 	let map: mapboxgl.Map;
-	let selectedTool: GeoJSONTool | null;
-
-	// const pointFeature: Feature = {
-	// 	type: 'Feature',
-	// 	properties: {
-	// 		capacity: '10',
-	// 		type: 'U-Rack',
-	// 		mount: 'Surface'
-	// 	},
-	// 	geometry: {
-	// 		type: 'Point',
-	// 		coordinates: [-71.073283, 42.4175]
-	// 	}
-	// };
+	let draw: MapboxDraw;
+	let tools: GeoJSONTool[];
+	let selectedTool: GeoJSONTool | null = null;
 
 	const geometryCollection: GeometryCollection = {
 		type: 'GeometryCollection',
@@ -207,17 +173,58 @@
 			zoom: 11
 		});
 
-		const Draw = new MapboxDraw({
-			displayControlsDefault: false,
-			controls: {
-				point: true,
-				line_string: true,
-				polygon: true,
-				trash: true
+		draw = new MapboxDraw({
+			modes: {
+				...MapboxDraw.modes,
+				draw_rectangle: DrawRecangle
 			},
-			defaultMode: 'draw_polygon'
+			displayControlsDefault: false,
+			defaultMode: 'simple_select'
 		});
-		// map.addControl(Draw, 'top-left');
+
+		tools = [
+			{ name: 'bbox', iconPath: 'button-icons/bbox.png', geoProcessor: BboxProcessor },
+			{
+				name: 'buffer',
+				iconPath: 'button-icons/buffer.png',
+				geoProcessor: BufferProcessor,
+				optionsComponent: {
+					component: BufferOptions,
+					props: {}
+				}
+			},
+			{ name: 'clip', iconPath: 'button-icons/clip.png' },
+			{
+				name: 'difference',
+				iconPath: 'button-icons/difference.png',
+				geoProcessor: DifferenceProcessor,
+				optionsComponent: {
+					component: DifferenceOptions,
+					props: {}
+				}
+			},
+			{
+				name: 'intersect',
+				iconPath: 'button-icons/intersection.png',
+				geoProcessor: IntersectProcessor
+			},
+			{ name: 'union', iconPath: 'button-icons/union.png', geoProcessor: UnionProcessor },
+			{
+				name: 'voronoi',
+				iconPath: 'button-icons/vornoi.png',
+				geoProcessor: VoronoiProcessor,
+				optionsComponent: {
+					component: VoronoiOptions,
+					props: { map: map, draw: draw }
+				}
+			}
+		];
+
+		map.addControl(draw, 'top-left');
+
+		// map.on('draw.create', function (feature) {
+		// 	console.log(feature);
+		// });
 
 		map.on('load', function () {
 			mapLayers.subscribeNewLayerIndex((newLayerIndex) => {
@@ -275,8 +282,8 @@
 
 <div id="map" />
 <div id="overlay">
-	<Sidebar {map} bind:selectedTool />
-	<ToolsDropdown bind:selectedTool on:toolSelected={(e) => (selectedTool = e.detail)} />
+	<Sidebar {map} {draw} {tools} bind:selectedTool />
+	<ToolsDropdown {tools} bind:selectedTool on:toolSelected={(e) => (selectedTool = e.detail)} />
 </div>
 
 <style lang="scss">

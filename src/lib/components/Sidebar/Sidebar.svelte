@@ -20,8 +20,11 @@
 	import type { GeoJSONTool } from '../GeoJsonProcessing/types';
 	import { addLayerWithTypeCheck, type LayerOptions } from '../Map/utils';
 	import type { FeatureCollection, Polygon, GeoJsonProperties } from 'geojson';
+	import type MapboxDraw from '@mapbox/mapbox-gl-draw';
 
 	export let map: mapboxgl.Map;
+	export let draw: MapboxDraw;
+	export let tools: GeoJSONTool[];
 	export let selectedTool: GeoJSONTool | null;
 
 	let fileInput: HTMLInputElement;
@@ -31,11 +34,13 @@
 	let selectedLayers: MapLayer<mapboxgl.Layer>[] = [];
 
 	let options: any;
+	let cleanupFunction: (() => void) | undefined;
 
-	function updateOptions(options: ToolSelectOptions) {
-		options = options.args;
-		if (options.layerSelection !== undefined && options.layerSelection.length !== undefined) {
-			selectedLayers = options.layerSelection;
+	function updateOptions(opts: ToolSelectOptions, cleanup?: () => void) {
+		options = opts.args;
+		cleanupFunction = cleanup;
+		if (opts.layerSelection !== undefined && opts.layerSelection.length !== undefined) {
+			selectedLayers = opts.layerSelection;
 		}
 	}
 
@@ -48,44 +53,25 @@
 
 	function handleApplyTransformation() {
 		console.log(selectedTool);
+		console.log(options);
 		if (!selectedTool?.geoProcessor?.validator(selectedLayers)) {
 			return;
 		}
 
-		// const result = selectedTool?.geoProcessor?.processor(selectedLayers, options);
-		const result = selectedTool?.geoProcessor?.processor(
-			selectedLayers,
-			options
-		) as FeatureCollection<Polygon, GeoJsonProperties>;
-
-		// result.features.forEach((f) => {
-		// 	addLayerWithTypeCheck(map, {
-		// 		id: selectedTool!.name,
-		// 		geojson: {
-		// 			type: 'geojson',
-		// 			data: f
-		// 		}
-		// 	});
-		// });
+		const result = selectedTool?.geoProcessor?.processor(selectedLayers, options);
+		console.log(result);
 
 		result &&
-			addLayerWithTypeCheck(
-				map,
-				{
-					id: selectedTool.name,
-					geojson: {
-						type: 'geojson',
-						data: result
-					}
-				},
-				{
-					border: {
-						'line-width': 3
-					}
-				} satisfies LayerOptions<mapboxgl.LineLayer>
-			);
+			addLayerWithTypeCheck(map, {
+				id: selectedTool.name,
+				geojson: {
+					type: 'geojson',
+					data: result
+				}
+			});
 
 		selectedTool = null;
+		cleanupFunction && cleanupFunction();
 	}
 
 	function handleSelectedLayersUpdate(e: CustomEvent<MapLayer<mapboxgl.Layer>>) {
@@ -123,7 +109,11 @@
 		<hr />
 		{#if selectedTool}
 			<h3>{selectedTool?.name.toUpperCase()}</h3>
-			<svelte:component this={selectedTool.optionsComponent} {updateOptions} />
+			<svelte:component
+				this={selectedTool.optionsComponent?.component}
+				{...selectedTool.optionsComponent?.props}
+				{updateOptions}
+			/>
 		{/if}
 		<SortableList list={$mapLayers} key={null} on:sort={sortList} let:item>
 			<ListItem
@@ -222,13 +212,10 @@
 		display: flex;
 		flex-direction: column;
 
-		/* :global(ul > li) {
-			border: none;
-		} */
-
 		:global(::-webkit-scrollbar) {
-			width: 10px;
+			width: 0px;
 		}
+
 		:global(ul) {
 			margin-block: 0;
 			overflow-y: scroll;
