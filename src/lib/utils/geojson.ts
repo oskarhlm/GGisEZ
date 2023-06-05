@@ -4,23 +4,101 @@ import type {
 	Feature,
 	FeatureCollection,
 	GeometryCollection,
-	GeoJsonTypes
+	GeoJsonTypes,
+	GeoJsonProperties,
+	Point,
+	Polygon,
+	LineString,
+	MultiPoint,
+	MultiPolygon,
+	MultiLineString
 } from 'geojson';
 
+// export const geoJsonTypeGuards: Record<GeoJsonTypes, (geometry: GeoJSON) => boolean> = {
+// 	Point: isPoint,
+// 	MultiPoint: isMultiPoint,
+// 	LineString: isLineString,
+// 	MultiLineString: isMultiLineString,
+// 	Polygon: isPolygon,
+// 	MultiPolygon: isMultiPolygon,
+// 	GeometryCollection: isGeometryCollection,
+// 	Feature: isFeature,
+// 	FeatureCollection: isFeatureCollection
+// };
+
 export function isGeometry(geojson: GeoJSON): geojson is Geometry {
-	return (geojson as Geometry).type !== undefined;
+	return (
+		isPoint(geojson as Geometry) ||
+		isMultiPoint(geojson as Geometry) ||
+		isLineString(geojson as Geometry) ||
+		isMultiLineString(geojson as Geometry) ||
+		isPolygon(geojson as Geometry) ||
+		isMultiPolygon(geojson as Geometry) ||
+		isGeometryCollection(geojson)
+	);
+}
+
+// export function isOfGeometryType<T extends Geometry>(
+// 	fc: Feature<Geometry, GeoJsonProperties>
+// ): fc is Feature<T, GeoJsonProperties>;
+// export function isOfGeometryType<T extends Geometry>(
+// 	fc: FeatureCollection<Geometry, GeoJsonProperties>
+// ): fc is FeatureCollection<T, GeoJsonProperties>;
+// export function isOfGeometryType<T extends Geometry>(
+// 	f: Feature<Geometry, GeoJsonProperties> | FeatureCollection<Geometry, GeoJsonProperties>
+// ): f is Feature<T, GeoJsonProperties> | FeatureCollection<T, GeoJsonProperties> {
+// 	// if (isFeature(f)) {
+// 	// 	return isGeometryOfType<T>(f.geometry);
+// 	// } else if (isFeatureCollection(f)) {
+// 	// 	return f.features.every((f) => isGeometryOfType<T>(f.geometry));
+// 	// }
+
+// 	if (isFeature(f)) {
+// 	} else if (isFeatureCollection(f)) {
+// 	}
+
+// 	return false;
+// }
+
+// export function isGeometryOfType<T extends Geometry>(geometry: Geometry): geometry is T {
+// 	const typeGuard = geoJsonTypeGuards[geometry.type];
+// 	return typeGuard(geometry);
+// }
+
+export function isPoint(geometry: Geometry): geometry is Point {
+	return geometry.type === 'Point';
+}
+
+export function isMultiPoint(geometry: Geometry): geometry is MultiPoint {
+	return geometry.type === 'MultiPoint';
+}
+
+export function isLineString(geometry: Geometry): geometry is LineString {
+	return geometry.type === 'LineString';
+}
+
+export function isMultiLineString(geometry: Geometry): geometry is MultiLineString {
+	return geometry.type === 'MultiLineString';
+}
+
+export function isPolygon(geometry: Geometry): geometry is Polygon {
+	return geometry.type === 'Polygon';
+}
+
+export function isMultiPolygon(geometry: Geometry): geometry is MultiPolygon {
+	return geometry.type === 'MultiPolygon';
 }
 
 export function isFeature(geojson: GeoJSON): geojson is Feature {
-	return (geojson as Feature).type === 'Feature';
+	return geojson.type === 'Feature';
 }
 
 export function isFeatureCollection(geojson: GeoJSON): geojson is FeatureCollection {
-	return (geojson as FeatureCollection).type === 'FeatureCollection';
+	return geojson.type === 'FeatureCollection';
 }
 
 export function isGeometryCollection(geojson: GeoJSON): geojson is GeometryCollection {
-	return (geojson as GeometryCollection).type === 'GeometryCollection';
+	return geojson.type === 'GeometryCollection';
 }
 
 export function isGeoJSON(json: any): json is GeoJSON {
@@ -46,6 +124,13 @@ export function isGeoJSON(json: any): json is GeoJSON {
 			typeof json.geometry === 'object'
 		) {
 			// Check if it's a valid Geometry
+			return true;
+		} else if (
+			json.type &&
+			typeof json.type === 'string' &&
+			json.geometries &&
+			Array.isArray(json.geometries)
+		) {
 			return true;
 		}
 	}

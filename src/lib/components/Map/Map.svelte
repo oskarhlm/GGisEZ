@@ -20,14 +20,14 @@
 			geoProcessor: IntersectProcessor
 		},
 		{ name: 'union', iconPath: 'button-icons/union.png', geoProcessor: UnionProcessor },
-		{ name: 'voronoi', iconPath: 'button-icons/vornoi.png' }
+		{ name: 'voronoi', iconPath: 'button-icons/vornoi.png', geoProcessor: VoronoiProcessor }
 	];
 </script>
 
 <script lang="ts">
 	import mapboxgl from 'mapbox-gl';
 	import type { AnySourceData, GeoJSONSourceRaw } from 'mapbox-gl';
-	import type { GeometryCollection, Feature } from 'geojson';
+	import type { GeometryCollection, Feature, FeatureCollection } from 'geojson';
 	import 'mapbox-gl/dist/mapbox-gl.css';
 	import MapboxDraw from '@mapbox/mapbox-gl-draw';
 	import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
@@ -44,7 +44,8 @@
 		BufferProcessor,
 		DifferenceProcessor,
 		IntersectProcessor,
-		UnionProcessor
+		UnionProcessor,
+		VoronoiProcessor
 	} from '../GeoJsonProcessing';
 	import BufferOptions from '../Sidebar/ToolOptions/BufferOptions.svelte';
 	import DifferenceOptions from '../Sidebar/ToolOptions/DifferenceOptions.svelte';
@@ -52,18 +53,18 @@
 	let map: mapboxgl.Map;
 	let selectedTool: GeoJSONTool | null;
 
-	const pointFeature: Feature = {
-		type: 'Feature',
-		properties: {
-			capacity: '10',
-			type: 'U-Rack',
-			mount: 'Surface'
-		},
-		geometry: {
-			type: 'Point',
-			coordinates: [-71.073283, 42.4175]
-		}
-	};
+	// const pointFeature: Feature = {
+	// 	type: 'Feature',
+	// 	properties: {
+	// 		capacity: '10',
+	// 		type: 'U-Rack',
+	// 		mount: 'Surface'
+	// 	},
+	// 	geometry: {
+	// 		type: 'Point',
+	// 		coordinates: [-71.073283, 42.4175]
+	// 	}
+	// };
 
 	const geometryCollection: GeometryCollection = {
 		type: 'GeometryCollection',
@@ -96,6 +97,102 @@
 					[-75, 45],
 					[-74, 46]
 				]
+			}
+		]
+	};
+
+	const pointFeature: FeatureCollection = {
+		type: 'FeatureCollection',
+		features: [
+			{
+				type: 'Feature',
+				properties: {},
+				geometry: {
+					coordinates: [10.404302642303605, 63.42516678277332],
+					type: 'Point'
+				},
+				id: 0
+			},
+			{
+				type: 'Feature',
+				properties: {},
+				geometry: {
+					coordinates: [10.436036116805411, 63.42006376878629],
+					type: 'Point'
+				},
+				id: 1
+			},
+			{
+				type: 'Feature',
+				properties: {},
+				geometry: {
+					coordinates: [10.409004602872159, 63.41532208127228],
+					type: 'Point'
+				}
+			},
+			{
+				type: 'Feature',
+				properties: {},
+				geometry: {
+					coordinates: [10.426953528125097, 63.41338647323124],
+					type: 'Point'
+				}
+			},
+			{
+				type: 'Feature',
+				properties: {},
+				geometry: {
+					coordinates: [10.427818536571323, 63.430898967131895],
+					type: 'Point'
+				}
+			},
+			{
+				type: 'Feature',
+				properties: {},
+				geometry: {
+					coordinates: [10.421547225338287, 63.42490141707867],
+					type: 'Point'
+				}
+			},
+			{
+				type: 'Feature',
+				properties: {},
+				geometry: {
+					coordinates: [10.41462715777132, 63.409611661716895],
+					type: 'Point'
+				}
+			},
+			{
+				type: 'Feature',
+				properties: {},
+				geometry: {
+					coordinates: [10.418519695777889, 63.42006376878646],
+					type: 'Point'
+				}
+			},
+			{
+				type: 'Feature',
+				properties: {},
+				geometry: {
+					coordinates: [10.399273257855157, 63.41996700749232],
+					type: 'Point'
+				}
+			},
+			{
+				type: 'Feature',
+				properties: {},
+				geometry: {
+					coordinates: [10.432143578800577, 63.42741667153595],
+					type: 'Point'
+				}
+			},
+			{
+				type: 'Feature',
+				properties: {},
+				geometry: {
+					coordinates: [10.414194653547668, 63.42993170524824],
+					type: 'Point'
+				}
 			}
 		]
 	};
@@ -141,12 +238,12 @@
 				id: 'source',
 				geojson: sourceData
 			});
-			map.addSource('point-source', {
+			map.addSource('trd-points', {
 				type: 'geojson',
 				data: pointFeature
 			});
 			addLayerWithTypeCheck(map, {
-				id: 'point-source',
+				id: 'trd-points',
 				geojson: {
 					type: 'geojson',
 					data: pointFeature

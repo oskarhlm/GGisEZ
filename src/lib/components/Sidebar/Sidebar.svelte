@@ -19,6 +19,7 @@
 	import type { GeoJSONSourceRaw } from 'mapbox-gl';
 	import type { GeoJSONTool } from '../GeoJsonProcessing/types';
 	import { addLayerWithTypeCheck } from '../Map/utils';
+	import type { FeatureCollection, Polygon, GeoJsonProperties } from 'geojson';
 
 	export let map: mapboxgl.Map;
 	export let selectedTool: GeoJSONTool | null;
@@ -32,11 +33,8 @@
 	let options: any;
 
 	function updateOptions(options: ToolSelectOptions) {
-		console.log(options);
 		options = options.args;
-
 		if (options.layerSelection !== undefined && options.layerSelection.length !== undefined) {
-			console.log('heo');
 			selectedLayers = options.layerSelection;
 		}
 	}
@@ -50,18 +48,34 @@
 
 	function handleApplyTransformation() {
 		console.log(selectedTool);
-		if (!selectedTool?.geoProcessor?.validator(selectedLayers)) return;
+		if (!selectedTool?.geoProcessor?.validator(selectedLayers)) {
+			return;
+		}
 
-		const result = selectedTool?.geoProcessor?.processor(selectedLayers, options);
+		// const result = selectedTool?.geoProcessor?.processor(selectedLayers, options);
+		const result = selectedTool?.geoProcessor?.processor(
+			selectedLayers,
+			options
+		) as FeatureCollection<Polygon, GeoJsonProperties>;
 
-		result &&
+		result.features.forEach((f) => {
 			addLayerWithTypeCheck(map, {
-				id: selectedTool.name,
+				id: selectedTool!.name,
 				geojson: {
 					type: 'geojson',
-					data: result
+					data: f
 				}
 			});
+		});
+
+		// result &&
+		// 	addLayerWithTypeCheck(map, {
+		// 		id: selectedTool.name,
+		// 		geojson: {
+		// 			type: 'geojson',
+		// 			data: result
+		// 		}
+		// 	});
 
 		selectedTool = null;
 	}

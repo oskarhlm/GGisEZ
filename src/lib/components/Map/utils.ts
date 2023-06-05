@@ -123,7 +123,8 @@ function addPolygonLayer(map: mapboxgl.Map, data: GeoJSON, id: string) {
 			data
 		},
 		paint: {
-			'fill-color': nextColor()
+			'fill-color': nextColor(),
+			'fill-opacity': 0.5
 		},
 		isVisible: true,
 		displayName: id
