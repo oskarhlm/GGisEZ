@@ -7,6 +7,7 @@ import type { GeoJSONSourceRaw } from 'mapbox-gl';
 export type MapLayer<T extends mapboxgl.Layer> = {
 	isVisible: boolean;
 	displayName: string;
+	attachedLayerIds?: string[];
 } & T;
 
 function createMapLayers() {
@@ -20,25 +21,15 @@ function createMapLayers() {
 		subscribe,
 		set,
 		add: <T extends mapboxgl.Layer>(newLayer: MapLayer<T>) =>
-			update((storeLayers) => {
-				if (storeLayers.map((l) => l.id).includes(newLayer.id)) {
-					const numEqualNamesInStore = storeLayers
-						.map((l) => l.id)
-						.filter((name) => name.startsWith(newLayer.id)).length;
-					newLayer.id += `_${numEqualNamesInStore}`;
-					newLayer.displayName += `_${numEqualNamesInStore}`;
-				}
-				// console.log((newLayer.source as GeoJSONSourceRaw).data);
-
-				return [newLayer, ...storeLayers];
-			}),
-		getUniqueLayerId: <T extends mapboxgl.Layer>(newLayer: T): T => {
+			update((storeLayers) => [newLayer, ...storeLayers]),
+		getUniqueLayerId: <T extends mapboxgl.Layer>(newLayer: MapLayer<T>): MapLayer<T> => {
 			const storeLayers = get(mapLayers);
 			if (storeLayers.map((l) => l.id).includes(newLayer.id)) {
 				const numEqualNamesInStore = storeLayers
 					.map((l) => l.id)
 					.filter((name) => name.startsWith(newLayer.id)).length;
-				newLayer.id + `_${numEqualNamesInStore}`;
+				newLayer.id += `_${numEqualNamesInStore}`;
+				newLayer.displayName += `_${numEqualNamesInStore}`;
 			}
 
 			return newLayer;

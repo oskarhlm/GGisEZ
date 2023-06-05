@@ -18,7 +18,7 @@
 	import type { MapLayer } from '../../../stores/mapLayers';
 	import type { GeoJSONSourceRaw } from 'mapbox-gl';
 	import type { GeoJSONTool } from '../GeoJsonProcessing/types';
-	import { addLayerWithTypeCheck } from '../Map/utils';
+	import { addLayerWithTypeCheck, type LayerOptions } from '../Map/utils';
 	import type { FeatureCollection, Polygon, GeoJsonProperties } from 'geojson';
 
 	export let map: mapboxgl.Map;
@@ -58,24 +58,32 @@
 			options
 		) as FeatureCollection<Polygon, GeoJsonProperties>;
 
-		result.features.forEach((f) => {
-			addLayerWithTypeCheck(map, {
-				id: selectedTool!.name,
-				geojson: {
-					type: 'geojson',
-					data: f
-				}
-			});
-		});
-
-		// result &&
+		// result.features.forEach((f) => {
 		// 	addLayerWithTypeCheck(map, {
-		// 		id: selectedTool.name,
+		// 		id: selectedTool!.name,
 		// 		geojson: {
 		// 			type: 'geojson',
-		// 			data: result
+		// 			data: f
 		// 		}
 		// 	});
+		// });
+
+		result &&
+			addLayerWithTypeCheck(
+				map,
+				{
+					id: selectedTool.name,
+					geojson: {
+						type: 'geojson',
+						data: result
+					}
+				},
+				{
+					border: {
+						'line-width': 3
+					}
+				} satisfies LayerOptions<mapboxgl.LineLayer>
+			);
 
 		selectedTool = null;
 	}

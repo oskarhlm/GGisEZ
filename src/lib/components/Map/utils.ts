@@ -45,7 +45,18 @@ export function isValid(data: GeoJSON | undefined | string): data is GeoJSON {
 	return data !== undefined && !isString(data);
 }
 
-export function addLayerWithTypeCheck(map: mapboxgl.Map, source: MapSource, id?: string) {
+export type LayerOptions<T extends mapboxgl.AnyLayer> = Omit<
+	T,
+	'id' | 'type' | 'source' | 'source-layer'
+> & {
+	border?: mapboxgl.LinePaint;
+};
+
+export function addLayerWithTypeCheck(
+	map: mapboxgl.Map,
+	source: MapSource,
+	options?: LayerOptions<mapboxgl.AnyLayer>
+) {
 	const data = source.geojson.data;
 	if (!isValid(data)) {
 		throw new Error('Invalid data source');
@@ -54,29 +65,34 @@ export function addLayerWithTypeCheck(map: mapboxgl.Map, source: MapSource, id?:
 	switch (data.type) {
 		case 'Point':
 		case 'MultiPoint':
-			addPointLayer(map, data, source.id);
+			addPointLayer(map, data, source.id, options);
 			break;
 		case 'LineString':
 		case 'MultiLineString':
-			addLineLayer(map, data, source.id);
+			addLineLayer(map, data, source.id, options);
 			break;
 		case 'Polygon':
 		case 'MultiPolygon':
-			addPolygonLayer(map, data, source.id);
+			addPolygonLayer(map, data, source.id, options);
 			break;
 		case 'Feature':
-			addFeature(map, source);
+			addFeature(map, source, options);
 			break;
 		case 'GeometryCollection':
-			addGeometryCollection(map, source);
+			addGeometryCollection(map, source, options);
 			break;
 		case 'FeatureCollection':
-			addFeatureCollectionLayer(map, source);
+			addFeatureCollectionLayer(map, source, options);
 			break;
 	}
 }
 
-function addPointLayer(map: mapboxgl.Map, data: GeoJSON, id: string) {
+function addPointLayer(
+	map: mapboxgl.Map,
+	data: GeoJSON,
+	id: string,
+	options?: LayerOptions<mapboxgl.CircleLayer>
+) {
 	let newLayer: MapLayer<mapboxgl.CircleLayer> = {
 		id: id + '-point',
 		type: 'circle',
@@ -88,14 +104,20 @@ function addPointLayer(map: mapboxgl.Map, data: GeoJSON, id: string) {
 			'circle-color': nextColor()
 		},
 		isVisible: true,
-		displayName: id
+		displayName: id,
+		...options
 	};
 	newLayer = mapLayers.getUniqueLayerId(newLayer);
 	mapLayers.add(newLayer);
 	map.addLayer(newLayer);
 }
 
-function addLineLayer(map: mapboxgl.Map, data: GeoJSON, id: string) {
+function addLineLayer(
+	map: mapboxgl.Map,
+	data: GeoJSON,
+	id: string,
+	options?: LayerOptions<mapboxgl.LineLayer>
+) {
 	let newLayer: MapLayer<mapboxgl.LineLayer> = {
 		id: id + '-line',
 		type: 'line',
@@ -107,14 +129,20 @@ function addLineLayer(map: mapboxgl.Map, data: GeoJSON, id: string) {
 			'line-color': nextColor()
 		},
 		isVisible: true,
-		displayName: id
+		displayName: id,
+		...options
 	};
 	newLayer = mapLayers.getUniqueLayerId(newLayer);
 	mapLayers.add(newLayer);
 	map.addLayer(newLayer);
 }
 
-function addPolygonLayer(map: mapboxgl.Map, data: GeoJSON, id: string) {
+function addPolygonLayer(
+	map: mapboxgl.Map,
+	data: GeoJSON,
+	id: string,
+	options?: LayerOptions<mapboxgl.FillLayer>
+) {
 	let newLayer: MapLayer<mapboxgl.FillLayer> = {
 		id: id + '-polygon',
 		type: 'fill',
@@ -124,30 +152,41 @@ function addPolygonLayer(map: mapboxgl.Map, data: GeoJSON, id: string) {
 		},
 		paint: {
 			'fill-color': nextColor(),
-			'fill-opacity': 0.5
+			'fill-opacity': 0.5,
+			'fill-outline-color': '#000'
 		},
 		isVisible: true,
-		displayName: id
+		displayName: id,
+		...options
 	};
 	newLayer = mapLayers.getUniqueLayerId(newLayer);
+	console.log(newLayer.id);
 	mapLayers.add(newLayer);
 	map.addLayer(newLayer);
 }
 
-function addFeature(map: mapboxgl.Map, source: MapSource) {
+function addFeature(
+	map: mapboxgl.Map,
+	source: MapSource,
+	options?: LayerOptions<mapboxgl.AnyLayer>
+) {
 	const data = source.geojson.data;
 	if (!isValid(data) || !isFeature(data)) throw new Error('Not a Feature');
 
-	addLayerWithTypeCheck(map, {
-		...source,
-		geojson: {
-			type: 'geojson',
-			data: data.geometry
-		}
-	});
+	addLayerWithTypeCheck(
+		map,
+		{
+			...source,
+			geojson: {
+				type: 'geojson',
+				data: data.geometry
+			}
+		},
+		options
+	);
 }
 
-function addGeometryCollection(map: mapboxgl.Map, source: MapSource) {
+function addGeometryCollection(map: mapboxgl.Map, source: MapSource, options?: LayerOptions<any>) {
 	const data = source.geojson.data;
 	if (!isValid(data) || !isGeometryCollection(data)) throw new Error('Not a GeometryCollection');
 
@@ -173,19 +212,23 @@ function addGeometryCollection(map: mapboxgl.Map, source: MapSource) {
 		} satisfies GeometryCollection;
 		switch (value as LayerTypes) {
 			case 'Point':
-				addPointLayer(map, data, source.id);
+				addPointLayer(map, data, source.id, options);
 				break;
 			case 'LineString':
-				addLineLayer(map, data, source.id);
+				addLineLayer(map, data, source.id, options);
 				break;
 			case 'Polygon':
-				addPolygonLayer(map, data, source.id);
+				addPolygonLayer(map, data, source.id, options);
 				break;
 		}
 	});
 }
 
-function addFeatureCollectionLayer(map: mapboxgl.Map, source: MapSource) {
+function addFeatureCollectionLayer(
+	map: mapboxgl.Map,
+	source: MapSource,
+	options?: LayerOptions<any>
+) {
 	const data = source.geojson.data;
 	if (!isValid(data) || !isFeatureCollection(data)) throw new Error('Not a FeaureCollection');
 
@@ -211,13 +254,13 @@ function addFeatureCollectionLayer(map: mapboxgl.Map, source: MapSource) {
 		} satisfies FeatureCollection;
 		switch (value as LayerTypes) {
 			case 'Point':
-				addPointLayer(map, data, source.id);
+				addPointLayer(map, data, source.id, options);
 				break;
 			case 'LineString':
-				addLineLayer(map, data, source.id);
+				addLineLayer(map, data, source.id, options);
 				break;
 			case 'Polygon':
-				addPolygonLayer(map, data, source.id);
+				addPolygonLayer(map, data, source.id, options);
 				break;
 		}
 	});
