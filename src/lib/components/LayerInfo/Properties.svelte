@@ -28,10 +28,15 @@
 	import Textfield from '@smui/textfield';
 	import type { MapLayer } from '../../../stores/mapLayers';
 	import type mapboxgl from 'mapbox-gl';
+	import type { FillPaint } from 'mapbox-gl';
 
 	export let layer: MapLayer<mapboxgl.Layer>;
 	$: layerName = layer.displayName;
 	$: displayName = layerName;
+
+	$: {
+		if (colorWheel) colorWheel.color.set((layer.paint as FillPaint)['fill-color'] as string);
+	}
 
 	let colorWheel: iro.ColorPicker;
 
@@ -47,8 +52,9 @@
 
 	onMount(() => {
 		colorWheel = iro.ColorPicker('#colorWheel', {
-			width: 200,
+			width: 250,
 			color: '#fff',
+			// color: defaultColor,
 			layoutDirection: 'vertical',
 			borderWidth: 0,
 			borderColor: '#fff',
@@ -97,7 +103,8 @@
 	}
 
 	#apply-btn {
-		margin-top: auto;
+		/* margin-top: auto; */
+		margin-top: 24px;
 		margin-left: auto;
 	}
 </style>

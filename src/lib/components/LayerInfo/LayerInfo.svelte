@@ -23,15 +23,18 @@
 				<Label>{tab.tabName}</Label>
 			</Tab>
 		</TabBar>
-		<svelte:component this={active.component} bind:layer on:propertiesSet />
+		{#if layer}
+			<svelte:component this={active.component} bind:layer on:propertiesSet />
+		{/if}
 	</div>
 </div>
 
 <style lang="scss">
 	.container {
-		/* width: 350px; */
-		width: 250px;
-		height: 100%;
+		width: 350px;
+		/* width: 250px; */
+		/* height: 100%; */
+		height: auto;
 		@include transparent-background($secondary-color, 0.9);
 		pointer-events: all;
 		box-sizing: border-box;

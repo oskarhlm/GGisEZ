@@ -86,17 +86,17 @@
 	}
 
 	const dispatch = createEventDispatcher<{
-		singleLayerSelect: { layer: MapLayer<mapboxgl.Layer> };
+		singleLayerSelect: { layer: MapLayer<mapboxgl.Layer> | null };
 	}>();
 	function handleSingleLayerSelect(e: CustomEvent<MapLayer<mapboxgl.Layer>>) {
 		const layer = e.detail;
 		if (selectedLayers.length === 1 && selectedLayers[0] === layer) {
 			selectedLayers = [];
+			dispatch('singleLayerSelect', { layer: null });
 		} else {
 			selectedLayers = [layer];
+			dispatch('singleLayerSelect', { layer });
 		}
-
-		dispatch('singleLayerSelect', { layer });
 	}
 
 	async function handleFileChange(event: Event) {
@@ -201,8 +201,8 @@
 	}
 
 	.container {
-		/* width: 350px; */
-		width: 250px;
+		width: 350px;
+		/* width: 250px; */
 		height: 100%;
 		@include transparent-background($secondary-color, 0.9);
 		pointer-events: all;
