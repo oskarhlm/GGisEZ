@@ -21,11 +21,13 @@
 		DifferenceProcessor,
 		IntersectProcessor,
 		UnionProcessor,
-		VoronoiProcessor
+		VoronoiProcessor,
+		BboxClipProcessor
 	} from '../GeoJsonProcessing';
 	import BufferOptions from '../Sidebar/ToolOptions/BufferOptions.svelte';
 	import DifferenceOptions from '../Sidebar/ToolOptions/DifferenceOptions.svelte';
 	import VoronoiOptions from '../Sidebar/ToolOptions/VoronoiOptions.svelte';
+	import BboxClipOptions from '../Sidebar/ToolOptions/BboxClipOptions.svelte';
 
 	let map: mapboxgl.Map;
 	let draw: MapboxDraw;
@@ -183,21 +185,32 @@
 		});
 
 		tools = [
-			{ name: 'bbox', iconPath: 'button-icons/bbox.png', geoProcessor: BboxProcessor },
+			{ name: 'bbox', iconPath: 'button-icons/bbox.png', geoProcessor: BboxProcessor, tooltip: '' },
 			{
 				name: 'buffer',
 				iconPath: 'button-icons/buffer.png',
 				geoProcessor: BufferProcessor,
+				tooltip: '',
 				optionsComponent: {
 					component: BufferOptions,
 					props: {}
 				}
 			},
-			{ name: 'clip', iconPath: 'button-icons/clip.png' },
+			{
+				name: 'clip',
+				iconPath: 'button-icons/clip.png',
+				geoProcessor: BboxClipProcessor,
+				tooltip: '',
+				optionsComponent: {
+					component: BboxClipOptions,
+					props: { map: map, draw: draw }
+				}
+			},
 			{
 				name: 'difference',
 				iconPath: 'button-icons/difference.png',
 				geoProcessor: DifferenceProcessor,
+				tooltip: '',
 				optionsComponent: {
 					component: DifferenceOptions,
 					props: {}
@@ -206,13 +219,20 @@
 			{
 				name: 'intersect',
 				iconPath: 'button-icons/intersection.png',
-				geoProcessor: IntersectProcessor
+				geoProcessor: IntersectProcessor,
+				tooltip: ''
 			},
-			{ name: 'union', iconPath: 'button-icons/union.png', geoProcessor: UnionProcessor },
+			{
+				name: 'union',
+				iconPath: 'button-icons/union.png',
+				geoProcessor: UnionProcessor,
+				tooltip: ''
+			},
 			{
 				name: 'voronoi',
 				iconPath: 'button-icons/vornoi.png',
 				geoProcessor: VoronoiProcessor,
+				tooltip: '',
 				optionsComponent: {
 					component: VoronoiOptions,
 					props: { map: map, draw: draw }
@@ -221,10 +241,6 @@
 		];
 
 		map.addControl(draw, 'top-left');
-
-		// map.on('draw.create', function (feature) {
-		// 	console.log(feature);
-		// });
 
 		map.on('load', function () {
 			mapLayers.subscribeNewLayerIndex((newLayerIndex) => {

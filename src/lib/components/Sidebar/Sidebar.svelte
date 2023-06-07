@@ -4,7 +4,7 @@
 </script>
 
 <script lang="ts">
-	import Tooltip, { Wrapper } from '@smui/tooltip';
+	import Tooltip, { Content, Wrapper } from '@smui/tooltip';
 	import Button, { Label } from '@smui/button';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import SortableList from '../../SortableList.svelte';
@@ -34,11 +34,12 @@
 	let selectedLayers: MapLayer<mapboxgl.Layer>[] = [];
 
 	let options: any;
-	let cleanupFunction: (() => void) | undefined;
+	let optionsCleanup: (() => void) | undefined;
 
 	function updateOptions(opts: ToolSelectOptions, cleanup?: () => void) {
+		console.log(opts);
 		options = opts.args;
-		cleanupFunction = cleanup;
+		optionsCleanup = cleanup;
 		if (opts.layerSelection !== undefined && opts.layerSelection.length !== undefined) {
 			selectedLayers = opts.layerSelection;
 		}
@@ -52,8 +53,6 @@
 	}
 
 	function handleApplyTransformation() {
-		console.log(selectedTool);
-		console.log(options);
 		if (!selectedTool?.geoProcessor?.validator(selectedLayers)) {
 			return;
 		}
@@ -71,7 +70,7 @@
 			});
 
 		selectedTool = null;
-		cleanupFunction && cleanupFunction();
+		optionsCleanup && optionsCleanup();
 	}
 
 	function handleSelectedLayersUpdate(e: CustomEvent<MapLayer<mapboxgl.Layer>>) {
@@ -108,7 +107,17 @@
 		>
 		<hr />
 		{#if selectedTool}
-			<h3>{selectedTool?.name.toUpperCase()}</h3>
+			<span style="display: flex; align-items: center; justify-content: space-between; ">
+				<h3>{selectedTool?.name.toUpperCase()}</h3>
+				<Wrapper rich>
+					<span
+						style="display: flex; align-items: center; text-justify: center; padding-right: 12px;"
+					>
+						<Icon class="material-icons">info</Icon>
+					</span>
+					<Tooltip><Content>{selectedTool.tooltip}</Content></Tooltip>
+				</Wrapper>
+			</span>
 			<svelte:component
 				this={selectedTool.optionsComponent?.component}
 				{...selectedTool.optionsComponent?.props}

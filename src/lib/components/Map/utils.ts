@@ -98,7 +98,8 @@ function addPointLayer(
 		type: 'circle',
 		source: {
 			type: 'geojson',
-			data
+			data,
+			generateId: true
 		},
 		paint: {
 			'circle-color': nextColor()
@@ -123,7 +124,8 @@ function addLineLayer(
 		type: 'line',
 		source: {
 			type: 'geojson',
-			data
+			data,
+			generateId: true
 		},
 		paint: {
 			'line-color': nextColor()
@@ -148,7 +150,8 @@ function addPolygonLayer(
 		type: 'fill',
 		source: {
 			type: 'geojson',
-			data
+			data,
+			generateId: true
 		},
 		paint: {
 			'fill-color': nextColor(),

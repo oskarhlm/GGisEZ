@@ -1,7 +1,6 @@
 import type { GeoJSON, Feature, FeatureCollection } from 'geojson';
 import type { MapLayer } from '../../../stores/mapLayers';
 import type mapboxgl from 'mapbox-gl';
-import type { SvelteComponent } from 'svelte';
 
 export const toolNamesArray = [
 	'bbox',
@@ -18,32 +17,15 @@ export type Tool<Input extends MapLayer<mapboxgl.Layer>[], Output extends GeoJSO
 	name: ToolName;
 	iconPath: string;
 	geoProcessor?: GeoJSONProcessor<Input, Output, any, any>;
+	tooltip: any;
 	optionsComponent?: {
 		component: any;
 		props: { [key: string]: any };
 	};
+	onSelected?: () => void;
 };
 
-// export type Tool<Input extends GeoJSON, Output extends GeoJSON> = {
-// 	iconPath: string;
-// 	geoProcessor?: GeoJSONProcessor<Input, Output | undefined>;
-// };
-
-// export type Tools<Input extends GeoJSON, Output extends GeoJSON> = {
-// 	[key in ToolName]: Tool<Input, Output>;
-// };
-
-// export type Tools<Input extends GeoJSON, Output extends GeoJSON> = {
-// 	[key in ToolName]: {
-// 		iconPath: string;
-// 		geoProcessor?: GeoJSONProcessor<Input, Output | undefined>;
-// 	};
-// };
-
-// export type GeoJSONTools = Tools<GeoJSON, GeoJSON>;
-// export type GeoJSONTool = Tool<MapLayer<mapboxgl.Layer>[], GeoJSON>;
 export type GeoJSONTool = Tool<any, GeoJSON | null>;
-// export type GeoJSONTool = Tool<any, Feature | FeatureCollection | null>;
 
 export type GeoJSONProcessor<
 	Input, // extends MapLayer<mapboxgl.Layer>[],
