@@ -9,7 +9,7 @@
 	import IconButton, { Icon } from '@smui/icon-button';
 	import SortableList from '../../SortableList.svelte';
 	import ListItem from './ListItem.svelte';
-	import { onMount } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 	import { readFiles } from '../../utils/fileUploader';
 	import { mapSources } from '../../../stores/mapSources';
 	import { mapLayers } from '../../../stores/mapLayers';
@@ -85,6 +85,9 @@
 		selectedLayers = [...selectedLayers, layer];
 	}
 
+	const dispatch = createEventDispatcher<{
+		singleLayerSelect: { layer: MapLayer<mapboxgl.Layer> };
+	}>();
 	function handleSingleLayerSelect(e: CustomEvent<MapLayer<mapboxgl.Layer>>) {
 		const layer = e.detail;
 		if (selectedLayers.length === 1 && selectedLayers[0] === layer) {
@@ -92,6 +95,8 @@
 		} else {
 			selectedLayers = [layer];
 		}
+
+		dispatch('singleLayerSelect', { layer });
 	}
 
 	async function handleFileChange(event: Event) {
@@ -196,7 +201,8 @@
 	}
 
 	.container {
-		width: 350px;
+		/* width: 350px; */
+		width: 250px;
 		height: 100%;
 		@include transparent-background($secondary-color, 0.9);
 		pointer-events: all;

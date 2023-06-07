@@ -1,0 +1,114 @@
+<script lang="ts" context="module">
+	type RgbValue = { r: number; g: number; b: number; a?: number };
+
+	function rgba2hex(rgba: RgbValue) {
+		let hex =
+			(rgba.r | (1 << 8)).toString(16).slice(1) +
+			(rgba.g | (1 << 8)).toString(16).slice(1) +
+			(rgba.b | (1 << 8)).toString(16).slice(1);
+
+		// const a = rgba.a ? ((rgba.a * 255) | (1 << 8)).toString(16).slice(1) : '01';
+		// console.log(a);
+		console.log(rgba.a);
+
+		return {
+			color: '#' + hex,
+			opacity: rgba.a
+		};
+	}
+
+	export type LayerStyleProperties = {
+		layer: MapLayer<mapboxgl.Layer>;
+		newName: string;
+		color: string;
+		opacity: number;
+	};
+</script>
+
+<script lang="ts">
+	import iro from '@jaames/iro';
+	// import type { IroColor } from '@jaames/iro';
+	import { createEventDispatcher, onMount } from 'svelte';
+	import Button from '@smui/button';
+	import Textfield from '@smui/textfield';
+	import type { MapLayer } from '../../../stores/mapLayers';
+	import type mapboxgl from 'mapbox-gl';
+
+	export let layer: MapLayer<mapboxgl.Layer>;
+
+	$: displayName = layer.displayName;
+
+	let colorWheel: iro.ColorPicker;
+
+	function handleColorChange(e: any) {
+		console.log(e);
+	}
+
+	const dispatch = createEventDispatcher<{ propertiesSet: LayerStyleProperties }>();
+
+	function onApply() {
+		dispatch('propertiesSet', {
+			layer,
+			newName: displayName,
+			...rgba2hex(colorWheel.color.rgba)
+		});
+	}
+
+	onMount(() => {
+		colorWheel = iro.ColorPicker('#colorWheel', {
+			width: 200,
+			color: '#fff',
+			layoutDirection: 'vertical',
+			borderWidth: 0,
+			borderColor: '#fff',
+			padding: 4,
+			handleRadius: 8,
+			wheelLightness: true,
+			wheelDirection: 'anticlockwise',
+			sliderSize: undefined,
+			sliderMargin: 12,
+			layout: [
+				{
+					component: iro.ui.Wheel,
+					options: {
+						wheelLightness: true,
+						wheelAngle: 0,
+						wheelDirection: 'anticlockwise'
+					}
+				},
+				{
+					component: iro.ui.Slider,
+					options: {
+						sliderType: 'value'
+					}
+				},
+				{
+					component: iro.ui.Slider,
+					options: {
+						sliderType: 'alpha', // can also be 'saturation', 'value', 'alpha' or 'kelvin',
+						activeIndex: 2
+					}
+				}
+			]
+		});
+
+		colorWheel.on('color:change', handleColorChange);
+	});
+</script>
+
+<span style="height: 10px;" />
+<Textfield bind:value={displayName} label="Layer name" />
+<div class="wheel" id="colorWheel" />
+<span id="apply-btn"><Button on:click={onApply} variant="unelevated">Apply</Button></span>
+
+<style lang="scss">
+	.wheel {
+		margin-top: 20px;
+		margin-inline: auto;
+	}
+
+	#apply-btn {
+		margin-top: auto;
+		margin-left: auto;
+	}
+</style>

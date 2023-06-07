@@ -8,7 +8,7 @@
 	import { onMount } from 'svelte';
 	import { mapSources } from '../../../stores/mapSources';
 	import { addLayerWithTypeCheck, isValid } from './utils';
-	import { mapLayers } from '../../../stores/mapLayers';
+	import { mapLayers, type MapLayer } from '../../../stores/mapLayers';
 	import Sidebar from '../Sidebar/Sidebar.svelte';
 	import ToolsDropdown from '../AnalysisTools/ToolsDropdown.svelte';
 	import type { GeoJSON } from 'geojson';
@@ -28,6 +28,8 @@
 	import DifferenceOptions from '../Sidebar/ToolOptions/DifferenceOptions.svelte';
 	import VoronoiOptions from '../Sidebar/ToolOptions/VoronoiOptions.svelte';
 	import BboxClipOptions from '../Sidebar/ToolOptions/BboxClipOptions.svelte';
+	import LayerInfo from '../LayerInfo/LayerInfo.svelte';
+	import type { LayerStyleProperties } from '../LayerInfo/Properties.svelte';
 
 	let map: mapboxgl.Map;
 	let draw: MapboxDraw;
@@ -165,6 +167,13 @@
 		]
 	};
 
+	let infoLayer: MapLayer<mapboxgl.Layer>;
+
+	function handleSingleLayerSelect(e: any) {
+		console.log(e.detail.layer);
+		infoLayer = e.detail.layer;
+	}
+
 	onMount(() => {
 		mapboxgl.accessToken =
 			'pk.eyJ1Ijoia29ob2xtIiwiYSI6ImNremUzM2tsMzJmZWsybm54d20xazFicWQifQ.uZRVptXit_O5hkkSFBKXug';
@@ -294,12 +303,25 @@
 			addLayerWithTypeCheck(map, source);
 		});
 	});
+
+	function handlePropertiesSet(e: CustomEvent<LayerStyleProperties>) {
+		const { layer, newName, color, opacity } = e.detail;
+		console.log(opacity);
+		layer.displayName = 'newName';
+		map.setPaintProperty(layer.id, 'fill-color', color);
+		map.setPaintProperty(layer.id, 'fill-opacity', opacity);
+	}
 </script>
 
 <div id="map" />
 <div id="overlay">
-	<Sidebar {map} {draw} {tools} bind:selectedTool />
+	<Sidebar {map} {draw} {tools} bind:selectedTool on:singleLayerSelect={handleSingleLayerSelect} />
 	<ToolsDropdown {tools} bind:selectedTool on:toolSelected={(e) => (selectedTool = e.detail)} />
+	{#if infoLayer}
+		<span style="margin-left: auto;">
+			<LayerInfo bind:layer={infoLayer} on:propertiesSet={handlePropertiesSet} />
+		</span>
+	{/if}
 </div>
 
 <style lang="scss">
