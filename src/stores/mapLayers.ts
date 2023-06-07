@@ -20,6 +20,7 @@ function createMapLayers() {
 	return {
 		subscribe,
 		set,
+		update,
 		add: <T extends mapboxgl.Layer>(newLayer: MapLayer<T>) =>
 			update((storeLayers) => [newLayer, ...storeLayers]),
 		getUniqueLayerId: <T extends mapboxgl.Layer>(newLayer: MapLayer<T>): MapLayer<T> => {

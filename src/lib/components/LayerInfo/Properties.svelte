@@ -1,15 +1,11 @@
 <script lang="ts" context="module">
 	type RgbValue = { r: number; g: number; b: number; a?: number };
 
-	function rgba2hex(rgba: RgbValue) {
+	export function rgba2hex(rgba: RgbValue) {
 		let hex =
 			(rgba.r | (1 << 8)).toString(16).slice(1) +
 			(rgba.g | (1 << 8)).toString(16).slice(1) +
 			(rgba.b | (1 << 8)).toString(16).slice(1);
-
-		// const a = rgba.a ? ((rgba.a * 255) | (1 << 8)).toString(16).slice(1) : '01';
-		// console.log(a);
-		console.log(rgba.a);
 
 		return {
 			color: '#' + hex,
@@ -21,13 +17,12 @@
 		layer: MapLayer<mapboxgl.Layer>;
 		newName: string;
 		color: string;
-		opacity: number;
+		opacity?: number;
 	};
 </script>
 
 <script lang="ts">
 	import iro from '@jaames/iro';
-	// import type { IroColor } from '@jaames/iro';
 	import { createEventDispatcher, onMount } from 'svelte';
 	import Button from '@smui/button';
 	import Textfield from '@smui/textfield';
@@ -35,14 +30,10 @@
 	import type mapboxgl from 'mapbox-gl';
 
 	export let layer: MapLayer<mapboxgl.Layer>;
-
-	$: displayName = layer.displayName;
+	$: layerName = layer.displayName;
+	$: displayName = layerName;
 
 	let colorWheel: iro.ColorPicker;
-
-	function handleColorChange(e: any) {
-		console.log(e);
-	}
 
 	const dispatch = createEventDispatcher<{ propertiesSet: LayerStyleProperties }>();
 
@@ -91,8 +82,6 @@
 				}
 			]
 		});
-
-		colorWheel.on('color:change', handleColorChange);
 	});
 </script>
 

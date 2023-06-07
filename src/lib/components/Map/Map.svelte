@@ -306,8 +306,11 @@
 
 	function handlePropertiesSet(e: CustomEvent<LayerStyleProperties>) {
 		const { layer, newName, color, opacity } = e.detail;
-		console.log(opacity);
-		layer.displayName = 'newName';
+		mapLayers.update((storeLayers) => {
+			const layerToUpdate = storeLayers.find((l) => l.id === layer.id);
+			if (layerToUpdate) layerToUpdate.displayName = newName;
+			return storeLayers;
+		});
 		map.setPaintProperty(layer.id, 'fill-color', color);
 		map.setPaintProperty(layer.id, 'fill-opacity', opacity);
 	}
