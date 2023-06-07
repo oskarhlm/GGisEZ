@@ -37,8 +37,12 @@
 
 	let nodeRef: Node;
 
-	const dispatch = createEventDispatcher<{ toggled: MapLayer<mapboxgl.Layer> }>();
+	const dispatch = createEventDispatcher<{
+		toggled: MapLayer<mapboxgl.Layer>;
+		singleSelect: MapLayer<mapboxgl.Layer>;
+	}>();
 	const handleOnToggled = () => dispatch('toggled', layer);
+	const handleOnSingleSelect = () => dispatch('singleSelect', layer);
 
 	function getIconPath(layer: mapboxgl.Layer) {
 		switch (layer.type) {
@@ -101,9 +105,11 @@
 	};
 </script>
 
-<div class="item" bind:this={nodeRef}>
-	<img class="icon" src={getIconPath(layer)} alt={layer.type} />
-	<p class="description">{layer.displayName}</p>
+<div class="item" class:checked bind:this={nodeRef}>
+	<button class="btn" on:click={handleOnSingleSelect}>
+		<img class="icon" src={getIconPath(layer)} alt={layer.type} />
+		<p class="description">{layer.displayName}</p>
+	</button>
 	<Wrapper>
 		<span class="visibility-btn"
 			><IconButton class="material-icons" on:click={actionDescription[visibility].onClick}>
@@ -128,6 +134,19 @@
 		display: flex;
 		align-items: center;
 		cursor: grab;
+		border: none;
+		background: none;
+		width: 100%;
+	}
+
+	.btn {
+		display: flex;
+		align-items: center;
+		cursor: grab;
+		border: none;
+		background: none;
+		width: 100%;
+		color: $primary-color;
 	}
 
 	.icon {
@@ -144,6 +163,10 @@
 			border: none;
 			cursor: pointer;
 		}
+	}
+
+	.checked {
+		@include transparent-background($highlight-color, 0.4);
 	}
 
 	.visibility-btn {

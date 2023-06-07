@@ -70,6 +70,7 @@
 			});
 
 		selectedTool = null;
+		selectedLayers = [];
 		optionsCleanup && optionsCleanup();
 	}
 
@@ -82,6 +83,15 @@
 		}
 
 		selectedLayers = [...selectedLayers, layer];
+	}
+
+	function handleSingleLayerSelect(e: CustomEvent<MapLayer<mapboxgl.Layer>>) {
+		const layer = e.detail;
+		if (selectedLayers.length === 1 && selectedLayers[0] === layer) {
+			selectedLayers = [];
+		} else {
+			selectedLayers = [layer];
+		}
 	}
 
 	async function handleFileChange(event: Event) {
@@ -132,6 +142,7 @@
 				bind:selectedLayers
 				{map}
 				on:toggled={handleSelectedLayersUpdate}
+				on:singleSelect={handleSingleLayerSelect}
 			/>
 		</SortableList>
 		<hr style="margin-top: auto" />
