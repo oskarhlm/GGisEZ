@@ -9,25 +9,27 @@ import { isFeature, isFeatureCollection, isPolygon } from '$lib/utils/geojson';
 import { isValid } from '../Map/utils';
 
 function dissolveProcessor(input: MapLayer<mapboxgl.Layer>[]) {
-	const data = (input[0].source as GeoJSONSourceRaw).data;
-	if (
-		!isValid(data) ||
-		!isFeatureCollection(data) ||
-		!data.features.every((f) => isPolygon(f.geometry))
-	)
-		return null;
-
-	return dissolve(data as FeatureCollection<Polygon, {}>) as GeoJSON;
+	if (!dissolveInputValidator(input)) return null;
+	// const data = (input[0].source as GeoJSONSourceRaw).data as FeatureCollection<Polygon, {}>;
+	const data = input.map(
+		(i) => (i.source as GeoJSONSourceRaw).data as FeatureCollection<Polygon, {}>
+	);
+	return data.map((d) => dissolve(d));
 }
 
 function dissolveInputValidator(input: MapLayer<mapboxgl.Layer>[]) {
+	if (input.length === 0) return false;
 	return input.every((l) => {
 		const data = (l.source as GeoJSONSourceRaw).data;
-		return isValid(data) && isFeatureCollection(data);
+		return (
+			isValid(data) &&
+			isFeatureCollection(data) &&
+			data.features.every((f) => isPolygon(f.geometry))
+		);
 	});
 }
 
 export default {
 	processor: dissolveProcessor,
 	validator: dissolveInputValidator
-} satisfies GeoJSONProcessor<MapLayer<mapboxgl.Layer>[], GeoJSON, {}, {}>;
+} satisfies GeoJSONProcessor<MapLayer<mapboxgl.Layer>[], GeoJSON[], {}, {}>;

@@ -23,16 +23,14 @@ function unionProcessor(input: MapLayer<mapboxgl.Layer>[]) {
 		}
 	});
 
-	return union(poly1 as any, poly2 as any) as GeoJSON;
+	return [union(poly1 as any, poly2 as any)].filter((u) => u !== null) as GeoJSON[];
 }
 
 function unionInputValidator(input: MapLayer<mapboxgl.Layer>[]): boolean {
-	if (input.length !== 2) throw new Error('Exactly two polygon layers required');
-
-	return true;
+	return input.length === 2;
 }
 
 export default {
 	processor: unionProcessor,
 	validator: unionInputValidator
-} satisfies GeoJSONProcessor<MapLayer<mapboxgl.Layer>[], GeoJSON, {}, {}>;
+} satisfies GeoJSONProcessor<MapLayer<mapboxgl.Layer>[], GeoJSON[], {}, {}>;

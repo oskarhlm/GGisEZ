@@ -14,7 +14,7 @@ export const toolNamesArray = [
 ] as const;
 export type ToolName = (typeof toolNamesArray)[number];
 
-export type Tool<Input extends MapLayer<mapboxgl.Layer>[], Output extends GeoJSON | null> = {
+export type Tool<Input extends MapLayer<mapboxgl.Layer>[], Output extends GeoJSON[] | null> = {
 	name: ToolName;
 	iconPath: string;
 	geoProcessor?: GeoJSONProcessor<Input, Output, any, any>;
@@ -26,11 +26,11 @@ export type Tool<Input extends MapLayer<mapboxgl.Layer>[], Output extends GeoJSO
 	onSelected?: () => void;
 };
 
-export type GeoJSONTool = Tool<any, GeoJSON | null>;
+export type GeoJSONTool = Tool<any, GeoJSON[] | null>;
 
 export type GeoJSONProcessor<
-	Input, // extends MapLayer<mapboxgl.Layer>[],
-	Output,
+	Input extends MapLayer<mapboxgl.Layer>[],
+	Output extends GeoJSON[] | null,
 	ProcessorArgs extends Record<string, any>,
 	ValidatorArgs extends Record<string, any>
 > = {

@@ -18,14 +18,14 @@ import type { GeoJSONSourceRaw } from 'mapbox-gl';
 export type BufferOptions = { radius: number; units: Units };
 
 function bufferProcessor(input: MapLayer<mapboxgl.Layer>[], options?: BufferOptions) {
-	const sources = input.map((l) => l.source) as GeoJSONSourceRaw[];
-	const data: any = sources.map((s) => s.data);
-	const buf = buffer(data[0], options?.radius || 1, { units: options?.units || 'kilometers' });
-	return buf;
+	const data = input.map((l) => (l.source as GeoJSONSourceRaw).data as any);
+	return data
+		.map((d) => buffer(d, options?.radius || 1, { units: options?.units || 'kilometers' }))
+		.filter((b) => b !== undefined);
 }
 
 function bufferInputValidator(input: MapLayer<mapboxgl.Layer>[]): boolean {
-	return true;
+	return input.length > 0;
 }
 
 export default {
@@ -33,7 +33,7 @@ export default {
 	validator: bufferInputValidator
 } satisfies GeoJSONProcessor<
 	MapLayer<mapboxgl.Layer>[],
-	FeatureCollection | Feature<Polygon | MultiPolygon> | undefined,
+	(FeatureCollection | Feature<Polygon | MultiPolygon>)[],
 	{ radius: number; units: Units },
 	{}
 >;

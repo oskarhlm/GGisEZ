@@ -250,7 +250,7 @@
 			},
 			{
 				name: 'voronoi',
-				iconPath: 'button-icons/vornoi.png',
+				iconPath: 'button-icons/voronoi.png',
 				geoProcessor: VoronoiProcessor,
 				tooltip:
 					'Takes a FeatureCollection of points, and an optional bounding box, and returns a FeatureCollection of Voronoi polygons.',
@@ -261,7 +261,7 @@
 			},
 			{
 				name: 'dissolve',
-				iconPath: 'button-icons/union.png',
+				iconPath: 'button-icons/dissolve.png',
 				geoProcessor: DissolveProcessor,
 				tooltip:
 					'Dissolves a FeatureCollection of polygon features, filtered by an optional property name. Like a union reduction on a single FeatureCollection.'

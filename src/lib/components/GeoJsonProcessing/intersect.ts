@@ -24,13 +24,11 @@ function intersectProcessor(input: MapLayer<mapboxgl.Layer>[]) {
 	});
 
 	const intersection = intersect(poly1 as any, poly2 as any);
-	return intersection as GeoJSON;
+	return [intersection] as GeoJSON[];
 }
 
 function intersectInputValidator(input: MapLayer<mapboxgl.Layer>[]): boolean {
-	if (input.length !== 2) throw new Error('Exactly two polygon layers required');
-
-	return true;
+	return input.length === 2;
 }
 
 export default {
@@ -40,7 +38,7 @@ export default {
 	// { poly1: MapLayer<mapboxgl.Layer>; poly2: MapLayer<mapboxgl.Layer> },
 	MapLayer<mapboxgl.Layer>[],
 	// Feature<Polygon | MultiPolygon, any> | null,
-	GeoJSON,
+	GeoJSON[],
 	{},
 	{}
 >;

@@ -25,7 +25,9 @@
 	export let map: mapboxgl.Map;
 	export let draw: MapboxDraw;
 	export let tools: GeoJSONTool[];
+
 	export let selectedTool: GeoJSONTool | null;
+	$: applyIsDisabled = !selectedTool?.geoProcessor?.validator(selectedLayers, options);
 
 	let fileInput: HTMLInputElement;
 	let files: FileList;
@@ -52,21 +54,21 @@
 	}
 
 	function handleApplyTransformation() {
-		if (!selectedTool?.geoProcessor?.validator(selectedLayers)) {
-			return;
+		let result = selectedTool?.geoProcessor?.processor(selectedLayers, options);
+
+		if (result && !Array.isArray(result)) {
+			result = [result];
 		}
 
-		const result = selectedTool?.geoProcessor?.processor(selectedLayers, options);
-		console.log(result);
-
-		result &&
+		result?.forEach((r) =>
 			addLayerWithTypeCheck(map, {
-				id: selectedTool.name,
+				id: selectedTool!.name,
 				geojson: {
 					type: 'geojson',
-					data: result
+					data: r
 				}
-			});
+			})
+		);
 
 		selectedTool = null;
 		selectedLayers = [];
@@ -184,7 +186,11 @@
 			</Wrapper>
 			<span style="margin-left: auto;">
 				{#if selectedTool}
-					<Button variant="unelevated" on:click={handleApplyTransformation}>
+					<Button
+						variant="unelevated"
+						bind:disabled={applyIsDisabled}
+						on:click={handleApplyTransformation}
+					>
 						<Label>Apply</Label>
 					</Button>
 					<Button variant="outlined" on:click={() => (selectedTool = null)}>
@@ -196,6 +202,10 @@
 							class="material-icons"
 							on:click={() => {
 								selectModeEnabled = !selectModeEnabled;
+								if (!selectModeEnabled) {
+									selectedLayers = [];
+									dispatch('singleLayerSelect', { layer: null });
+								}
 							}}>{selectModeEnabled ? 'check' : 'rule'}</IconButton
 						>
 						<Tooltip>Select layers</Tooltip>

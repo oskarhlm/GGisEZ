@@ -88,28 +88,38 @@ function bboxClipProcessor(input: MapLayer<mapboxgl.Layer>[], options?: BBoxClip
 	}
 
 	if (isGeometryCollection(data))
-		return {
-			type: 'GeometryCollection',
-			geometries: data.geometries.flatMap((g) => bboxClipper(g, options)).map((f) => f.geometry)
-		} satisfies GeometryCollection;
+		return [
+			{
+				type: 'GeometryCollection',
+				geometries: data.geometries.flatMap((g) => bboxClipper(g, options)).map((f) => f.geometry)
+			}
+		] satisfies GeometryCollection[];
 
 	if (isFeatureCollection(data)) {
-		console.log('hei');
-		const ya = {
-			type: 'FeatureCollection',
-			features: data.features.flatMap((f) => bboxClipper(f, options))
-		} satisfies FeatureCollection;
-		return ya;
+		return [
+			{
+				type: 'FeatureCollection',
+				features: data.features.flatMap((f) => bboxClipper(f, options))
+			}
+		] satisfies FeatureCollection[];
 	}
 
 	return null;
 }
 
-function bboxClipInputValidator(input: MapLayer<mapboxgl.Layer>[]): boolean {
-	return true;
+function bboxClipInputValidator(
+	input: MapLayer<mapboxgl.Layer>[],
+	options?: BBoxClipOptions
+): boolean {
+	return input.length > 0 && options !== undefined;
 }
 
 export default {
 	processor: bboxClipProcessor,
 	validator: bboxClipInputValidator
-} satisfies GeoJSONProcessor<MapLayer<mapboxgl.Layer>[], GeoJSON, BBoxClipOptions, {}>;
+} satisfies GeoJSONProcessor<
+	MapLayer<mapboxgl.Layer>[],
+	GeoJSON[],
+	BBoxClipOptions,
+	BBoxClipOptions
+>;

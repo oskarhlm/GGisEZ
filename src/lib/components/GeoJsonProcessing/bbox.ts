@@ -16,10 +16,11 @@ function bboxProcessor(input: MapLayer<mapboxgl.Layer>[]) {
 	}
 
 	const bboxCoords = bbox(data);
-	return bboxPolygon(bboxCoords);
+	return [bboxPolygon(bboxCoords)];
 }
 
 function intersectInputValidator(input: MapLayer<mapboxgl.Layer>[]): boolean {
+	if (input.length === 0) return false;
 	const data = (input[0].source as GeoJSONSourceRaw).data;
 
 	if (!data || !isGeoJSON(data)) {

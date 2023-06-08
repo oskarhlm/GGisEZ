@@ -66,10 +66,12 @@ function voronoiProcessor(input: MapLayer<mapboxgl.Layer>[], options?: VoronoiOp
 
 	voronoiFC.features = voronoiFC.features.filter((f) => f !== undefined);
 
-	return voronoiFC;
+	return [voronoiFC];
 }
 
 function voronoiInputValidator(input: MapLayer<mapboxgl.Layer>[]): boolean {
+	if (input.length === 0) return false;
+
 	const data = (input[0].source as GeoJSONSourceRaw).data;
 
 	if (!data || !isGeoJSON(data)) {
@@ -82,4 +84,4 @@ function voronoiInputValidator(input: MapLayer<mapboxgl.Layer>[]): boolean {
 export default {
 	processor: voronoiProcessor,
 	validator: voronoiInputValidator
-} satisfies GeoJSONProcessor<MapLayer<mapboxgl.Layer>[], GeoJSON, VoronoiOptions, {}>;
+} satisfies GeoJSONProcessor<MapLayer<mapboxgl.Layer>[], GeoJSON[], VoronoiOptions, {}>;

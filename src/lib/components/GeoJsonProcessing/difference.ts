@@ -38,8 +38,7 @@ function differenceProcessor(input: MapLayer<mapboxgl.Layer>[]) {
 		}
 	});
 
-	const res = difference(poly1 as any, poly2 as any);
-	return res as GeoJSON;
+	return [difference(poly1 as any, poly2 as any)].filter((d) => d !== null) as GeoJSON[];
 }
 
 function differenceInputValidator(input: MapLayer<mapboxgl.Layer>[]): boolean {
@@ -51,4 +50,4 @@ function differenceInputValidator(input: MapLayer<mapboxgl.Layer>[]): boolean {
 export default {
 	processor: differenceProcessor,
 	validator: differenceInputValidator
-} satisfies GeoJSONProcessor<MapLayer<mapboxgl.Layer>[], GeoJSON, DifferenceOptions, {}>;
+} satisfies GeoJSONProcessor<MapLayer<mapboxgl.Layer>[], GeoJSON[], DifferenceOptions, {}>;
