@@ -108,6 +108,28 @@
 		}
 	}
 
+	function dowloadFiles() {
+		selectedLayers.forEach((l) => {
+			const jsonData = (l.source as GeoJSONSourceRaw).data;
+			if (!jsonData) return;
+
+			const fileName = l.displayName + '.geojson';
+			const contentType = 'application/json';
+
+			const jsonContent = JSON.stringify(jsonData);
+
+			const jsonBlob = new Blob([JSON.stringify(jsonData)], { type: contentType });
+			const url = URL.createObjectURL(jsonBlob);
+
+			const link = document.createElement('a');
+			link.href = url;
+			link.download = fileName;
+			link.click();
+
+			URL.revokeObjectURL(url);
+		});
+	}
+
 	onMount(() => {
 		fileInput.addEventListener('change', handleFileChange);
 	});
@@ -157,7 +179,7 @@
 			</Wrapper>
 			<input bind:this={fileInput} id="file-upload" multiple type="file" style="display: none;" />
 			<Wrapper>
-				<IconButton class="material-icons">download</IconButton>
+				<IconButton class="material-icons" on:click={dowloadFiles}>download</IconButton>
 				<Tooltip>Download layer(s)</Tooltip>
 			</Wrapper>
 			<span style="margin-left: auto;">
