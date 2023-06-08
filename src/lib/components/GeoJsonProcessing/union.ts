@@ -23,8 +23,7 @@ function unionProcessor(input: MapLayer<mapboxgl.Layer>[]) {
 		}
 	});
 
-	const res = union(poly1 as any, poly2 as any);
-	return res as GeoJSON;
+	return union(poly1 as any, poly2 as any) as GeoJSON;
 }
 
 function unionInputValidator(input: MapLayer<mapboxgl.Layer>[]): boolean {

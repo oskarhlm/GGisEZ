@@ -83,6 +83,7 @@
 			tooltip: 'Remove layer',
 			onClick: async () => {
 				map.removeLayer(layer.id);
+				map.removeSource(layer.id);
 				mapLayers.deleteLayer(layer.id);
 				nodeRef.parentNode?.removeChild(nodeRef);
 			},

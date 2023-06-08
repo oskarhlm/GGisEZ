@@ -37,7 +37,6 @@
 	let optionsCleanup: (() => void) | undefined;
 
 	function updateOptions(opts: ToolSelectOptions, cleanup?: () => void) {
-		console.log(opts);
 		options = opts.args;
 		optionsCleanup = cleanup;
 		if (opts.layerSelection !== undefined && opts.layerSelection.length !== undefined) {
@@ -125,9 +124,7 @@
 			<span style="display: flex; align-items: center; justify-content: space-between; ">
 				<h3>{selectedTool?.name.toUpperCase()}</h3>
 				<Wrapper rich>
-					<span
-						style="display: flex; align-items: center; text-justify: center; padding-right: 12px;"
-					>
+					<span class="info-btn">
 						<Icon class="material-icons">info</Icon>
 					</span>
 					<Tooltip><Content>{selectedTool.tooltip}</Content></Tooltip>
@@ -188,6 +185,14 @@
 </div>
 
 <style lang="scss">
+	.info-btn {
+		display: flex;
+		align-items: center;
+		text-justify: center;
+		padding-right: 12px;
+		cursor: default;
+	}
+
 	.file-action-row {
 		display: flex;
 		align-items: center;

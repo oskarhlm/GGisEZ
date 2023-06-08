@@ -1,4 +1,4 @@
-import { writable, type Writable } from 'svelte/store';
+import { get, writable, type Writable } from 'svelte/store';
 import type { GeoJSON } from 'geojson';
 import type { GeoJSONSourceRaw } from 'mapbox-gl';
 
@@ -23,7 +23,18 @@ function createMapSources() {
 				});
 
 				return [...storeSources, ...newSources];
-			})
+			}),
+		getUniqueSourceId: (idProposal: string) => {
+			const storeSources = get(mapSources);
+			if (storeSources.map((s) => s.id).includes(idProposal)) {
+				const numEqualNamesInStore = storeSources
+					.map((l) => l.id)
+					.filter((name) => name.startsWith(idProposal)).length;
+				idProposal += `_${numEqualNamesInStore}`;
+			}
+
+			return idProposal;
+		}
 	};
 }
 

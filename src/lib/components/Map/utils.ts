@@ -1,5 +1,5 @@
 import type mapboxgl from 'mapbox-gl';
-import type { MapSource } from '../../../stores/mapSources';
+import { mapSources, type MapSource } from '../../../stores/mapSources';
 import type {
 	GeoJsonTypes,
 	FeatureCollection,
@@ -94,7 +94,8 @@ function addPointLayer(
 	options?: LayerOptions<mapboxgl.CircleLayer>
 ) {
 	let newLayer: MapLayer<mapboxgl.CircleLayer> = {
-		id: id + '-point',
+		// id: id + '-point',
+		id: mapSources.getUniqueSourceId(id + '-point'),
 		type: 'circle',
 		source: {
 			type: 'geojson',
@@ -120,7 +121,8 @@ function addLineLayer(
 	options?: LayerOptions<mapboxgl.LineLayer>
 ) {
 	let newLayer: MapLayer<mapboxgl.LineLayer> = {
-		id: id + '-line',
+		// id: id + '-line',
+		id: mapSources.getUniqueSourceId(id + '-line'),
 		type: 'line',
 		source: {
 			type: 'geojson',
@@ -146,7 +148,8 @@ function addPolygonLayer(
 	options?: LayerOptions<mapboxgl.FillLayer>
 ) {
 	let newLayer: MapLayer<mapboxgl.FillLayer> = {
-		id: id + '-polygon',
+		// id: id + '-polygon',
+		id: mapSources.getUniqueSourceId(id + '-polygon'),
 		type: 'fill',
 		source: {
 			type: 'geojson',

@@ -67,13 +67,20 @@ function bboxClipper<T extends Feature | Geometry>(data: T, options: BBoxClipOpt
 		} satisfies Feature;
 	}
 
-	if (isLineString(geoms) && isMultiLineString(geoms) && isPolygon(geoms) && isMultiPolygon(geoms))
+	if (
+		isLineString(geoms) ||
+		isMultiLineString(geoms) ||
+		isPolygon(geoms) ||
+		isMultiPolygon(geoms)
+	) {
 		return bboxClip(geoms, options.bbox);
+	}
 
 	return [];
 }
 
 function bboxClipProcessor(input: MapLayer<mapboxgl.Layer>[], options?: BBoxClipOptions) {
+	console.log(input, options);
 	const data = input.map((l) => (l.source as GeoJSONSourceRaw).data)[0];
 
 	if (!isValid(data) || !options) {
@@ -87,10 +94,12 @@ function bboxClipProcessor(input: MapLayer<mapboxgl.Layer>[], options?: BBoxClip
 		} satisfies GeometryCollection;
 
 	if (isFeatureCollection(data)) {
-		return {
+		console.log('hei');
+		const ya = {
 			type: 'FeatureCollection',
 			features: data.features.flatMap((f) => bboxClipper(f, options))
 		} satisfies FeatureCollection;
+		return ya;
 	}
 
 	return null;

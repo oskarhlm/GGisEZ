@@ -9,7 +9,8 @@ export const toolNamesArray = [
 	'difference',
 	'intersect',
 	'union',
-	'voronoi'
+	'voronoi',
+	'dissolve'
 ] as const;
 export type ToolName = (typeof toolNamesArray)[number];
 

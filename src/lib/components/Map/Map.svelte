@@ -22,7 +22,8 @@
 		IntersectProcessor,
 		UnionProcessor,
 		VoronoiProcessor,
-		BboxClipProcessor
+		BboxClipProcessor,
+		DissolveProcessor
 	} from '../GeoJsonProcessing';
 	import BufferOptions from '../Sidebar/ToolOptions/BufferOptions.svelte';
 	import DifferenceOptions from '../Sidebar/ToolOptions/DifferenceOptions.svelte';
@@ -193,12 +194,19 @@
 		});
 
 		tools = [
-			{ name: 'bbox', iconPath: 'button-icons/bbox.png', geoProcessor: BboxProcessor, tooltip: '' },
+			{
+				name: 'bbox',
+				iconPath: 'button-icons/bbox.png',
+				geoProcessor: BboxProcessor,
+				tooltip:
+					'Takes a set of features, calculates the bbox of all input features, and returns a bounding box.'
+			},
 			{
 				name: 'buffer',
 				iconPath: 'button-icons/buffer.png',
 				geoProcessor: BufferProcessor,
-				tooltip: '',
+				tooltip:
+					'Calculates a buffer for input features for a given radius. For FeatureCollections, individual buffers are calculated for each feature, but you can use dissolve to combine them.',
 				optionsComponent: {
 					component: BufferOptions,
 					props: {}
@@ -208,7 +216,8 @@
 				name: 'clip',
 				iconPath: 'button-icons/clip.png',
 				geoProcessor: BboxClipProcessor,
-				tooltip: '',
+				tooltip:
+					'Clips a selected feature to the bbox (bounding box) using lineclip. Select two positions in the map to create the bbox.',
 				optionsComponent: {
 					component: BboxClipOptions,
 					props: { map: map, draw: draw }
@@ -218,7 +227,8 @@
 				name: 'difference',
 				iconPath: 'button-icons/difference.png',
 				geoProcessor: DifferenceProcessor,
-				tooltip: '',
+				tooltip:
+					'Finds the difference between two polygons by clipping the second polygon from the first.',
 				optionsComponent: {
 					component: DifferenceOptions,
 					props: {}
@@ -228,23 +238,33 @@
 				name: 'intersect',
 				iconPath: 'button-icons/intersection.png',
 				geoProcessor: IntersectProcessor,
-				tooltip: ''
+				tooltip:
+					'Takes two polygon or multi-polygon geometries and finds their polygonal intersection, if there is one.'
 			},
 			{
 				name: 'union',
 				iconPath: 'button-icons/union.png',
 				geoProcessor: UnionProcessor,
-				tooltip: ''
+				tooltip:
+					'Takes two (Multi)Polygon(s) and returns a combined polygon. If the input polygons are not contiguous, this function returns a MultiPolygon feature.'
 			},
 			{
 				name: 'voronoi',
 				iconPath: 'button-icons/vornoi.png',
 				geoProcessor: VoronoiProcessor,
-				tooltip: '',
+				tooltip:
+					'Takes a FeatureCollection of points, and an optional bounding box, and returns a FeatureCollection of Voronoi polygons.',
 				optionsComponent: {
 					component: VoronoiOptions,
 					props: { map: map, draw: draw }
 				}
+			},
+			{
+				name: 'dissolve',
+				iconPath: 'button-icons/union.png',
+				geoProcessor: DissolveProcessor,
+				tooltip:
+					'Dissolves a FeatureCollection of polygon features, filtered by an optional property name. Like a union reduction on a single FeatureCollection.'
 			}
 		];
 
@@ -314,8 +334,6 @@
 			}
 			return storeLayers;
 		});
-
-		console.log(layer.type);
 
 		map.setPaintProperty(layer.id, `${layer.type}-color`, color);
 		map.setPaintProperty(layer.id, `${layer.type}-opacity`, opacity);
