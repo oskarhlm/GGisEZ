@@ -170,7 +170,6 @@
 	let infoLayer: MapLayer<mapboxgl.Layer>;
 
 	function handleSingleLayerSelect(e: any) {
-		console.log(e.detail.layer);
 		infoLayer = e.detail.layer;
 	}
 
@@ -308,11 +307,18 @@
 		const { layer, newName, color, opacity } = e.detail;
 		mapLayers.update((storeLayers) => {
 			const layerToUpdate = storeLayers.find((l) => l.id === layer.id);
-			if (layerToUpdate) layerToUpdate.displayName = newName;
+			if (layerToUpdate) {
+				layerToUpdate.displayName = newName;
+				(layerToUpdate.paint as any)[`${layer.type}-color`] = color as any;
+				(layerToUpdate.paint as any)[`${layer.type}-opacity`] = opacity;
+			}
 			return storeLayers;
 		});
-		map.setPaintProperty(layer.id, 'fill-color', color);
-		map.setPaintProperty(layer.id, 'fill-opacity', opacity);
+
+		console.log(layer.type);
+
+		map.setPaintProperty(layer.id, `${layer.type}-color`, color);
+		map.setPaintProperty(layer.id, `${layer.type}-opacity`, opacity);
 	}
 </script>
 

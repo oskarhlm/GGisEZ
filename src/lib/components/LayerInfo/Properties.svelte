@@ -19,6 +19,12 @@
 		color: string;
 		opacity?: number;
 	};
+
+	function floatToHex(value: number) {
+		var intValue = Math.round(value * 255);
+		var hexValue = intValue.toString(16).padStart(2, '0');
+		return hexValue;
+	}
 </script>
 
 <script lang="ts">
@@ -28,14 +34,19 @@
 	import Textfield from '@smui/textfield';
 	import type { MapLayer } from '../../../stores/mapLayers';
 	import type mapboxgl from 'mapbox-gl';
-	import type { FillPaint } from 'mapbox-gl';
 
 	export let layer: MapLayer<mapboxgl.Layer>;
 	$: layerName = layer.displayName;
 	$: displayName = layerName;
 
 	$: {
-		if (colorWheel) colorWheel.color.set((layer.paint as FillPaint)['fill-color'] as string);
+		if (colorWheel) {
+			console.log(layer.paint);
+			const hexColor = (layer.paint as any)[`${layer.type}-color`] as string;
+			const opacity = (layer.paint as any)[`${layer.type}-opacity`];
+			const hexOpacity = floatToHex(opacity || 1);
+			colorWheel.color.set(hexColor + hexOpacity);
+		}
 	}
 
 	let colorWheel: iro.ColorPicker;
@@ -54,10 +65,7 @@
 		colorWheel = iro.ColorPicker('#colorWheel', {
 			width: 250,
 			color: '#fff',
-			// color: defaultColor,
 			layoutDirection: 'vertical',
-			borderWidth: 0,
-			borderColor: '#fff',
 			padding: 4,
 			handleRadius: 8,
 			wheelLightness: true,
