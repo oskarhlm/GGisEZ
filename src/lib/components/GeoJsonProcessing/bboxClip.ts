@@ -31,6 +31,7 @@ import type {
 	Polygon,
 	MultiPolygon,
 	GeoJsonProperties,
+	Point,
 	MultiPoint
 } from 'geojson';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
@@ -54,7 +55,7 @@ function bboxClipper<T extends Feature | Geometry>(data: T, options: BBoxClipOpt
 				type: 'Feature',
 				geometry: geoms,
 				properties: {}
-			} satisfies Feature;
+			} satisfies Feature<Point, {}>;
 		}
 	} else if (isMultiPoint(geoms)) {
 		return {
@@ -64,7 +65,7 @@ function bboxClipper<T extends Feature | Geometry>(data: T, options: BBoxClipOpt
 				coordinates: geoms.coordinates.filter((p) => booleanPointInPolygon(p, bboxPoly))
 			},
 			properties: {}
-		} satisfies Feature;
+		} satisfies Feature<MultiPoint, {}>;
 	}
 
 	if (
@@ -80,38 +81,35 @@ function bboxClipper<T extends Feature | Geometry>(data: T, options: BBoxClipOpt
 }
 
 function bboxClipProcessor(input: MapLayer<mapboxgl.Layer>[], options?: BBoxClipOptions) {
-	console.log(input, options);
-	const data = input.map((l) => (l.source as GeoJSONSourceRaw).data)[0];
+	const data = input.map((l) => (l.source as GeoJSONSourceRaw).data) as GeoJSON[];
 
-	if (!isValid(data) || !options) {
-		throw new Error('Invalid input');
-	}
-
-	if (isGeometryCollection(data))
-		return [
-			{
+	const res = data.map((d) => {
+		if (isGeometryCollection(d))
+			return {
 				type: 'GeometryCollection',
-				geometries: data.geometries.flatMap((g) => bboxClipper(g, options)).map((f) => f.geometry)
-			}
-		] satisfies GeometryCollection[];
+				geometries: d.geometries.flatMap((g) => bboxClipper(g, options!)).map((f) => f.geometry)
+			} satisfies GeometryCollection;
 
-	if (isFeatureCollection(data)) {
-		return [
-			{
+		if (isFeatureCollection(d))
+			return {
 				type: 'FeatureCollection',
-				features: data.features.flatMap((f) => bboxClipper(f, options))
-			}
-		] satisfies FeatureCollection[];
-	}
+				features: d.features.flatMap((f) => bboxClipper(f, options!))
+			} satisfies FeatureCollection;
 
-	return null;
+		if (isFeature(d) || isGeometry(d)) return bboxClipper(d, options!);
+
+		return null;
+	});
+
+	return res.filter((r) => r !== undefined) as GeoJSON[];
 }
 
 function bboxClipInputValidator(
 	input: MapLayer<mapboxgl.Layer>[],
 	options?: BBoxClipOptions
 ): boolean {
-	return input.length > 0 && options !== undefined;
+	const data = input.map((l) => (l.source as GeoJSONSourceRaw).data)[0];
+	return input.length > 0 && options !== undefined && isValid(data);
 }
 
 export default {

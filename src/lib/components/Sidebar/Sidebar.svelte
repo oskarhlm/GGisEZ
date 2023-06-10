@@ -208,7 +208,7 @@
 								}
 							}}>{selectModeEnabled ? 'check' : 'rule'}</IconButton
 						>
-						<Tooltip>Select layers</Tooltip>
+						<Tooltip>{selectModeEnabled ? 'Quit selection mode' : 'Select layers'}</Tooltip>
 					</Wrapper>
 				{/if}
 			</span>

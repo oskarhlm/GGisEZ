@@ -14,18 +14,6 @@ import type {
 	MultiLineString
 } from 'geojson';
 
-// export const geoJsonTypeGuards: Record<GeoJsonTypes, (geometry: GeoJSON) => boolean> = {
-// 	Point: isPoint,
-// 	MultiPoint: isMultiPoint,
-// 	LineString: isLineString,
-// 	MultiLineString: isMultiLineString,
-// 	Polygon: isPolygon,
-// 	MultiPolygon: isMultiPolygon,
-// 	GeometryCollection: isGeometryCollection,
-// 	Feature: isFeature,
-// 	FeatureCollection: isFeatureCollection
-// };
-
 export function isGeometry(geojson: GeoJSON): geojson is Geometry {
 	return (
 		isPoint(geojson as Geometry) ||
@@ -37,33 +25,6 @@ export function isGeometry(geojson: GeoJSON): geojson is Geometry {
 		isGeometryCollection(geojson)
 	);
 }
-
-// export function isOfGeometryType<T extends Geometry>(
-// 	fc: Feature<Geometry, GeoJsonProperties>
-// ): fc is Feature<T, GeoJsonProperties>;
-// export function isOfGeometryType<T extends Geometry>(
-// 	fc: FeatureCollection<Geometry, GeoJsonProperties>
-// ): fc is FeatureCollection<T, GeoJsonProperties>;
-// export function isOfGeometryType<T extends Geometry>(
-// 	f: Feature<Geometry, GeoJsonProperties> | FeatureCollection<Geometry, GeoJsonProperties>
-// ): f is Feature<T, GeoJsonProperties> | FeatureCollection<T, GeoJsonProperties> {
-// 	// if (isFeature(f)) {
-// 	// 	return isGeometryOfType<T>(f.geometry);
-// 	// } else if (isFeatureCollection(f)) {
-// 	// 	return f.features.every((f) => isGeometryOfType<T>(f.geometry));
-// 	// }
-
-// 	if (isFeature(f)) {
-// 	} else if (isFeatureCollection(f)) {
-// 	}
-
-// 	return false;
-// }
-
-// export function isGeometryOfType<T extends Geometry>(geometry: Geometry): geometry is T {
-// 	const typeGuard = geoJsonTypeGuards[geometry.type];
-// 	return typeGuard(geometry);
-// }
 
 export function isPoint(geometry: Geometry): geometry is Point {
 	return geometry.type === 'Point';
@@ -123,7 +84,7 @@ export function isGeoJSON(json: any): json is GeoJSON {
 			json.geometry &&
 			typeof json.geometry === 'object'
 		) {
-			// Check if it's a valid Geometry
+			// Check if it's a valid GeometryCollection
 			return true;
 		} else if (
 			json.type &&
@@ -131,6 +92,9 @@ export function isGeoJSON(json: any): json is GeoJSON {
 			json.geometries &&
 			Array.isArray(json.geometries)
 		) {
+			return true;
+		} else if (isGeoJsonType(json.type) && json.coordinates) {
+			// Check if valid Geometry
 			return true;
 		}
 	}
@@ -179,9 +143,6 @@ export const enumerate =
 	<U extends T[]>(...elements: WhenIncludesEvery<T, U>): U =>
 		elements;
 
-/**
- * Denne er litt artig...
- */
 export function isGeoJsonType(candidate: string): candidate is GeoJsonTypes {
 	const valid = enumerate<GeoJsonTypes>()(
 		'Feature',

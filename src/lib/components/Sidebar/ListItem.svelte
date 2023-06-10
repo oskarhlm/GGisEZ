@@ -80,12 +80,10 @@
 			muiIcon: 'visibility'
 		},
 		remove: {
-			tooltip: 'Remove layer',
 			onClick: async () => {
 				map.removeLayer(layer.id);
 				map.removeSource(layer.id);
 				mapLayers.deleteLayer(layer.id);
-				nodeRef.parentNode?.removeChild(nodeRef);
 			},
 			muiIcon: 'delete_outline'
 		},
@@ -106,7 +104,7 @@
 	};
 </script>
 
-<div class="item" class:checked bind:this={nodeRef}>
+<div class="item" class:checked>
 	<button class="btn" on:click={handleOnSingleSelect}>
 		<img class="icon" src={getIconPath(layer)} alt={layer.type} />
 		<p class="description">{layer.displayName}</p>
