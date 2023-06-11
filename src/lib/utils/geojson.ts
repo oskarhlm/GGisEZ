@@ -13,6 +13,7 @@ import type {
 	MultiPolygon,
 	MultiLineString
 } from 'geojson';
+import { isString } from 'lodash';
 
 export function isGeometry(geojson: GeoJSON): geojson is Geometry {
 	return (
@@ -157,4 +158,36 @@ export function isGeoJsonType(candidate: string): candidate is GeoJsonTypes {
 	);
 
 	return valid.some((value) => candidate === value);
+}
+
+export function getPolygonGeometries(data: (GeoJSON | string | undefined)[]) {
+	if (data === undefined || isString(data)) throw new Error('Invalid data');
+	return (data as GeoJSON[]).map((d) => {
+		if (isFeatureCollection(d)) {
+			if (!d.features.every((f) => isPolygon(f.geometry) || isMultiPolygon(f.geometry)))
+				return null;
+			return {
+				type: 'MultiPolygon',
+				coordinates: d.features.flatMap((f) => {
+					if (isMultiPolygon(f.geometry)) return f.geometry.coordinates;
+					if (isPolygon(f.geometry)) return [f.geometry.coordinates];
+					return [];
+				})
+			} satisfies MultiPolygon;
+		}
+		if (isFeature(d)) return d.geometry;
+		if (isGeometryCollection(d)) {
+			if (!d.geometries.every((g) => isPolygon(g) || isMultiPolygon(g))) return null;
+			return {
+				type: 'MultiPolygon',
+				coordinates: d.geometries.flatMap((g) => {
+					if (isMultiPolygon(g)) return g.coordinates;
+					if (isPolygon(g)) return [g.coordinates];
+					return [];
+				})
+			} satisfies MultiPolygon;
+		}
+		if (isPolygon(d) || isMultiPolygon(d)) return d;
+		return null;
+	});
 }
