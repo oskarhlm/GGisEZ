@@ -16,8 +16,8 @@
 	$: {
 		updateOptions({
 			args: {
-				layerA: get(mapLayers).find((l) => l.id === layerAId),
-				layerB: get(mapLayers).find((l) => l.id === layerBId)
+				layerA: get(mapLayers).find((l) => l.id === layerAId)!,
+				layerB: get(mapLayers).find((l) => l.id === layerBId)!
 			} satisfies DifferenceOptions,
 			layerSelection: get(mapLayers).filter((l) => [layerAId, layerBId].includes(l.id))
 		});

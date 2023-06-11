@@ -24,12 +24,14 @@ import {
 import difference from '@turf/difference';
 
 export type DifferenceOptions = {
-	layerA: MapLayer<mapboxgl.Layer> | undefined;
-	layerB: MapLayer<mapboxgl.Layer> | undefined;
+	layerA: MapLayer<mapboxgl.Layer>;
+	layerB: MapLayer<mapboxgl.Layer>;
 };
 
-function differenceProcessor(input: MapLayer<mapboxgl.Layer>[]) {
-	const data = input.map((l) => (l.source as GeoJSONSourceRaw).data) as GeoJSON[];
+function differenceProcessor(input: MapLayer<mapboxgl.Layer>[], options?: DifferenceOptions) {
+	if (!options) return null;
+	const { layerA, layerB } = options;
+	const data = [layerA, layerB].map((l) => (l.source as GeoJSONSourceRaw).data) as GeoJSON[];
 	const [poly1, poly2] = data.map((d) => {
 		if (isFeatureCollection(d)) {
 			if (!d.features.every((f) => isPolygon(f.geometry) || isMultiPolygon(f.geometry)))
@@ -46,9 +48,9 @@ function differenceProcessor(input: MapLayer<mapboxgl.Layer>[]) {
 		return d;
 	});
 	console.log(poly1, poly2);
-	const ya = [difference(poly1 as any, poly2 as any)] as GeoJSON[];
-	console.log(ya);
-	return ya;
+	const res = [difference(poly1 as any, poly2 as any)] as GeoJSON[];
+	console.log(res);
+	return res;
 }
 
 function differenceInputValidator(input: MapLayer<mapboxgl.Layer>[]): boolean {

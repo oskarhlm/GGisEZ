@@ -80,7 +80,7 @@
 			muiIcon: 'visibility'
 		},
 		remove: {
-			onClick: async () => {
+			onClick: () => {
 				map.removeLayer(layer.id);
 				map.removeSource(layer.id);
 				mapLayers.deleteLayer(layer.id);

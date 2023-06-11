@@ -21,6 +21,7 @@
 	import { addLayerWithTypeCheck, type LayerOptions } from '../Map/utils';
 	import type { FeatureCollection, Polygon, GeoJsonProperties } from 'geojson';
 	import type MapboxDraw from '@mapbox/mapbox-gl-draw';
+	import { get } from 'svelte/store';
 
 	export let map: mapboxgl.Map;
 	export let draw: MapboxDraw;
@@ -132,6 +133,13 @@
 		});
 	}
 
+	$: allSelected = selectedLayers.length === get(mapLayers).length;
+
+	function selectAll() {
+		if (allSelected) selectedLayers = [];
+		else selectedLayers = get(mapLayers);
+	}
+
 	onMount(() => {
 		fileInput.addEventListener('change', handleFileChange);
 	});
@@ -141,8 +149,15 @@
 	<div class="content">
 		<span class="layer-title"
 			><h2 style="margin: 0;">Layers</h2>
-			<Icon class="material-icons">layers</Icon></span
-		>
+			<Icon class="material-icons">layers</Icon>
+			{#if selectModeEnabled}
+				<span class="check-all-btn">
+					<IconButton class="material-icons" on:click={selectAll}
+						>{allSelected ? 'check_box' : 'check_box_outline_blank'}</IconButton
+					>
+				</span>
+			{/if}
+		</span>
 		<hr />
 		{#if selectedTool}
 			<span style="display: flex; align-items: center; justify-content: space-between; ">
@@ -210,6 +225,20 @@
 						>
 						<Tooltip>{selectModeEnabled ? 'Quit selection mode' : 'Select layers'}</Tooltip>
 					</Wrapper>
+					{#if selectModeEnabled}
+						<IconButton
+							class="material-icons"
+							disabled={selectedLayers.length === 0}
+							on:click={() => {
+								selectedLayers.forEach((l) => {
+									map.removeLayer(l.id);
+									map.removeSource(l.id);
+									mapLayers.deleteLayer(l.id);
+								});
+								selectModeEnabled = !selectModeEnabled;
+							}}>delete_outline</IconButton
+						>
+					{/if}
 				{/if}
 			</span>
 		</span>
@@ -217,6 +246,11 @@
 </div>
 
 <style lang="scss">
+	.check-all-btn {
+		margin-left: auto;
+		margin-block: 0;
+		align-items: center;
+	}
 	.info-btn {
 		display: flex;
 		align-items: center;
@@ -255,6 +289,7 @@
 		display: flex;
 		gap: 5px;
 		align-items: center;
+		/* padding-block: 6px; */
 
 		:global(.material-icons) {
 			background: none;

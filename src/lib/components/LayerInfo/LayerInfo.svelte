@@ -18,11 +18,11 @@
 
 <div class="container">
 	<div class="content">
-		<TabBar {tabs} let:tab bind:active>
+		<!-- <TabBar {tabs} let:tab bind:active>
 			<Tab {tab}>
 				<Label>{tab.tabName}</Label>
 			</Tab>
-		</TabBar>
+		</TabBar> -->
 		{#if layer}
 			<svelte:component this={active.component} bind:layer on:propertiesSet on:closeProperties />
 		{/if}

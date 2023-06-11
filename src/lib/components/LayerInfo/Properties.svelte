@@ -41,7 +41,6 @@
 
 	$: {
 		if (colorWheel) {
-			console.log(layer.paint);
 			const hexColor = (layer.paint as any)[`${layer.type}-color`] as string;
 			const opacity = (layer.paint as any)[`${layer.type}-opacity`];
 			const hexOpacity = floatToHex(opacity || 1);
@@ -102,6 +101,7 @@
 	});
 </script>
 
+<h3>Properties</h3>
 <span style="height: 10px;" />
 <Textfield bind:value={displayName} label="Layer name" />
 <div class="wheel" id="colorWheel" />
@@ -117,7 +117,6 @@
 	}
 
 	#apply-btn {
-		/* margin-top: auto; */
 		margin-left: auto;
 	}
 
