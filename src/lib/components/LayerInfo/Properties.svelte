@@ -51,7 +51,10 @@
 
 	let colorWheel: iro.ColorPicker;
 
-	const dispatch = createEventDispatcher<{ propertiesSet: LayerStyleProperties }>();
+	const dispatch = createEventDispatcher<{
+		propertiesSet: LayerStyleProperties;
+		closeProperties: null;
+	}>();
 
 	function onApply() {
 		dispatch('propertiesSet', {
@@ -102,7 +105,10 @@
 <span style="height: 10px;" />
 <Textfield bind:value={displayName} label="Layer name" />
 <div class="wheel" id="colorWheel" />
-<span id="apply-btn"><Button on:click={onApply} variant="unelevated">Apply</Button></span>
+<span class="btn-row">
+	<span id="apply-btn"><Button on:click={onApply} variant="unelevated">Apply</Button></span>
+	<Button on:click={() => dispatch('closeProperties')} variant="outlined">Cancel</Button>
+</span>
 
 <style lang="scss">
 	.wheel {
@@ -112,7 +118,13 @@
 
 	#apply-btn {
 		/* margin-top: auto; */
-		margin-top: 24px;
 		margin-left: auto;
+	}
+
+	.btn-row {
+		margin-top: 24px;
+		display: flex;
+		align-items: center;
+		gap: 4px;
 	}
 </style>

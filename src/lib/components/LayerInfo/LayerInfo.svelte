@@ -24,7 +24,7 @@
 			</Tab>
 		</TabBar>
 		{#if layer}
-			<svelte:component this={active.component} bind:layer on:propertiesSet />
+			<svelte:component this={active.component} bind:layer on:propertiesSet on:closeProperties />
 		{/if}
 	</div>
 </div>

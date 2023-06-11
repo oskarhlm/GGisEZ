@@ -2,7 +2,7 @@ import intersect from '@turf/intersect';
 import type { MapLayer } from '../../../stores/mapLayers';
 import type { GeoJSONSourceRaw } from 'mapbox-gl';
 import _, { isString } from 'lodash';
-import type { GeoJSON, Feature, Polygon, MultiPolygon, GeoJsonProperties } from 'geojson';
+import type { GeoJSON, Feature, Polygon, MultiPolygon, GeoJsonProperties, Position } from 'geojson';
 import type { GeoJSONProcessor } from './types';
 import type mapboxgl from 'mapbox-gl';
 import {
@@ -17,45 +17,51 @@ import {
 
 type ValidInput = Polygon | MultiPolygon | Feature<Polygon | MultiPolygon, GeoJsonProperties>;
 
-function getGeometries(data: (GeoJSON | string | undefined)[]) {
+function getPolygonGeometries(data: (GeoJSON | string | undefined)[]) {
 	if (data === undefined || isString(data)) throw new Error('Invalid data');
-	return (data as GeoJSON[])
-		.map((d) => {
-			if (isFeatureCollection(d)) return d.features.map((f) => f.geometry);
-			if (isFeature(d)) return d.geometry;
-			if (isGeometryCollection(d)) return d.geometries;
-			if (isGeometry(d)) return d;
-		})
-		.filter((d) => d !== undefined);
+	return (data as GeoJSON[]).map((d) => {
+		if (isFeatureCollection(d)) {
+			if (!d.features.every((f) => isPolygon(f.geometry) || isMultiPolygon(f.geometry)))
+				return null;
+			return {
+				type: 'MultiPolygon',
+				coordinates: d.features.flatMap((f) => {
+					if (isMultiPolygon(f.geometry)) return f.geometry.coordinates;
+					if (isPolygon(f.geometry)) return [f.geometry.coordinates];
+					return [];
+				})
+			} satisfies MultiPolygon;
+		}
+		if (isFeature(d)) return d.geometry;
+		if (isGeometryCollection(d)) {
+			if (!d.geometries.every((g) => isPolygon(g) || isMultiPolygon(g))) return null;
+			return {
+				type: 'MultiPolygon',
+				coordinates: d.geometries.flatMap((g) => {
+					if (isMultiPolygon(g)) return g.coordinates;
+					if (isPolygon(g)) return [g.coordinates];
+					return [];
+				})
+			} satisfies MultiPolygon;
+		}
+		if (isPolygon(d) || isMultiPolygon(d)) return d;
+		return null;
+	});
 }
 
 function intersectProcessor(input: MapLayer<mapboxgl.Layer>[]) {
-	const data = input.map((l) => (l.source as GeoJSONSourceRaw).data);
-	let geoms = getGeometries(data)! as unknown as (Polygon | MultiPolygon | Polygon[])[];
-	geoms = geoms.map((g) => {
-		if (Array.isArray(g))
-			return {
-				type: 'MultiPolygon',
-				coordinates: g.map((g) => g.coordinates)
-			} satisfies MultiPolygon;
-
-		return g;
-	});
-	const [poly1, poly2] = geoms as (Polygon | MultiPolygon)[];
+	const data = input.map((l) => (l.source as GeoJSONSourceRaw).data) as any;
+	let geoms = getPolygonGeometries(data)! as (Polygon | MultiPolygon)[];
+	console.log(geoms);
+	const [poly1, poly2] = geoms;
 	const intersection = intersect(poly1, poly2);
 	return [intersection] as GeoJSON[];
 }
 
 function intersectInputValidator(input: MapLayer<mapboxgl.Layer>[]): boolean {
-	const geoms = getGeometries(input.map((l) => (l.source as GeoJSONSourceRaw).data));
-	console.log(geoms);
-	return (
-		input.length === 2 &&
-		geoms.every((g) => {
-			if (Array.isArray(g)) return g.every(isPolygon);
-			return g && (isPolygon(g) || isMultiPolygon(g));
-		})
-	);
+	const data = input.map((l) => (l.source as GeoJSONSourceRaw).data) as GeoJSON[];
+	const geoms = getPolygonGeometries(data).filter((g) => g !== null);
+	return input.length === geoms.length && geoms.length === 2;
 }
 
 export default {

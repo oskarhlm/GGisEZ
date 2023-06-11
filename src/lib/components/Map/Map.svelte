@@ -36,6 +36,7 @@
 	let draw: MapboxDraw;
 	let tools: GeoJSONTool[];
 	let selectedTool: GeoJSONTool | null = null;
+	let infoLayer: MapLayer<mapboxgl.Layer> | null;
 
 	const geometryCollection: GeometryCollection = {
 		type: 'GeometryCollection',
@@ -167,8 +168,6 @@
 			}
 		]
 	};
-
-	let infoLayer: MapLayer<mapboxgl.Layer>;
 
 	function handleSingleLayerSelect(e: any) {
 		infoLayer = e.detail.layer;
@@ -346,7 +345,13 @@
 	<ToolsDropdown {tools} bind:selectedTool on:toolSelected={(e) => (selectedTool = e.detail)} />
 	{#if infoLayer}
 		<span style="margin-left: auto;">
-			<LayerInfo bind:layer={infoLayer} on:propertiesSet={handlePropertiesSet} />
+			<LayerInfo
+				bind:layer={infoLayer}
+				on:propertiesSet={handlePropertiesSet}
+				on:closeProperties={() => {
+					infoLayer = null;
+				}}
+			/>
 		</span>
 	{/if}
 </div>
