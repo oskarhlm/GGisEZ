@@ -1,9 +1,8 @@
 <script lang="ts">
-	import Dialog, { Title, Actions } from '@smui/dialog';
+	import Dialog, { Title } from '@smui/dialog';
 	import Button, { Label } from '@smui/button';
 	import Textfield from '@smui/textfield';
 	import { createEventDispatcher } from 'svelte';
-	import { getProj4String } from '$lib/utils/fileUploader';
 
 	export let open: boolean;
 	export let problem: boolean;
@@ -13,9 +12,9 @@
 
 	$: downLoadDisabled = !/^[0-9]+$/.test(epsg) || epsg.length === 0;
 
-	const dispatch = createEventDispatcher<{ download: { epsg: string } }>();
+	const dispatch = createEventDispatcher<{ epsgSet: { epsg: string } }>();
 	function handleDownload() {
-		dispatch('download', { epsg });
+		dispatch('epsgSet', { epsg });
 	}
 </script>
 

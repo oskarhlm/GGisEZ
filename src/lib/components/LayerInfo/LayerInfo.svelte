@@ -7,6 +7,7 @@
 	import type mapboxgl from 'mapbox-gl';
 
 	export let layer: MapLayer<mapboxgl.Layer>;
+	export let map: mapboxgl.Map;
 
 	type Tab = { tabName: string; component: any };
 	const tabs: Tab[] = [
@@ -29,7 +30,13 @@
 			</Tab>
 		</TabBar>
 		{#if layer}
-			<svelte:component this={active.component} bind:layer on:propertiesSet on:closeProperties />
+			<svelte:component
+				this={active.component}
+				bind:layer
+				{map}
+				on:propertiesSet
+				on:closeProperties
+			/>
 		{/if}
 	</div>
 </div>

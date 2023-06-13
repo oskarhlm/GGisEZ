@@ -5,7 +5,7 @@
 	import MapboxDraw from '@mapbox/mapbox-gl-draw';
 	import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 	import { onMount } from 'svelte';
-	import { mapSources } from '../../../stores/mapSources';
+	import { mapSources, type MapSource } from '../../../stores/mapSources';
 	import { addLayerWithTypeCheck, isValid } from './utils';
 	import { mapLayers, type MapLayer } from '../../../stores/mapLayers';
 	import Sidebar from '../Sidebar/Sidebar.svelte';
@@ -170,7 +170,7 @@
 				data: data
 			};
 			map.addSource(source.id, sourceData);
-			addLayerWithTypeCheck(map, source);
+			addLayerWithTypeCheck(map, source, { epsg: source.epsg });
 		});
 	});
 
@@ -203,7 +203,7 @@
 <div id="overlay">
 	<Sidebar {map} {draw} {tools} bind:selectedTool on:singleLayerSelect={handleSingleLayerSelect} />
 	<ToolsDropdown {tools} bind:selectedTool on:toolSelected={(e) => (selectedTool = e.detail)} />
-	{#if infoLayer}
+	{#if infoLayer && map}
 		<span style="margin-left: auto;">
 			<LayerInfo
 				bind:layer={infoLayer}
@@ -211,6 +211,7 @@
 				on:closeProperties={() => {
 					infoLayer = null;
 				}}
+				{map}
 			/>
 		</span>
 	{/if}

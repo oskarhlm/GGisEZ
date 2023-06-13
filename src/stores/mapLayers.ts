@@ -3,8 +3,10 @@ import type mapboxgl from 'mapbox-gl';
 import type { GeoJSON } from 'geojson';
 import { enumerate } from '$lib/utils/geojson';
 import type { GeoJSONSourceRaw } from 'mapbox-gl';
+import type { MapSource } from './mapSources';
 
 export type MapLayer<T extends mapboxgl.Layer> = {
+	epsg?: string;
 	isVisible: boolean;
 	displayName: string;
 	attachedLayerIds?: string[];

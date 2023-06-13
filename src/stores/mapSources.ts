@@ -2,8 +2,7 @@ import { get, writable, type Writable } from 'svelte/store';
 import type { GeoJSON } from 'geojson';
 import type { GeoJSONSourceRaw } from 'mapbox-gl';
 
-// export type MapSource = { id: string; data: GeoJSON };
-export type MapSource = { id: string; geojson: GeoJSONSourceRaw };
+export type MapSource = { id: string; geojson: GeoJSONSourceRaw; epsg?: string };
 
 function createMapSources() {
 	const { subscribe, set, update }: Writable<MapSource[]> = writable([]);

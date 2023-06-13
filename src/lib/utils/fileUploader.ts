@@ -99,14 +99,14 @@ async function readShp(shp: File, dbf?: File, prj?: File): Promise<MapSource> {
 		geojsonData.features.forEach((f) => {
 			f.geometry = convertGeometry(f.geometry, converter);
 		});
-	else throw new Error('No .prj file passed');
 
 	return {
 		id: shp.name.split('.')[0],
 		geojson: {
 			type: 'geojson',
 			data: geojsonData
-		}
+		},
+		epsg: converter ? '4326' : undefined
 	};
 }
 

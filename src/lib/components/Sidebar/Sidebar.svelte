@@ -337,7 +337,7 @@
 	</div>
 </div>
 
-<EpsgDialog bind:open={epsgDialoagOpen} bind:problem={epsgProblem} on:download={dowloadFiles} />
+<EpsgDialog bind:open={epsgDialoagOpen} bind:problem={epsgProblem} on:epsgSet={dowloadFiles} />
 
 <style lang="scss">
 	.check-all-btn {

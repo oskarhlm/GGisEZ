@@ -50,6 +50,7 @@ export type LayerOptions<T extends mapboxgl.AnyLayer> = Omit<
 	'id' | 'type' | 'source' | 'source-layer'
 > & {
 	border?: mapboxgl.LinePaint;
+	epsg?: string;
 };
 
 export function addLayerWithTypeCheck(
