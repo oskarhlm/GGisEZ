@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Tab, { Label } from '@smui/tab';
 	import TabBar from '@smui/tab-bar';
-	import Properties from './Properties.svelte';
+	import Styling from './Styling.svelte';
 	import Info from './Info.svelte';
 	import type { MapLayer } from '../../../stores/mapLayers';
 	import type mapboxgl from 'mapbox-gl';
@@ -10,7 +10,7 @@
 
 	type Tab = { tabName: string; component: any };
 	const tabs: Tab[] = [
-		{ tabName: 'Properties', component: Properties },
+		{ tabName: 'Styling', component: Styling },
 		{ tabName: 'Info', component: Info }
 	];
 	let active: Tab = tabs[0];
@@ -18,11 +18,11 @@
 
 <div class="container">
 	<div class="content">
-		<!-- <TabBar {tabs} let:tab bind:active>
+		<TabBar {tabs} let:tab bind:active>
 			<Tab {tab}>
 				<Label>{tab.tabName}</Label>
 			</Tab>
-		</TabBar> -->
+		</TabBar>
 		{#if layer}
 			<svelte:component this={active.component} bind:layer on:propertiesSet on:closeProperties />
 		{/if}
