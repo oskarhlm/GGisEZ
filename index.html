@@ -21,15 +21,15 @@
 		<link rel="stylesheet" href="./smui.css" />
 
 		
-		<link href="./_app/immutable/assets/0.79c4f289.css" rel="stylesheet">
-		<link href="./_app/immutable/assets/2.028543fc.css" rel="stylesheet">
-		<link rel="modulepreload" href="./_app/immutable/entry/start.e9eb03aa.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/index.f81ab6e4.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/singletons.7623f780.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/index.2ba63786.js">
-		<link rel="modulepreload" href="./_app/immutable/entry/app.0ebe39c4.js">
-		<link rel="modulepreload" href="./_app/immutable/nodes/0.17ded493.js">
-		<link rel="modulepreload" href="./_app/immutable/nodes/2.ba6b91af.js">
+		<link href="./_app/immutable/assets/0.2ccec7bc.css" rel="stylesheet">
+		<link href="./_app/immutable/assets/2.ac764f0d.css" rel="stylesheet">
+		<link rel="modulepreload" href="./_app/immutable/entry/start.4ad91d72.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/index.7f787515.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/singletons.acf1a84d.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/index.8651d173.js">
+		<link rel="modulepreload" href="./_app/immutable/entry/app.20127af1.js">
+		<link rel="modulepreload" href="./_app/immutable/nodes/0.75152e83.js">
+		<link rel="modulepreload" href="./_app/immutable/nodes/2.609cc100.js">
 		<style>
 			body {
 				margin: 0;
@@ -42,17 +42,18 @@
 
 
 <div id="map" class="svelte-7s216m"></div>
-<div id="overlay" class="svelte-7s216m"><div class="container pulsating-border svelte-mi2azc"><div class="content svelte-mi2azc"><span class="layer-title svelte-mi2azc"><h2 style="margin: 0;">Layers</h2>
-			<i class="material-icons" aria-hidden="true">layers</i></span>
-		<hr class="svelte-mi2azc">
+<div id="overlay" class="svelte-7s216m"><div class="container pulsating-border svelte-ga66me"><div class="content svelte-ga66me"><span class="layer-title svelte-ga66me"><h2 style="margin: 0;">Layers</h2>
+			<i class="material-icons" aria-hidden="true">layers</i>
+			</span>
+		<hr class="svelte-ga66me">
 		
 		
 
 
 
 
-		<hr style="margin-top: auto" class="svelte-mi2azc">
-		<span class="file-action-row svelte-mi2azc"><button class="material-icons mdc-icon-button mdc-icon-button--display-flex" style=""><div class="mdc-icon-button__ripple"></div>
+		<hr style="margin-top: auto" class="svelte-ga66me">
+		<span class="file-action-row svelte-ga66me"><button class="material-icons mdc-icon-button mdc-icon-button--display-flex" style=""><div class="mdc-icon-button__ripple"></div>
   upload_file</button>
 				<div class="mdc-tooltip" style="" aria-hidden="true" id="SMUI-tooltip-0" role="tooltip"><div class="mdc-tooltip__surface mdc-tooltip__surface-animation" style="">Upload layers</div>
 </div>
@@ -63,32 +64,20 @@
 </div>
 			<span style="margin-left: auto;"><button class="material-icons mdc-icon-button mdc-icon-button--display-flex" style=""><div class="mdc-icon-button__ripple"></div>
   rule</button>
-					<div class="mdc-tooltip" style="" aria-hidden="true" id="SMUI-tooltip-2" role="tooltip"><div class="mdc-tooltip__surface mdc-tooltip__surface-animation" style="">Select layers</div>
-</div></span></span></div>
+						<div class="mdc-tooltip" style="" aria-hidden="true" id="SMUI-tooltip-2" role="tooltip"><div class="mdc-tooltip__surface mdc-tooltip__surface-animation" style="">Select layers</div>
 </div>
-	<div class="container svelte-1lqfry2"><button class="svelte-dbbhwe"><img class="button-icon svelte-dbbhwe" alt="button" src="button-icons/bbox.png">
-	<p class="svelte-dbbhwe">BBOX</p>
-</button><button class="svelte-dbbhwe"><img class="button-icon svelte-dbbhwe" alt="button" src="button-icons/buffer.png">
-	<p class="svelte-dbbhwe">BUFFER</p>
-</button><button class="svelte-dbbhwe"><img class="button-icon svelte-dbbhwe" alt="button" src="button-icons/clip.png">
-	<p class="svelte-dbbhwe">CLIP</p>
-</button><button class="svelte-dbbhwe"><img class="button-icon svelte-dbbhwe" alt="button" src="button-icons/difference.png">
-	<p class="svelte-dbbhwe">DIFFERENCE</p>
-</button><button class="svelte-dbbhwe"><img class="button-icon svelte-dbbhwe" alt="button" src="button-icons/intersection.png">
-	<p class="svelte-dbbhwe">INTERSECT</p>
-</button><button class="svelte-dbbhwe"><img class="button-icon svelte-dbbhwe" alt="button" src="button-icons/union.png">
-	<p class="svelte-dbbhwe">UNION</p>
-</button><button class="svelte-dbbhwe"><img class="button-icon svelte-dbbhwe" alt="button" src="button-icons/vornoi.png">
-	<p class="svelte-dbbhwe">VORONOI</p>
-</button>
+					</span></span></div>
 </div>
+	<div class="container svelte-ux8w1b">
+</div>
+	
 </div>
 
 
 			
 			<script>
 				{
-					__sveltekit_1nw0omu = {
+					__sveltekit_k81rdj = {
 						base: new URL(".", location).pathname.slice(0, -1),
 						env: {}
 					};
@@ -98,8 +87,8 @@
 					const data = [null,null];
 
 					Promise.all([
-						import("./_app/immutable/entry/start.e9eb03aa.js"),
-						import("./_app/immutable/entry/app.0ebe39c4.js")
+						import("./_app/immutable/entry/start.4ad91d72.js"),
+						import("./_app/immutable/entry/app.20127af1.js")
 					]).then(([kit, app]) => {
 						kit.start(app, element, {
 							node_ids: [0, 2],
