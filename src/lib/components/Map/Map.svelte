@@ -30,7 +30,7 @@
 	import VoronoiOptions from '../Sidebar/ToolOptions/VoronoiOptions.svelte';
 	import BboxClipOptions from '../Sidebar/ToolOptions/BboxClipOptions.svelte';
 	import LayerInfo from '../LayerInfo/LayerInfo.svelte';
-	import type { LayerStyleProperties } from '../LayerInfo/Properties.svelte';
+	import type { LayerStyleProperties } from '../LayerInfo/Styling.svelte';
 
 	let map: mapboxgl.Map;
 	let draw: MapboxDraw;

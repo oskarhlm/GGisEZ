@@ -10,7 +10,7 @@
 	import SortableList from '../../SortableList.svelte';
 	import ListItem from './ListItem.svelte';
 	import { createEventDispatcher, onMount } from 'svelte';
-	import { readFiles } from '../../utils/fileUploader';
+	import { getProj4String, readFiles } from '../../utils/fileUploader';
 	import { mapSources } from '../../../stores/mapSources';
 	import { mapLayers } from '../../../stores/mapLayers';
 	import _ from 'lodash';
@@ -18,10 +18,26 @@
 	import type { MapLayer } from '../../../stores/mapLayers';
 	import type { GeoJSONSourceRaw } from 'mapbox-gl';
 	import type { GeoJSONTool } from '../GeoJsonProcessing/types';
-	import { addLayerWithTypeCheck, type LayerOptions } from '../Map/utils';
-	import type { FeatureCollection, Polygon, GeoJsonProperties } from 'geojson';
+	import { addLayerWithTypeCheck, isValid, type LayerOptions } from '../Map/utils';
+	import type {
+		FeatureCollection,
+		Polygon,
+		GeoJsonProperties,
+		Geometry,
+		Feature,
+		GeometryCollection
+	} from 'geojson';
 	import type MapboxDraw from '@mapbox/mapbox-gl-draw';
 	import { get } from 'svelte/store';
+	import EpsgDialog from './EpsgDialog.svelte';
+	import {
+		convertGeometry,
+		isFeature,
+		isFeatureCollection,
+		isGeometry,
+		isGeometryCollection
+	} from '$lib/utils/geojson';
+	import proj4 from 'proj4';
 
 	export let map: mapboxgl.Map;
 	export let draw: MapboxDraw;
@@ -39,6 +55,12 @@
 	let options: any;
 	let optionsCleanup: (() => void) | undefined;
 
+	let epsgDialoagOpen = false;
+
+	/**
+	 * A function that is passed as a callback to all <Tool>Options.svelte components,
+	 * so that they can update the options variable defined in the Sidebar.svelte file.
+	 */
 	function updateOptions(opts: ToolSelectOptions, cleanup?: () => void) {
 		options = opts.args;
 		optionsCleanup = cleanup;
@@ -54,6 +76,9 @@
 		mapLayers.setNewLayerIndex({ layerId: movedLayerId, index: parseInt(to) });
 	}
 
+	/**
+	 * Applies the transformation specified by the currently selected tool to the selected layers.
+	 */
 	function handleApplyTransformation() {
 		let result = selectedTool?.geoProcessor?.processor(selectedLayers, options);
 
@@ -90,6 +115,7 @@
 	const dispatch = createEventDispatcher<{
 		singleLayerSelect: { layer: MapLayer<mapboxgl.Layer> | null };
 	}>();
+
 	function handleSingleLayerSelect(e: CustomEvent<MapLayer<mapboxgl.Layer>>) {
 		const layer = e.detail;
 		if (selectedLayers.length === 1 && selectedLayers[0] === layer) {
@@ -101,6 +127,9 @@
 		}
 	}
 
+	/**
+	 * Adds a new source to the map whenever a new file is uploaded
+	 */
 	async function handleFileChange(event: Event) {
 		const inputElement = event.target as HTMLInputElement;
 		if (inputElement.files && inputElement.files.length > 0) {
@@ -111,17 +140,60 @@
 		}
 	}
 
-	function dowloadFiles() {
-		selectedLayers.forEach((l) => {
+	/**
+	 * Downloads all files that are currently selected in the layer list,
+	 * and converts them to a specified map projection using the ESPG number specified
+	 * by the user.
+	 */
+	async function dowloadFiles(e: CustomEvent<{ epsg: string }>) {
+		selectedLayers.forEach(async (l) => {
 			const jsonData = (l.source as GeoJSONSourceRaw).data;
-			if (!jsonData) return;
+			if (!isValid(jsonData)) return;
+
+			let outdata: any = jsonData;
+
+			// Convert to other projection if different from Mapbox projection
+			if (e.detail.epsg !== '4326') {
+				const sourceProjection = await getProj4String('4326');
+				const targetProjection = await getProj4String(e.detail.epsg);
+				const converter = proj4(sourceProjection!, targetProjection);
+
+				// A bit messy, but for some reason deep copying didn't work
+				if (isGeometryCollection(jsonData)) {
+					outdata = {
+						type: 'GeometryCollection',
+						geometries: jsonData.geometries
+					} satisfies GeometryCollection;
+				} else if (isGeometry(jsonData)) {
+					outdata = {
+						type: jsonData.type,
+						coordinates: jsonData.coordinates as any
+					} satisfies Geometry;
+				} else if (isFeature(jsonData)) {
+					outdata = {
+						type: 'Feature',
+						geometry: convertGeometry(jsonData.geometry, converter),
+						properties: jsonData.properties
+					} satisfies Feature<Geometry, GeoJsonProperties>;
+				} else if (isFeatureCollection(jsonData)) {
+					console.log(outdata);
+					outdata = {
+						type: 'FeatureCollection',
+						features: jsonData.features.map(
+							(f) =>
+								({
+									type: 'Feature',
+									geometry: convertGeometry(f.geometry, converter),
+									properties: f.properties
+								} satisfies Feature<Geometry, GeoJsonProperties>)
+						)
+					} satisfies FeatureCollection;
+				}
+			}
 
 			const fileName = l.displayName + '.geojson';
 			const contentType = 'application/json';
-
-			const jsonContent = JSON.stringify(jsonData);
-
-			const jsonBlob = new Blob([JSON.stringify(jsonData)], { type: contentType });
+			const jsonBlob = new Blob([JSON.stringify(outdata)], { type: contentType });
 			const url = URL.createObjectURL(jsonBlob);
 
 			const link = document.createElement('a');
@@ -196,7 +268,12 @@
 			</Wrapper>
 			<input bind:this={fileInput} id="file-upload" multiple type="file" style="display: none;" />
 			<Wrapper>
-				<IconButton class="material-icons" on:click={dowloadFiles}>download</IconButton>
+				<IconButton
+					class="material-icons"
+					on:click={() => {
+						epsgDialoagOpen = true;
+					}}>download</IconButton
+				>
 				<Tooltip>Download layer(s)</Tooltip>
 			</Wrapper>
 			<span style="margin-left: auto;">
@@ -244,6 +321,8 @@
 		</span>
 	</div>
 </div>
+
+<EpsgDialog bind:open={epsgDialoagOpen} on:download={dowloadFiles} />
 
 <style lang="scss">
 	.check-all-btn {

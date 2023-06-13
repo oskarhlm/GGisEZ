@@ -1,23 +1,14 @@
 import _ from 'lodash';
-import type {
-	GeoJSON,
-	FeatureCollection,
-	Geometry,
-	Position,
-	GeometryCollection,
-	Point,
-	MultiLineString,
-	MultiPoint,
-	MultiPolygon,
-	LineString,
-	Polygon,
-	GeoJsonProperties
-} from 'geojson';
-import { convertGeometry, isFeatureCollection, isGeoJSON } from './geojson';
+import type { GeoJsonProperties } from 'geojson';
+import { convertGeometry, isFeatureCollection } from './geojson';
 import { read, openDbf } from 'shapefile';
 import proj4 from 'proj4';
 import type { MapSource } from '../../stores/mapSources';
 
+/**
+ * Reads each file and reads them based on their file extension,
+ * returning an array of MapSoruce objects.
+ */
 export function readFiles(files: FileList) {
 	const groupedFiles = _.groupBy(files, (file) => file.name.split('.')[0]);
 
@@ -41,6 +32,9 @@ export function readFiles(files: FileList) {
 	return Promise.all(filteredSources);
 }
 
+/**
+ * Takes an EPSG number and gets the proj4 string from https://epsg.io.
+ */
 export async function getProj4String(epsg: string) {
 	const res = await fetch(`https://epsg.io/${epsg}.proj4js`);
 	const str = await res.text();
