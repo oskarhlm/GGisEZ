@@ -1,4 +1,10 @@
-# GGisEZ
+# GGisEZ - TBA4251 (V2023)
+
+## Forfatter: Oskar Holm
+
+### Fakultet for ingeniørvitenskap - IV - NTNU (Geomatikk)
+
+<https://oskarhlm.github.io/GGisEZ/>
 
 ## 1 Formålet med applikasjonen
 
@@ -7,6 +13,8 @@ Formålet med applikasjonen er å introdusere arbeidsgangen i et typisk geografi
 Det viktigste fokusområdet under utviklingsprosessen var brukervennlighet. Ettersom applikasjonen er myntet på personer med lite erfaring med GIS, gikk en stor porsjon av arbeidet med til å "idiotsikre" bruker-input så godt det lar seg gjøre under de gitte tidsrammene. Derfor har hvert av de ulike GIS-verktøyene en egen valideringsfunksjon som sjekker om de kartlagene brukeren ønsker å utføre transformasjonen gir mening for det valgte verktøyet. Eksempelvis skal det være umulig å "intersection" på et kartlag bestående av linje-geometrier og punkt-geometrier, da dette er en transformasjon myntet på polygon-geometrier. Ønsket om brukervennlighet reflekteres også i valget av programmingsspråk og i brukergrensesnittet.
 
 ## 2 Bakgrunn for valg av programmeringsspråk
+
+### 2.1 TypeScript
 
 Programmingsspråket jeg valgte å bruke for dette prosjektet, er TypeScript. TypeScript er et superset av JavaScript som innfører et typesystem til det ellers dynamiske språket. TypeScript er først og fremst ment som et verktøy for utvikleren, og transpileres til JavaScript før det sendes til nettleseren. Fordelen med å bruke TypeScript er at du varsles når du er i ferd med å gjøre uriktige ting, slik som å sende ugyldig input til en funksjon. Det gjør utvikler i stand til å oppdage feil i "compile time", framfor i "runtime" som man måtte gjort dersom man brukte JavaScript. Dette kan spare deg masse tid som ellers hadde vært brukt på feilsøking og brannslukking. TypeScript gjør også at du lett kan finne ut av hvilke funksjoner om finnes på et gitt object, uten å måtte lete deg fram til filen hvor klassen for det objektet er definert.
 
@@ -24,15 +32,210 @@ function foo(data: GeoJSON) {
 
 "Type guards" hjelper utvikleren med å skrive trygg kode hvor man unngår å bruke attributter og funksjoner som ikke er definert på objektet man jobber med.
 
+### 2.2 SvelteKit
+
+For å gjøre utviklingsprosessen enklere, har jeg valgt å benytte meg av et app-rammeverk ved navn SvelteKit. SvelteKit er bygget på komponent-rammeverket Svelte, som er et nytt og veldig populært valg for de som ønsker å bygge nettsider. Svelte/SvelteKit kjennetegnes ved å være raskt i produksjon og enkelt å bygge apper med. Sistnevnte er hovedgrunnen til at jeg valgte nettopp dette rammeverket, da noe som ReactJS ofte gjør at man må skrivde det som virker som unødvendige mengder "boilerplate"-kode. Jeg ville også bare prøve noe nytt, og SvelteKit virket som et godt valg, ettersom det virkelig er i vinden i frontend-verden.
+
+SvelteKit tilbyr en masse funksjonalitet som skal gjøre det enklere å lage en produksjonsklar applikasjon, sammenlignet med det du får med en vanlig Svelte-applikasjon. Det tilbys ting som en innebygd router, server-side rendering (SSR), adaptere til produksjon i ulike produksjonsmiljøer, og mye mer. Jeg endte ikke opp med å benytte meg av noen av disse funksjonene i særlig stor grad, da jeg ikke følte at de var passende til formålet. Mye av det som gjør SvelteKit bra, er at man kan produsere websidene på serveren og sende ferdige sider til klienten. Dette fungerer heller dårlig ettersom Mapbox ikke støtter dette, og da blir egentlig litt av poenget med å bruke SvelteKit bort, særlig når man ikke heller får bruk for routing-systemet fordi man kun har én side. Sånn sett hadde jeg kommet unna med å "kun" lage en valig Svelte-app, men det er heller ingenting i veien for å bruke SvelteKit uten å ta i bruk hver eneste funksjon som tilbys.
+
 ## 3 Oppsummering av arbeidsgangen
+
+### 3.1 MVP og Figma
+
+Det første jeg satt i gang med var å implementere de tingene som er helt nødvendige i et "Minimum viable product" (MVP) for dette formålet. Absolutt nødvendig er det å kunne laste inne et kart og å kunne legge inn kartlag i dette. Det første jeg gjorde var å sette opp kartet med et overlay jeg kunne legge andre komponenter inni. Jeg lagde også noen ikoner til de ulike geoprosesseringsverktøyene ved hjelp av Figma:
+
+![](img/figma.png)
+
+### 3.2 Innlasting av filer
+
+Deretter begynte jeg jobben med å kunne legge til geodata i kartet. Dette innebar å lage en fil ved navn `fileUploader.ts` som tar inn en liste med `File`-objekter, leser filendelsen og legger geodataene inn i kartet. Dette var ganske enkelt å få til for GeoJSON-filer, da dette er formatet Mapbox allerede bruker for kartlagene sine. Det var derimot mer utfordrende å få ting til å fungere for shape-filer, spesielt ettersom jeg også hadde lyst til at man skulle kunne lese hvilken projeksjon shape-filen er i fra tilhørende .prj-fil, og deretter konvertere dataene til riktig projeksjon (WGS84) før det legges inn i Mapbox-kartet. Jeg ville også at .dbf-filer skulle kunne leses slik at man får lagt inn `Feature`'s med deres tilhørende `properties`.
+
+Jeg løste problemet ved hjelp av JavaScript-bibliotekene _shapefile_ og _proj4_. _shapefile_ brukes til å konvertere .shp-filer til GeoJSON, mens _proj4_ lar deg konvertere mellom ulike projeksjoner. Dette ser slik ut i koden:
+
+```typescript
+const converter = prj && (await readPrj(prj));
+converter &&
+	geojsonData.features.forEach((f) => {
+		f.geometry = convertGeometry(f.geometry, converter);
+	});
+```
+
+`convertGeometry` er funksjon jeg laget som tar inn et `Geometry`-objekt, sjekker typen på denne, og returnerer et objekt med lik struktur, men der alle geometrier er konvertert ved hjelp av et `proj4.Converter`-objekt.
+
+Jeg laget også en funksjon som tar inn et EPSG-nummer og returnerer en proj4-streng som kan brukes til å lage en `Converter`. Denne brukes allerede i `readPrj`-funksjonen, og jeg ser også for meg at denne kan brukes dersom brukeren ønsker å laste ned et kartlag i en spesiell projeksjon. Funksjonen utnytter at man på <epsg.io> kan søke opp ethvert EPSG-nummer og få tilbake en streng som _proj4_ kan lese.
+
+```typescript
+export async function getProj4String(epsg: string) {
+	const res = await fetch(`https://epsg.io/${epsg}.proj4js`);
+	const str = await res.text();
+	const proj4StringRegex = /"([^"]+)"/g;
+	const match = str.match(proj4StringRegex);
+	if (match && match.length > 1) {
+		const proj4String = match[1].replace(/"/g, '');
+		return proj4String.trim();
+	} else {
+		console.error('Failed to extract Proj4 string.');
+	}
+}
+```
+
+Jeg laget også en funksjon for å lese `properties` fra .dbf-filer. Jeg rakk aldri å implementere en visning av `properties`s, eller å ta dem i bruk på noe vis, men de er der, klare til å brukes. Funksjonen ser slik ut:
+
+```typescript
+async function readDbf(file: File) {
+	const arrayBuffer = await file.arrayBuffer();
+	const dbf = await openDbf(arrayBuffer);
+
+	async function readUntilDone(
+		propertiesArray: GeoJsonProperties[] = []
+	): Promise<GeoJsonProperties[]> {
+		const properties = await dbf.read();
+		if (!properties.done) {
+			return await readUntilDone([...propertiesArray, properties.value]);
+		}
+
+		return propertiesArray;
+	}
+
+	return await readUntilDone();
+}
+```
+
+Når et `GeoJSON`-objekt er ferdig innlest, blir det larget i minnet som et MapSource-objekt som brukes når man skal legge et inn i kartet. I `$lib/components/Map/utils.ts` ligger den en fil `addLayerWithTypeCheck` som tar inn blant annet en `MapSource` og legger det inn i kartet som et punkt,- linje- eller polygonlag, basert på hva slags type GeoJSON-objekt som ligger i `MapSource`-en:
+
+```typescript
+export function addLayerWithTypeCheck(
+	map: mapboxgl.Map,
+	source: MapSource,
+	options?: LayerOptions<mapboxgl.AnyLayer>
+) {
+	const data = source.geojson.data;
+	if (!isValid(data)) {
+		throw new Error('Invalid data source');
+	}
+
+	switch (data.type) {
+		case 'Point':
+		case 'MultiPoint':
+			addPointLayer(map, data, source.id, options);
+			break;
+		case 'LineString':
+		case 'MultiLineString':
+			addLineLayer(map, data, source.id, options);
+			break;
+		case 'Polygon':
+		case 'MultiPolygon':
+			addPolygonLayer(map, data, source.id, options);
+			break;
+		case 'Feature':
+			addFeature(map, source, options);
+			break;
+		case 'GeometryCollection':
+			addGeometryCollection(map, source, options);
+			break;
+		case 'FeatureCollection':
+			addFeatureCollectionLayer(map, source, options);
+			break;
+	}
+}
+```
+
+### 3.3 Rekkefølge og synlighet til kartlag
+
+Når det ble mulig å laste inn nye kartlag på en god måte, var det på tide å gjøre det mulig å legge dem oppå hverandre i ønsket rekkefølge, i tillegg til å kunne skjule/slette dem.
+
+### 3.4 Implementasjon av GIS-verktøy
+
+Denne delen av jobben var den klart største, og tok lenger tid enn forventet. Jeg endte opp med å implementere sju verktøy: buffer, bounding box (finner bounding box til en kolleksjon av kartlag), bounding box clip (lar bruker tegn en bbox og returnerer et utklipp av valgt(e) kartlag innenfor denne), difference, dissolve, intersect, union og Voronoi. Jeg tok hjelp fra Turf.js for å gjøre selv transformasjonene. Se avsnittet om programstruktur for å få innblikk i denne implementasjonen.
 
 ## 4 Programstruktur
 
+```
+src
+│
+└───lib
+|   └───components
+|   │   └───AnalysisTools
+|   │       │   AnalysisElement.svelte
+|   │       │   ToolsDropdown.svelte
+|   |   └───GeoJsonProcessing
+|   │       │   bbox.ts
+|   │       │   bboxClip.ts
+|   │       │   buffer.ts
+|   |       |   ...
+|   |   |   ...
+|   |   └───Map
+|   |       |   ...
+|   |   └───Sidebar
+|   |       └───ToolOptions
+|   |       |   ListItem.svelte
+|   |       |   Sidebar.svelte
+|   |   |   ...
+|   └───scss
+|       |   ...
+|   └───utils
+|       fileUploader.ts
+|       geojson.ts
+└───routes
+|   │   _global.scss
+|   │   +page.svelte
+|   │   ...
+└───routes
+|   |   mapLayers.ts
+|   |   mapSources.ts
+└───theme
+|   |   ...
+|   |   _smui-theme.scss_
+|   ...
+|   app.html
+└───static
+|   |   ...
+|   |   smui.css
+|
+
+```
+
+Over er den overornede strukturen til programmet, hvor mindre viktige filer er ekskludert. `app.html` er "startpunktet" til applikasjonen, og den linker videre til Svelte-delen av applikasjonen. I `routes/`-mappen finner man alle endepunktene, og fil- og mappestrukturen her bestemmer URL-ene til de ulike sidene i applikasjonen. Her har vi kun én `+page.svelte` - altså har vi kun én side i denne applikasjonen.
+
+SvelteKit gir deg også en `lib/`-mappe der du kan legge inn alt fra enkeltkomponenter til CSS-filer. Det er anbefalt å ha mest mulig kode her, slik at ikke filene i `routes`-mappen blir for store, da disse bør fokusere på den overordnede strukturen til applikasjonen, og ikke implementasjon.
+
+I `lib/`-mappen har jeg mapper for hvert av de tre panelene i applikasjonen (`AnalysisTools`, `LayerInfo` og `Sidebar`), samt en egen for selv `map`-komponenten. `Map`-komponenten importer disse tre hovedkomponentene og plasserer dem i et overlay som lever oppå kartet. `Map`-komponenten importeres deretter til `+page.svelte`, slik at den vises når man navigerer til hjemmesiden (<https://oskarhlm.github.io/GGisEZ/>).
+
+Videre har jeg en mappe kalt `GeoJsonProcessing/`. Er har jeg filer som `buffer.ts`, `intersect.ts` og `difference.ts`. Disse filene eksporterer et objekt bestående av en _processor_ og en _validator_. Her er et eksempel fra `bboxClip.ts`:
+
+```typescript
+export default {
+	processor: bboxClipProcessor,
+	validator: bboxClipInputValidator
+} satisfies GeoJSONProcessor<
+	MapLayer<mapboxgl.Layer>[],
+	GeoJSON[],
+	BBoxClipOptions,
+	BBoxClipOptions
+>;
+```
+
+Her eksporteres det et objekt av typen `GeoJSONProcessor` som tar inn en liste med `MapLayer`s og returnerer en liste med `GeoJSON`-objekter. De to `BBoxClipOptions`-ene definerer formen på `options`-objektene som sendes til henholdsvis _processor_-en og _validator_-en. Alle filene i denne mappen returnerer objekter av denne typen, noe som gjør at man ikke trenger å hardkode funksjonalitet når man skal bruke verktøyene i .svelte-filene.
+
+Flere av verktøyene har komplementære .svelte-komponenter med navn som `BboxClipOptions.svelte` og `BufferOptions.svelte`. Dette er komponenter som settes inn over listen over kartlag i `Sidebar`-en, og er ansvarlige for at man skal kunne sende `options` til filene som ble diskutert i forrige avsnitt. Disse filene ligger under `Sidebar/ToolOptions/`.
+
+Avslutningsvis vil jeg diskutere de ulike stedene man finner .scss-filer. SCSS er en preprosessor for CSS som skal gjøre CSS enklere å skrive ved hjelp av "nesting", mixin's, osv. Filer som definerer mixin's (CSS-funksjoner) og variabler (fargepalett) ligger i `lib/scss/`. I tillegg har jeg en fil `_smui-theme.scss` som kompileres til `smui.css`. Denne bestemmer stylingen til alle Material UI komponenter som brukes applikasjonen. Dette sammenfatter alle knapper, sliders, osv.
+
 ## 5 Tutorial
+
+Se eget tutorial-dokument.
 
 ## 6 Diskusjon
 
 ### 6.1 Problem underveis
+
+#### 6.1.1 TypeScript - a blessing and a curse
+
+Selv om TypeScript kan gjøre programmet ditt både enklere å utvikle, mer forutsigbart og gi det større grad av korrekthet, kan det også by på utfordringer man ikke får ved bruk av et dynamisk programmeringsspråk. Det var utfordrende å ta hensyn til alle ulike former for GeoJSON som brukeren kan legge inn i kartet. Det kan være en form for Geometry (Point, LineString, Polygon, Multi"x", GeometryCollection) og Feature's, FeatureCollection's. Det er spesielt viktig å vite hva slags geometrier et gitt kartlag består av når man skal utføre transformasjoner på dem. Funksjonene i TurfJS - JavaScript-biblioteket jeg har brukt for å utføre disse transformasjonene - er avhengige av at man gir dem data av riktig format. Noen funksjoner ønsker kun Geometry- og Feature-objekter, og tillatter ikke at du gir dem GeometryCollection's og FeatureCollection's. Selv om dette ikke støttes direkte, er det ønskelig at man skal kunne utføre transformasjonene der det er mulig. Derfor ble det en del knoting for å få alle transformasjonen til å fungere for alle relevante datatyper, noe som tok lenger tid, og var litt vanskeligere, enn forventet.
+
+#### 6.1.2 Svelte Material UI
+
+Det var også en del problemer med å få Svlete Material UI (SMUI) til å fungere bra både i dev-modus og i produksjons-modus. Dokumentasjonen til biblioteket er ikke helt konsekvent, og jeg tror også at den gir feil anbefalinger for hvordan man skal bygge applikasjonen med SMUI. Dermed ble det en del prøving og feiling, men jeg kom til slutt frem til en halvveis god løsning på problemet. Dette var dog et problem jeg gjerne skulle vært foruten, da det absolutt ikke er noe som burde ha bydd på så store utfordringer som det gjorde. Det endte opp med å bli en tidstyv som tok fra meg tid til å implementere funksjonalitet som faktisk er viktig for applikasjonen.
 
 ### 6.2 Mangler og feil
 
