@@ -19,6 +19,7 @@
 	let hashTable: { [key: string]: any[] } = {};
 
 	$: {
+		hashTable = {};
 		if (open) {
 			for (const feature of geojson.data.features) {
 				for (const key in feature.properties) {

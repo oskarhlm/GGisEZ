@@ -36,6 +36,15 @@
 	}
 
 	$: source = get(mapSources).find((s) => s.id === layer.id.split('-')[0]);
+
+	$: showAttributeTableButton =
+		source &&
+		source.geojson &&
+		isValid(source.geojson.data) &&
+		isFeatureCollection(source.geojson.data) &&
+		source.geojson.data.features.every(
+			(f) => 'properties' in f && Object.keys(f.properties!).length > 0
+		);
 </script>
 
 <!-- 
@@ -48,7 +57,7 @@
 	<div class="stat"><span class="key">{k}</span>: {v}</div>
 {/each}
 
-{#if source && source.geojson}
+{#if showAttributeTableButton}
 	<span style="margin-top: 30px;" />
 	<Button
 		variant="unelevated"
