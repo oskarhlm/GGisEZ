@@ -3,7 +3,7 @@
 	import type { MapLayer } from '../../../stores/mapLayers';
 	import type { GeoJSONSourceRaw } from 'mapbox-gl';
 	import { isValid } from '../Map/utils';
-	import { isFeatureCollection } from '$lib/utils/geojson';
+	import { isFeature, isFeatureCollection } from '$lib/utils/geojson';
 	import _ from 'lodash';
 
 	export let layer: MapLayer<mapboxgl.Layer>;
@@ -16,17 +16,23 @@
 		if (isValid(data)) {
 			stats.set('Layer name', layer.displayName);
 			stats.set('Type', data.type);
-			// stats.set('Source', JSON.stringify(layer.source as any));
 			if (isFeatureCollection(data)) {
 				stats.set('Total number of features', data.features.length.toString());
 				const featureGroups = _.groupBy(data.features, (f) => f.geometry.type);
 				_.forEach(featureGroups, (items, category) => {
 					stats.set(`\t- ${category}s`, items.length.toString());
 				});
+			} else if (isFeature(data)) {
+				stats.set('Geometry type', data.geometry.type);
 			}
 		}
 	}
 </script>
+
+<!-- 
+	@component
+	Displays a list of stats about the selected layer. 
+ -->
 
 <h1>Info</h1>
 {#each Array.from(stats) as [k, v]}

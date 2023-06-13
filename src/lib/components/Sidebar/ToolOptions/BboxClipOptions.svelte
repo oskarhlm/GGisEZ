@@ -58,6 +58,11 @@
 	}
 </script>
 
+<!-- 
+	@component
+	Enables user to draw a bounding box for clipping. 	
+-->
+
 <span class="draw-btn">
 	<Button
 		bind:disabled={drawEnabled}

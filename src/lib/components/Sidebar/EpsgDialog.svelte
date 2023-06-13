@@ -1,11 +1,17 @@
 <script lang="ts">
-	import Dialog, { Title, Content, Actions } from '@smui/dialog';
+	import Dialog, { Title, Actions } from '@smui/dialog';
 	import Button, { Label } from '@smui/button';
 	import Textfield from '@smui/textfield';
 	import { createEventDispatcher } from 'svelte';
+	import { getProj4String } from '$lib/utils/fileUploader';
 
 	export let open: boolean;
-	let epsg = '4326';
+	export let problem: boolean;
+
+	const defaultEpsg = '4326';
+	let epsg = defaultEpsg;
+
+	$: downLoadDisabled = !/^[0-9]+$/.test(epsg) || epsg.length === 0;
 
 	const dispatch = createEventDispatcher<{ download: { epsg: string } }>();
 	function handleDownload() {
@@ -13,11 +19,20 @@
 	}
 </script>
 
+<!-- 
+    @component
+    Popup dialog that is display whenever the user presses the download button. 
+    Allows for downloading with a specified map projection. 
+ -->
+
 <Dialog bind:open>
 	<Title>Choose <a href="https://epsg.io/">EPSG</a> for download:</Title>
-	<Textfield bind:value={epsg} style="margin-inline: 20px;" />
-	<Actions style="margin-block: 8px;">
-		<Button variant="unelevated" on:click={handleDownload}>
+	<span class="epsg-row">
+		<Textfield variant="outlined" bind:value={epsg} bind:invalid={problem} />
+		<Button variant="outlined" on:click={() => (epsg = defaultEpsg)}>WGS84</Button>
+	</span>
+	<div class="btn-row">
+		<Button variant="unelevated" on:click={handleDownload} bind:disabled={downLoadDisabled}>
 			<Label>Download</Label>
 		</Button>
 		<Button
@@ -28,5 +43,21 @@
 		>
 			<Label>Cancel</Label>
 		</Button>
-	</Actions>
+	</div>
 </Dialog>
+
+<style lang="scss">
+	.btn-row {
+		margin-left: auto;
+		margin-block: 16px;
+		margin-right: 20px;
+	}
+
+	.epsg-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-inline: 20px;
+		gap: 8px;
+	}
+</style>

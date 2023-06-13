@@ -59,6 +59,11 @@
 	}
 </script>
 
+<!-- 
+	@component
+	Enables user to draw a bounding box for Voronoi creation. 	
+-->
+
 <div style="display: flex; align-items: center;">
 	<h4>Draw bounding box</h4>
 	<Icon class="material-icons" on>arrow_forward</Icon>

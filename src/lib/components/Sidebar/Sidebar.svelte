@@ -1,6 +1,5 @@
 <script lang="ts" context="module">
 	export type ToolSelectOptions = { args: any; layerSelection?: MapLayer<mapboxgl.Layer>[] };
-	// export type ToolSelectCallback = (args: any, layerSelection?: MapLayer<mapboxgl.Layer>[]) => void;
 </script>
 
 <script lang="ts">
@@ -21,7 +20,6 @@
 	import { addLayerWithTypeCheck, isValid, type LayerOptions } from '../Map/utils';
 	import type {
 		FeatureCollection,
-		Polygon,
 		GeoJsonProperties,
 		Geometry,
 		Feature,
@@ -56,6 +54,7 @@
 	let optionsCleanup: (() => void) | undefined;
 
 	let epsgDialoagOpen = false;
+	let epsgProblem = false;
 
 	/**
 	 * A function that is passed as a callback to all <Tool>Options.svelte components,
@@ -156,6 +155,15 @@
 			if (e.detail.epsg !== '4326') {
 				const sourceProjection = await getProj4String('4326');
 				const targetProjection = await getProj4String(e.detail.epsg);
+
+				if (!targetProjection) {
+					epsgProblem = true;
+					return;
+				} else {
+					epsgProblem = false;
+					epsgDialoagOpen = false;
+				}
+
 				const converter = proj4(sourceProjection!, targetProjection);
 
 				// A bit messy, but for some reason deep copying didn't work
@@ -217,6 +225,12 @@
 	});
 </script>
 
+<!-- 
+	@component
+	Sidebar that includes a sortable list of layers, as well as buttons for upload/download of 
+	new layers. 
+ -->
+
 <div class="container pulsating-border">
 	<div class="content">
 		<span class="layer-title"
@@ -270,6 +284,7 @@
 			<Wrapper>
 				<IconButton
 					class="material-icons"
+					disabled={selectedLayers.length === 0}
 					on:click={() => {
 						epsgDialoagOpen = true;
 					}}>download</IconButton
@@ -322,7 +337,7 @@
 	</div>
 </div>
 
-<EpsgDialog bind:open={epsgDialoagOpen} on:download={dowloadFiles} />
+<EpsgDialog bind:open={epsgDialoagOpen} bind:problem={epsgProblem} on:download={dowloadFiles} />
 
 <style lang="scss">
 	.check-all-btn {

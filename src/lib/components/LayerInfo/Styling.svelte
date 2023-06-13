@@ -101,6 +101,11 @@
 	});
 </script>
 
+<!-- 
+	@component
+	Allows for update of layer name and color. 
+ -->
+
 <span style="height: 10px;" />
 <Textfield bind:value={displayName} label="Layer name" />
 <div class="wheel" id="colorWheel" />

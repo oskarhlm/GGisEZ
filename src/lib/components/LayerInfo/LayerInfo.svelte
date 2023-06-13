@@ -16,6 +16,11 @@
 	let active: Tab = tabs[0];
 </script>
 
+<!-- 
+	@component
+	Contanier for layer specific tabs (styling and info). 
+ -->
+
 <div class="container">
 	<div class="content">
 		<TabBar {tabs} let:tab bind:active>

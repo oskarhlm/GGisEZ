@@ -7,6 +7,11 @@
 	export let tools: GeoJSONTool[] | null;
 </script>
 
+<!--
+	@component 
+	Component that takes a list of GeoJSONTools and aligns them vertically.
+ -->
+
 <div class="container">
 	{#if tools}
 		{#each _.sortBy(tools, (t) => t.name) as tool}

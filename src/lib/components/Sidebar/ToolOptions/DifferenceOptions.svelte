@@ -24,6 +24,11 @@
 	}
 </script>
 
+<!-- 
+	@component
+	Enables user to select layers on which to perform a difference transformation. 
+-->
+
 <Select bind:value={layerAId} label="Layer A">
 	{#each layerAOptions as layer}
 		<Option value={layer.id}>{layer.displayName}</Option>

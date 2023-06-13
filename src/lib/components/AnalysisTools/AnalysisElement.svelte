@@ -13,6 +13,11 @@
 	}
 </script>
 
+<!-- 
+	@component
+	Button component that allows the user to select/unselect a given GeoJSONTool.
+ -->
+
 <button class:selected on:click={handleSelect}>
 	<img class="button-icon" alt="button" src={tool.iconPath || 'button-icons/intersection.png'} />
 	<p>{tool.name.toUpperCase()}</p>

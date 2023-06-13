@@ -1,7 +1,6 @@
 <script lang="ts">
-	import mapboxgl, { Map } from 'mapbox-gl';
-	import type { AnySourceData, GeoJSONSourceRaw } from 'mapbox-gl';
-	import type { GeometryCollection, Feature, FeatureCollection } from 'geojson';
+	import mapboxgl from 'mapbox-gl';
+	import type { GeoJSONSourceRaw } from 'mapbox-gl';
 	import 'mapbox-gl/dist/mapbox-gl.css';
 	import MapboxDraw from '@mapbox/mapbox-gl-draw';
 	import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
@@ -11,7 +10,6 @@
 	import { mapLayers, type MapLayer } from '../../../stores/mapLayers';
 	import Sidebar from '../Sidebar/Sidebar.svelte';
 	import ToolsDropdown from '../AnalysisTools/ToolsDropdown.svelte';
-	import type { GeoJSON } from 'geojson';
 	import type { GeoJSONTool } from '../GeoJsonProcessing/types';
 	// @ts-ignore
 	import DrawRecangle from 'mapbox-gl-draw-rectangle-mode';
@@ -52,6 +50,7 @@
 			zoom: 11
 		});
 
+		// Enable drawing
 		draw = new MapboxDraw({
 			modes: {
 				...MapboxDraw.modes,
@@ -60,6 +59,7 @@
 			displayControlsDefault: false,
 			defaultMode: 'simple_select'
 		});
+		map.addControl(draw, 'top-left');
 
 		tools = [
 			{
@@ -136,9 +136,8 @@
 			}
 		];
 
-		map.addControl(draw, 'top-left');
-
 		map.on('load', function () {
+			// Update layer ordering in the map whenever a layer gets a new place in the list
 			mapLayers.subscribeNewLayerIndex((newLayerIndex) => {
 				if (!newLayerIndex) return;
 
@@ -149,6 +148,8 @@
 				layerAbove ? map.moveLayer(movedLayer.id, layerAbove.id) : map.moveLayer(movedLayer.id);
 			});
 		});
+
+		// Check if layer visibility has changed
 		mapLayers.subscribe((layers) => {
 			layers.forEach((layer) => {
 				if (!map.getLayer(layer.id)) return;
@@ -157,6 +158,8 @@
 		});
 	});
 
+	// Check if a new map source has been added
+	// If so, add a new layer to the map
 	mapSources.subscribe((sources) => {
 		sources.forEach((source) => {
 			if (map.getSource(source.id)) return;
@@ -171,6 +174,9 @@
 		});
 	});
 
+	/**
+	 * Updates layer style properties in both store and map.
+	 */
 	function handlePropertiesSet(e: CustomEvent<LayerStyleProperties>) {
 		const { layer, newName, color, opacity } = e.detail;
 		mapLayers.update((storeLayers) => {
@@ -187,6 +193,11 @@
 		map.setPaintProperty(layer.id, `${layer.type}-opacity`, opacity);
 	}
 </script>
+
+<!-- 
+	@component
+	Component consiting of a Mapbox GL map and an overlay of Sidebar, ToolDropdown and LayerInfo panels. 
+ -->
 
 <div id="map" />
 <div id="overlay">

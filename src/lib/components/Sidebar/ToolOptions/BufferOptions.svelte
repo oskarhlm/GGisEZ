@@ -30,6 +30,11 @@
 	}
 </script>
 
+<!-- 
+	@component
+	Enables user set buffer unit and size. 
+-->
+
 <span style="display: flex; align-items: center;">
 	{#if units === 'kilometers'}
 		<Slider style="width: 100%;" bind:value={radius} min={1} max={50} step={1} />

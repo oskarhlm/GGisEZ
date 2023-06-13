@@ -36,15 +36,17 @@ export function readFiles(files: FileList) {
  * Takes an EPSG number and gets the proj4 string from https://epsg.io.
  */
 export async function getProj4String(epsg: string) {
-	const res = await fetch(`https://epsg.io/${epsg}.proj4js`);
-	const str = await res.text();
-	const proj4StringRegex = /"([^"]+)"/g;
-	const match = str.match(proj4StringRegex);
-	if (match && match.length > 1) {
-		const proj4String = match[1].replace(/"/g, '');
-		return proj4String.trim();
-	} else {
-		console.error('Failed to extract Proj4 string.');
+	try {
+		const res = await fetch(`https://epsg.io/${epsg}.proj4js`);
+		const str = await res.text();
+		const proj4StringRegex = /"([^"]+)"/g;
+		const match = str.match(proj4StringRegex);
+		if (match && match.length > 1) {
+			const proj4String = match[1].replace(/"/g, '');
+			return proj4String.trim();
+		}
+	} catch (e) {
+		console.error('Failed to extract Proj4 string', e);
 	}
 }
 
@@ -90,17 +92,14 @@ async function readShp(shp: File, dbf?: File, prj?: File): Promise<MapSource> {
 		_.zip(geojsonData.features, properties).forEach(([f, p]) => {
 			_.merge(f, { properties: p });
 		});
-	} else {
-		throw new Error(
-			`Mismatch of features and properties (${geojsonData.features.length} vs. ${properties?.length})`
-		);
 	}
 
 	const converter = prj && (await readPrj(prj));
-	converter &&
+	if (converter)
 		geojsonData.features.forEach((f) => {
 			f.geometry = convertGeometry(f.geometry, converter);
 		});
+	else throw new Error('No .prj file passed');
 
 	return {
 		id: shp.name.split('.')[0],
