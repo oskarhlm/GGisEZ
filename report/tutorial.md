@@ -4,5 +4,4 @@ GGisEZ is a simple GIS application that lets the user upload geographical data i
 
 ## Task 1: Upload and explore data layers
 
-You can use the <img src="img/upload.png" alt="drawing" width="25"/>-button to upload an image.
-You can download necessary GeoJSON/SHAPE-files from <https://github.com/oskarhlm/GGisEZ/blob/data.zip>. In addition, go to <https://geonorge.no>
+Download necessary GeoJSON/SHAPE-files from <https://github.com/oskarhlm/GGisEZ/blob/data.zip>. You can then use the <img src="img/upload.png" alt="drawing" width="25"/>-button to upload a data layer. The _Elv_Elvnett_

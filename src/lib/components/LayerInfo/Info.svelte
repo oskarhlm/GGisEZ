@@ -52,12 +52,12 @@
 	Displays a list of stats about the selected layer. 
  -->
 
-<h1>Info</h1>
+<span style="margin-top: 20px;" />
 {#each Array.from(stats) as [k, v]}
 	<div class="stat"><span class="key">{k}</span>: {v}</div>
 {/each}
 
-{#if showAttributeTableButton}
+{#if source && showAttributeTableButton}
 	<span style="margin-top: 30px;" />
 	<Button
 		variant="unelevated"
