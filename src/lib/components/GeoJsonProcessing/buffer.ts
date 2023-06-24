@@ -14,6 +14,7 @@ import type { MapLayer } from '../../../stores/mapLayers';
 import type mapboxgl from 'mapbox-gl';
 import _ from 'lodash';
 import type { GeoJSONSourceRaw } from 'mapbox-gl';
+import { isValid } from '../Map/utils';
 
 export type BufferOptions = { radius: number; units: Units };
 
@@ -25,7 +26,8 @@ function bufferProcessor(input: MapLayer<mapboxgl.Layer>[], options?: BufferOpti
 }
 
 function bufferInputValidator(input: MapLayer<mapboxgl.Layer>[]): boolean {
-	return input.length > 0;
+	const data = input.map((l) => (l.source as GeoJSONSourceRaw).data);
+	return input.length > 0 && data.every(d => isValid(d));
 }
 
 export default {

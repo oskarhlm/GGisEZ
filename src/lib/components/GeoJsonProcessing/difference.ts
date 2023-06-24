@@ -22,6 +22,7 @@ import {
 	isPolygon
 } from '$lib/utils/geojson';
 import difference from '@turf/difference';
+import { isValid } from '../Map/utils';
 
 export type DifferenceOptions = {
 	layerA: MapLayer<mapboxgl.Layer>;
@@ -47,9 +48,7 @@ function differenceProcessor(input: MapLayer<mapboxgl.Layer>[], options?: Differ
 		}
 		return d;
 	});
-	console.log(poly1, poly2);
 	const res = [difference(poly1 as any, poly2 as any)] as GeoJSON[];
-	console.log(res);
 	return res;
 }
 

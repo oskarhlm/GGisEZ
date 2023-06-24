@@ -108,8 +108,8 @@ function bboxClipInputValidator(
 	input: MapLayer<mapboxgl.Layer>[],
 	options?: BBoxClipOptions
 ): boolean {
-	const data = input.map((l) => (l.source as GeoJSONSourceRaw).data)[0];
-	return input.length > 0 && options !== undefined && isValid(data);
+	const data = input.map((l) => (l.source as GeoJSONSourceRaw).data);
+	return input.length > 0 && options !== undefined && data.every(d => isValid(d));
 }
 
 export default {

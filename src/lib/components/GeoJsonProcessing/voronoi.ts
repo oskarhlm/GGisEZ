@@ -23,62 +23,77 @@ import {
 	isFeature,
 	isFeatureCollection,
 	isGeoJSON,
+	isGeometry,
 	isGeometryCollection,
 	isMultiPoint,
 	isPoint
 } from '$lib/utils/geojson';
+import { isValid } from '../Map/utils';
 
 export type VoronoiOptions = {
 	bbox: BBox;
 };
 
 function voronoiProcessor(input: MapLayer<mapboxgl.Layer>[], options?: VoronoiOptions) {
-	let data = (input[0].source as GeoJSONSourceRaw).data;
+	const data = input.map((l) => (l.source as GeoJSONSourceRaw).data) as GeoJSON[];
 
-	if (!data || isString(data)) {
-		return null;
-	}
+	const voronoiFCs = data.map((d) => {
+		if (isGeometryCollection(d)) {
+			// Turf voronoi only accepts FeatureCollections, so we need to convert
+			d = {
+				type: 'FeatureCollection',
+				features: d.geometries.map((g) => ({
+					type: 'Feature',
+					geometry: g,
+					properties: {}
+				}))
+			} satisfies FeatureCollection<Geometry, GeoJsonProperties>;
+		} else if (isGeometry(d) && (isPoint(d) || isMultiPoint(d))) {
+			d = {
+				type: 'FeatureCollection',
+				features: [
+					{
+						type: 'Feature',
+						geometry: {
+							type: d.type,
+							coordinates: d.coordinates as any
+						},
+						properties: {}
+					}
+				]
+			} satisfies FeatureCollection<Point | MultiPoint, GeoJsonProperties>;
+		} else if (isFeature(d)) {
+			d = {
+				type: 'FeatureCollection',
+				features: [d] as any
+			} satisfies FeatureCollection<Point | MultiPoint, GeoJsonProperties>;
+		}
 
-	if (isGeometryCollection(data)) {
-		// Turf voronoi only accepts FeatureCollections, so we need to convert
-		data = {
-			type: 'FeatureCollection',
-			features: data.geometries.map((g) => ({
-				type: 'Feature',
-				geometry: g,
-				properties: {}
-			}))
-		} satisfies FeatureCollection<Geometry, GeoJsonProperties>;
-	}
+		const flattenedPoints = flatten(d as FeatureCollection<Point | MultiPoint>);
 
-	if (
-		!isFeatureCollection(data) ||
-		!data.features.every((f) => isPoint(f.geometry) || isMultiPoint(f.geometry))
-	) {
-		return null;
-	}
+		const voronoiFC = voronoi(flattenedPoints, {
+			bbox: options?.bbox || bbox(flattenedPoints)
+		});
 
-	const flattenedPoints = flatten(data as FeatureCollection<Point | MultiPoint>);
+		voronoiFC.features = voronoiFC.features.filter((f) => f !== undefined);
 
-	const voronoiFC = voronoi(flattenedPoints, {
-		bbox: options?.bbox || bbox(flattenedPoints)
+		return voronoiFC as GeoJSON;
 	});
 
-	voronoiFC.features = voronoiFC.features.filter((f) => f !== undefined);
-
-	return [voronoiFC];
+	return voronoiFCs.filter((v) => v !== null) as GeoJSON[];
 }
 
 function voronoiInputValidator(input: MapLayer<mapboxgl.Layer>[]): boolean {
 	if (input.length === 0) return false;
+	const data = input.map((l) => (l.source as GeoJSONSourceRaw).data) as GeoJSON[];
 
-	const data = (input[0].source as GeoJSONSourceRaw).data;
-
-	if (!data || !isGeoJSON(data)) {
-		return false;
-	}
-
-	return true;
+	return data.every((d) => {
+		if (isGeometryCollection(d)) return d.geometries.every((g) => isPoint(g) || isMultiPoint(g));
+		if (isGeometry(d)) return isPoint(d) || isMultiPoint(d);
+		if (isFeature(d)) return isPoint(d.geometry) || isMultiPoint(d.geometry);
+		if (isFeatureCollection(d))
+			return d.features.every((f) => isPoint(f.geometry) || isMultiPoint(f.geometry));
+	});
 }
 
 export default {
