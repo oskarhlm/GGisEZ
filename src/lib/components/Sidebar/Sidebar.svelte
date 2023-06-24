@@ -12,7 +12,7 @@
 	import { getProj4String, readFiles } from '../../utils/fileUploader';
 	import { mapSources } from '../../../stores/mapSources';
 	import { mapLayers } from '../../../stores/mapLayers';
-	import _ from 'lodash';
+	import _, { findIndex, slice } from 'lodash';
 	import type mapboxgl from 'mapbox-gl';
 	import type { MapLayer } from '../../../stores/mapLayers';
 	import type { GeoJSONSourceRaw } from 'mapbox-gl';
@@ -36,6 +36,7 @@
 		isGeometryCollection
 	} from '$lib/utils/geojson';
 	import proj4 from 'proj4';
+	import { set_data } from 'svelte/internal';
 
 	export let map: mapboxgl.Map;
 	export let draw: MapboxDraw;

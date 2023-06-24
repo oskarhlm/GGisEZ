@@ -27,6 +27,7 @@ function createMapLayers() {
 			update((storeLayers) => [newLayer, ...storeLayers]),
 		getUniqueLayerId: <T extends mapboxgl.Layer>(newLayer: MapLayer<T>): MapLayer<T> => {
 			const storeLayers = get(mapLayers);
+
 			if (storeLayers.map((l) => l.id).includes(newLayer.id)) {
 				const numEqualNamesInStore = storeLayers
 					.map((l) => l.id)

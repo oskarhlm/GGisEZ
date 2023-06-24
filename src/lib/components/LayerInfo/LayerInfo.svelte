@@ -3,10 +3,13 @@
 	import TabBar from '@smui/tab-bar';
 	import Styling from './Styling.svelte';
 	import Info from './Info.svelte';
-	import type { MapLayer } from '../../../stores/mapLayers';
+	import { mapLayers, type MapLayer } from '../../../stores/mapLayers';
 	import type mapboxgl from 'mapbox-gl';
+	import Button from '@smui/button';
+	import { get } from 'svelte/store';
 
-	export let layer: MapLayer<mapboxgl.Layer>;
+	// export let layer: MapLayer<mapboxgl.Layer>;
+	export let layer: any;
 	export let map: mapboxgl.Map;
 
 	type Tab = { tabName: string; component: any };
@@ -38,6 +41,21 @@
 				on:closeProperties
 			/>
 		{/if}
+		<Button
+			on:click={() => {
+				let source = layer.source;
+				console.log(layer.epsg, source);
+				const layers = get(mapLayers);
+				console.log(layers);
+				layer.source = layers[0].source;
+
+				console.log(layer.source, map.getSource(layer.id));
+				map.removeLayer(layer.id);
+				map.removeSource(layer.id);
+				console.log(layer.source);
+				map.addLayer(layer);
+			}}>Transform</Button
+		>
 	</div>
 </div>
 
