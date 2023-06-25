@@ -37,16 +37,20 @@ export function readFiles(files: FileList) {
  */
 export async function getProj4String(epsg: string) {
 	try {
-		const res = await fetch(`https://epsg.io/${epsg}.proj4js`);
-		const str = await res.text();
-		const proj4StringRegex = /"([^"]+)"/g;
-		const match = str.match(proj4StringRegex);
-		if (match && match.length > 1) {
-			const proj4String = match[1].replace(/"/g, '');
-			return proj4String.trim();
-		}
+		const res = await fetch(`https://epsg.io/${epsg}.proj4`);
+		return await res.text();
 	} catch (e) {
 		console.error('Failed to extract Proj4 string', e);
+	}
+}
+
+export async function getProjectionName(epsg: string) {
+	try {
+		const res = await fetch(`https://epsg.io/${epsg}.json`);
+		const json = await res.json();
+		return json.name as string;
+	} catch (error) {
+		console.error('Invalid EPSG');
 	}
 }
 
@@ -106,7 +110,8 @@ async function readShp(shp: File, dbf?: File, prj?: File): Promise<MapSource> {
 			type: 'geojson',
 			data: geojsonData
 		},
-		epsg: converter ? '4326' : undefined
+		epsg: converter ? '4326' : undefined,
+		projectionName: converter ? await getProjectionName('4326') : undefined
 	};
 }
 

@@ -170,7 +170,10 @@
 				data: data
 			};
 			map.addSource(source.id, sourceData);
-			addLayerWithTypeCheck(map, source, { epsg: source.epsg });
+			addLayerWithTypeCheck(map, source, {
+				epsg: source.epsg,
+				projectionName: source.projectionName
+			});
 		});
 	});
 

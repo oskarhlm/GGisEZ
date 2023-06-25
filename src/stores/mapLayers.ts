@@ -7,6 +7,7 @@ import type { MapSource } from './mapSources';
 
 export type MapLayer<T extends mapboxgl.Layer> = {
 	epsg?: string;
+	projectionName?: string;
 	isVisible: boolean;
 	displayName: string;
 	attachedLayerIds?: string[];

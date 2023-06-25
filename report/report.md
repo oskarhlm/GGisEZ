@@ -67,14 +67,8 @@ Jeg laget også en funksjon som tar inn et EPSG-nummer og returnerer en proj4-st
 ```typescript
 export async function getProj4String(epsg: string) {
 	try {
-		const res = await fetch(`https://epsg.io/${epsg}.proj4js`);
-		const str = await res.text();
-		const proj4StringRegex = /"([^"]+)"/g;
-		const match = str.match(proj4StringRegex);
-		if (match && match.length > 1) {
-			const proj4String = match[1].replace(/"/g, '');
-			return proj4String.trim();
-		}
+		const res = await fetch(`https://epsg.io/${epsg}.proj4`);
+		return await res.text();
 	} catch (e) {
 		console.error('Failed to extract Proj4 string', e);
 	}

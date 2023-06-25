@@ -51,6 +51,7 @@ export type LayerOptions<T extends mapboxgl.AnyLayer> = Omit<
 > & {
 	border?: mapboxgl.LinePaint;
 	epsg?: string;
+	projectionName?: string;
 };
 
 export function addLayerWithTypeCheck(
