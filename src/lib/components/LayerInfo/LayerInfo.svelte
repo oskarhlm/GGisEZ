@@ -41,21 +41,6 @@
 				on:closeProperties
 			/>
 		{/if}
-		<!-- <Button
-			on:click={() => {
-				let source = layer.source;
-				console.log(layer.epsg, source);
-				const layers = get(mapLayers);
-				console.log(layers);
-				layer.source = layers[0].source;
-
-				console.log(layer.source, map.getSource(layer.id));
-				map.removeLayer(layer.id);
-				map.removeSource(layer.id);
-				console.log(layer.source);
-				map.addLayer(layer);
-			}}>Transform</Button
-		> -->
 	</div>
 </div>
 
