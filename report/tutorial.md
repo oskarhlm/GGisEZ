@@ -88,7 +88,7 @@ You can use the _Voronoi_ tool on the _ntnu_campuses_ layer in order to create a
 
 ![](img/voronoi.png)
 
-### 3.3 Intersetion
+### 3.3 Intersection
 
 We can use the _Intersect_ tool to find the intersection between two polygon layers. Find the intersection between the _dissolve_ and _voronoi_ layers by selecting the tool, checking the two layers, and pressing _Apply_. The result can look something like this:
 
