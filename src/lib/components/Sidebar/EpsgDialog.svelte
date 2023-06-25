@@ -15,6 +15,7 @@
 	const dispatch = createEventDispatcher<{ epsgSet: { epsg: string } }>();
 	function handleDownload() {
 		dispatch('epsgSet', { epsg });
+		open = false;
 	}
 </script>
 

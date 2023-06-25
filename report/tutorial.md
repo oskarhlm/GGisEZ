@@ -4,15 +4,29 @@ GGisEZ is a simple GIS application that lets the user upload geographical data i
 
 ## Task 1: Upload and explore data layers
 
+### 1.1 Uploading with .prj
+
 Download necessary GeoJSON/shape-files from <https://github.com/oskarhlm/GGisEZ/blob/main/data.zip>. You can then use the <img src="img/upload.png" alt="drawing" width="25"/>-button to upload a data layer. The _Elv_Elvnett_ data layer is a good place to start. Make sure to include all it's files (.shp, dbf, .prj, .shx). The .shp file holds the geometries, whereas the .dbf file includes properties for each feature of the layer, and the .prj file includes information about which projection the data is in. The .prj is especially important, as the source data is in ETRS89 / UTM zone 33N but the Mapbox map is in the GPS projection WGS84. The .prj file enables the program to perform a transformation to WGS84 before the data layer is added to the map.
 
 When loaded, highlight the layer in the panel to the left. You will now see a panel to the right where you can change the name and color of the layer. Press the _Apply_ button for changes to take effect. Select the _Info_ tab in the same panel. Here you have basic info about the layer, and you can also inspect the attribute table of the layer.
 
 ![](img/attribute_table.png)
 
+### 1.2 Uploading without .prj
+
+If a .prj file is not included, you can specify the original projection of the data layer after said layer has been added to the map. From the provided data, add _elvegl.shp_. You should see the new layer come up in the list of layers, but no geometries are visible in the map. This is because the data is in ETRS89 / UTM zone 33N, whereas the map is in WGS84. We need to tell the application what reference system the data comes from.
+
+Go to the _Info_ tab of the _elvegl_ layer. Here we can specify the EPSG of the new layer.
+
+<img src="img/set_epsg.png" width=500 />
+
+The EPSG code of ETRS89 / UTM zone 33N is _25833_. Enter this code and press _Set_. The road network of Trondheim should now become visible. You can delete or hide this layer now, as it get a bit cluttered when we will add more layers in the following section.
+
+### 1.3 Other layers
+
 Now, upload some more layers needed for the subsequent tasks, namely _balls.json_, _lines.json_, _squigglies.json_, and _weird.json_. Your screen should look something like this now:
 
-![](img/data_loaded.png)
+![](img/data_loaded2.png)
 
 You can change the ordering of the layers in the left panel to change what layers are drawn on top in the map. The layers at the top of the list will be draw in the forefront in the map. You can also hide and delete a layer using the buttons provided for each list item. You can use the button at the bottom right to select several items for deletion.
 
@@ -58,7 +72,7 @@ We now want to color the "GG" and the "EZ" in the same color. Use the _Union_ to
 
 ![](img/ggez.png)
 
-GGEZ! Maybe you can find a way to color the "GIS" portion of the name in it's own color?
+GGEZ!
 
 ## Task 3: Other tools
 
@@ -76,7 +90,7 @@ You can use the _Voronoi_ tool on the _ntnu_campuses_ layer in order to create a
 
 ### 3.3 Intersetion
 
-We can use the _Intersection_ tool to find the intersection between two polygon layers. Find the intersection between the _dissolve_ and _voronoi_ layers by selecting the tool, checking the two layers, and pressing _Apply_. The result can look something like this:
+We can use the _Intersect_ tool to find the intersection between two polygon layers. Find the intersection between the _dissolve_ and _voronoi_ layers by selecting the tool, checking the two layers, and pressing _Apply_. The result can look something like this:
 
 ![](img/intersect.png)
 

@@ -110,9 +110,28 @@ async function readShp(shp: File, dbf?: File, prj?: File): Promise<MapSource> {
 			type: 'geojson',
 			data: geojsonData
 		},
-		epsg: converter ? '4326' : undefined,
-		projectionName: converter ? await getProjectionName('4326') : undefined
+		projectionName: converter ? await readPrjName(prj) : undefined
 	};
+}
+
+async function readPrjName(file: File) {
+	return new Promise<string>((resolve, reject) => {
+		const reader = new FileReader();
+		reader.onload = async (e) => {
+			try {
+				const prjFileContent = e.target?.result;
+				const sourceProjection = prjFileContent?.toString().trim();
+				const regex = /PROJCS\["([^"]+)"/;
+				const match = sourceProjection!.match(regex);
+				const prjName = match![1].replaceAll('_', ' ');
+				resolve(prjName);
+			} catch (error) {
+				reject(error);
+			}
+		};
+
+		reader.readAsText(file);
+	});
 }
 
 async function readPrj(file: File) {

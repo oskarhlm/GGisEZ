@@ -27,7 +27,6 @@
 			stats.set('Layer name', layer.displayName);
 			stats.set('Type', data.type);
 			layer.projectionName && stats.set('From projection', layer.projectionName);
-			stats.set('EPSG', layer.epsg || 'unknown');
 
 			if (isFeatureCollection(data)) {
 				stats.set('Total number of features', data.features.length.toString());
@@ -103,7 +102,7 @@
 	<AttributeTable bind:open={attributeTableOpen} bind:geojson={source.geojson} />
 {/if}
 
-{#if layer.epsg === undefined}
+{#if layer.projectionName === undefined}
 	<span style="display: flex; align-items: center; gap: 20px; margin-top: 20px;">
 		<Textfield label="EPSG" bind:value={epsgValue} bind:invalid={invalidEpsg} />
 		<Button variant="unelevated" style="flex: 1;" on:click={transformLayer}>Set</Button>

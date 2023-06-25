@@ -264,7 +264,6 @@ Over styling-panelet finner man en "tab" hvor det står "INFO". Her finner man e
 ### 6.4 Potensielle forbedringer
 
 - SOSI: jeg prøvde å bruke Atle Sveen sitt SOSI->GeoJSON-program for å støtte SOSI direkte i applikasjonen, men hadde problemer med implementasjonen. Dette hadde vært artig å få til å fungere.
-- Mulighet for å spesifisere koordinatsystem: hvis ikke kartlaget du laster opp er i WGS84, eller har en .prj-fil, vil ikke laget vises riktig. Dette kunne vært fikset ved at man kan spesifisere hvilken projeksjon laget opprinnelig var i, og at programmet deretter gjør en transformasjon.
 - Støtte for WMS, raster, etc.
 - Mulighet til å "highlighte" enkelt-features i en feature collection.
 
